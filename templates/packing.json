@@ -1,0 +1,79 @@
+{
+    "page_type": "PACKING_DETAILS",
+    "base_width": 1000,
+    "base_height": 1414,
+    "extraction_template": {
+        "header_fields": {
+            "PRODUCT_NAME": {
+                "label": "Name of Product",
+                "regex": "Name\\s*of\\s*Product\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "type": "string"
+            },
+            "BATCH_NO": {
+                "label": "Batch No",
+                "regex": "Batch\\s*No\\.\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "type": "string"
+            },
+            "TOTAL_QTY": {
+                "label": "Total Qty",
+                "regex": "Total\\s*Qty\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "type": "string"
+            },
+            "TARE_WT": {
+                "label": "Tare Wet",
+                "regex": "Tare\\s*Wet\\.?\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "type": "string"
+            },
+            "BALANCE_ID": {
+                "label": "Balance ID",
+                "regex": "Balance\\s*ID\\.No\\.\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "type": "string"
+            },
+            "CALIBRATION_STATUS": {
+                "label": "Calibration Status",
+                "regex": "Calibration\\s*status\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "type": "string"
+            },
+            "RINSING_STATUS": {
+                "label": "Rinsing Status",
+                "regex": "Rinsed\\s*\\(Yes\\s*/\\s*No\\)\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "type": "string"
+            },
+            "REF_BMR_NO": {
+                "label": "Ref. BMR No.",
+                "regex": "Ref\\.\\s*BMR\\s*No\\.\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "type": "string"
+            },
+            "PAGE_INFO": {
+                "label": "Page Info",
+                "regex": "Page\\s*No\\.-(\\d+\\s*of\\s*\\d+)",
+                "type": "string"
+            }
+        },
+        "table_config": {
+            "extract_all_columns": true,
+            "dynamic_rows": true,
+            "header_identifier_keywords": [
+                "Packing Details",
+                "Drum No.",
+                "Gross Wet",
+                "Gross Wgt"
+            ],
+            "end_identifier_keywords": [
+                "CONTROLLED COPY",
+                "Net wet",
+                "Issued by"
+            ],
+            "parameter_column_keywords": [
+                "Drum No."
+            ],
+            "result_column_keywords": [
+                "Gross Wet.",
+                "Gross Wgt.",
+                "Done By",
+                "Checked By"
+            ],
+            "index_column_keywords": []
+        }
+    }
+}

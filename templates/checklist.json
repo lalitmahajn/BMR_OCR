@@ -1,0 +1,64 @@
+{
+    "page_type": "BMR_CHECKLIST",
+    "base_width": 1000,
+    "base_height": 1414,
+    "extraction_template": {
+        "header_fields": {
+            "DOC_TITLE": {
+                "label": "TITLE",
+                "regex": "TITLE\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "type": "string"
+            },
+            "DOCUMENT_NO": {
+                "label": "DOCUMENT NO.",
+                "regex": "DOCUMENT\\s*NO\\.\\s*\\|\\s*([^\\|\\n]+)",
+                "type": "string"
+            },
+            "REVISION_NO": {
+                "label": "REVISION NO.",
+                "regex": "REVISION\\s*NO\\.\\s*\\|\\s*([^\\|\\n]+)",
+                "type": "string"
+            },
+            "EFFECTIVE_DATE": {
+                "label": "EFFECTIVE DATE",
+                "regex": "EFFECTIVE\\s*DATE\\s*\\|\\s*(\\d{2}/\\d{2}/\\d{4})",
+                "type": "date"
+            },
+            "REVIEW_DATE": {
+                "label": "REVIEW DATE",
+                "regex": "REVIEW\\s*DATE\\s*\\|\\s*(\\d{2}/\\d{2}/\\d{4})",
+                "type": "date"
+            }
+        },
+        "table_config": {
+            "extract_all_columns": true,
+            "dynamic_rows": true,
+            "header_identifier_keywords": [
+                "Review Points",
+                "Attachments",
+                "Status",
+                "Yes",
+                "No",
+                "Na"
+            ],
+            "end_identifier_keywords": [
+                "PREPARED & ISSUED BY",
+                "Reviewed By:",
+                "Checked By:"
+            ],
+            "parameter_column_keywords": [
+                "Review Points",
+                "Attachments"
+            ],
+            "result_column_keywords": [
+                "Status",
+                "Yes",
+                "No",
+                "NA"
+            ],
+            "index_column_keywords": [
+                "Sr. No."
+            ]
+        }
+    }
+}

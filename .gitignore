@@ -41,9 +41,6 @@ env/
 # Project specific
 output/
 data/
-debug_log.txt
 *_extraction_results.md
-*_verification.txt
-*_tables.txt
-bmr_test_output.txt
-bmr_test_results.txt
+*.txt
+scripts/
