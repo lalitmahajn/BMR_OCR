@@ -1,0 +1,74 @@
+{
+    "page_type": "EMAIL",
+    "document_metadata": {
+        "document_type": "Rishabh Metals & Chemicals Pvt Ltd Mail",
+        "page_numbers": [
+            1
+        ],
+        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD"
+    },
+    "extraction_template": {
+        "header_fields": {
+            "subject": {
+                "label": "Wet",
+                "expected_label": [
+                    "Wet & % Wet Strength",
+                    "Subject"
+                ]
+            },
+            "to_email": {
+                "label": "To:"
+            },
+            "cc_email": {
+                "label": "Cc:"
+            },
+            "message_count": {
+                "label": "message"
+            }
+        },
+        "table_config": {
+            "parameter_column_keywords": [
+                "Sample Name",
+                "Sample",
+                "Product"
+            ],
+            "index_column_keywords": [
+                "sr.no.",
+                "sr. no",
+                "no.",
+                "no"
+            ],
+            "header_identifier_keywords": [
+                "sample name",
+                "batch no",
+                "dose",
+                "sample"
+            ],
+            "extract_all_columns": true,
+            "noise_markers": [
+                "Thanks & Regards",
+                "R & D Dept",
+                "https://mail.google.com"
+            ]
+        },
+        "test_parameters_table": [],
+        "footer_fields": {
+            "signature": {
+                "label": "Thanks",
+                "expected_label": [
+                    "Thanks & Regards",
+                    "Thanks",
+                    "Regards"
+                ]
+            },
+            "department": {
+                "label": "Dept",
+                "expected_label": [
+                    "Dept.",
+                    "Dept",
+                    "Department"
+                ]
+            }
+        }
+    }
+}

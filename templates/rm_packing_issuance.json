@@ -1,0 +1,160 @@
+{
+    "page_type": "RM_PACKING_ISSUANCE",
+    "document_metadata": {
+        "document_type": "Raw Material & Packing Material Issuance Record",
+        "page_numbers": [
+            1
+        ],
+        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD"
+    },
+    "extraction_template": {
+        "header_fields": {
+            "title": {
+                "label": "TITLE:",
+                "expected_label": [
+                    "TITLE:"
+                ]
+            },
+            "document_no": {
+                "label": "DOCUMENT NO.",
+                "expected_label": [
+                    "DOCUMENT NO.",
+                    "DOC. NO."
+                ]
+            },
+            "revision_no": {
+                "label": "REVISION NO.",
+                "expected_label": [
+                    "REVISION NO.",
+                    "REV. NO."
+                ]
+            },
+            "effective_date": {
+                "label": "EFFECTIVE DATE"
+            },
+            "review_date": {
+                "label": "REVIEW DATE"
+            },
+            "product": {
+                "label": "Product:"
+            },
+            "batch_no": {
+                "label": "Batch No:"
+            },
+            "date": {
+                "label": "Date:"
+            }
+        },
+        "table_config": {
+            "parameter_column_keywords": [
+                "Raw Material",
+                "Material"
+            ],
+            "index_column_keywords": [
+                "sr. no.",
+                "sr. no",
+                "no."
+            ],
+            "header_identifier_keywords": [
+                "raw material",
+                "ar no",
+                "barrel",
+                "weight",
+                "bags"
+            ],
+            "extract_all_columns": true,
+            "column_mapping": {
+                "sr_no": [
+                    "Sr. No."
+                ],
+                "raw_material": [
+                    "Raw Material"
+                ],
+                "ar_no": [
+                    "AR No."
+                ],
+                "barrel_carboy_count": [
+                    "No. of Barrel & Carboy"
+                ],
+                "barrel_condition": [
+                    "Barrel & Carboy Condition"
+                ],
+                "labeling": [
+                    "Labeling on each"
+                ],
+                "bags_count": [
+                    "No. of Bags"
+                ],
+                "bags_condition": [
+                    "Bags Condition"
+                ],
+                "weight": [
+                    "Weight (Kg)"
+                ],
+                "expire_date": [
+                    "Expire Date Checked"
+                ],
+                "physical_appearance": [
+                    "Physical Appearance"
+                ],
+                "excess_shortage": [
+                    "Excess/Shortage"
+                ],
+                "remark": [
+                    "Remark"
+                ],
+                "prod_rep": [
+                    "Prod. Rep."
+                ],
+                "store_rep": [
+                    "Store Rep."
+                ]
+            },
+            "noise_markers": [
+                "PREPARED",
+                "REVIEWED BY",
+                "APPROVED BY",
+                "Page 1 of"
+            ]
+        },
+        "test_parameters_table": [],
+        "footer_fields": {
+            "prepared_signature": {
+                "label": "SIGNATURE:",
+                "expected_label": [
+                    "SIGNATURE:"
+                ]
+            },
+            "prepared_date": {
+                "label": "DATE:",
+                "expected_label": [
+                    "DATE:"
+                ]
+            },
+            "reviewed_signature": {
+                "label": "SIGNATURE:",
+                "expected_label": [
+                    "SIGNATURE:"
+                ]
+            },
+            "reviewed_date": {
+                "label": "DATE:",
+                "expected_label": [
+                    "DATE:"
+                ]
+            },
+            "approved_signature": {
+                "label": "SIGNATURE:",
+                "expected_label": [
+                    "SIGNATURE:"
+                ]
+            },
+            "approved_date": {
+                "label": "DATE:",
+                "expected_label": [
+                    "DATE:"
+                ]
+            }
+        }
+    }
+}

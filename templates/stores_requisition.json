@@ -1,0 +1,108 @@
+{
+    "page_type": "STORES_REQUISITION",
+    "document_metadata": {
+        "document_type": "Stores Requisition Slip Polymer Plant",
+        "page_numbers": [
+            1
+        ],
+        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD"
+    },
+    "extraction_template": {
+        "header_fields": {
+            "batch_no": {
+                "label": "B. No.",
+                "expected_label": [
+                    "B. No.",
+                    "B.No.",
+                    "Batch No"
+                ]
+            },
+            "date": {
+                "label": "Date:"
+            },
+            "product_name": {
+                "label": "Product Name:"
+            },
+            "batch_capacity": {
+                "label": "Batch Capacity:"
+            }
+        },
+        "table_config": {
+            "parameter_column_keywords": [
+                "Particulars",
+                "Material",
+                "Item"
+            ],
+            "index_column_keywords": [
+                "sr. no.",
+                "sr. no",
+                "no.",
+                "no"
+            ],
+            "header_identifier_keywords": [
+                "particulars",
+                "qty",
+                "issued",
+                "remarks"
+            ],
+            "extract_all_columns": true,
+            "column_mapping": {
+                "sr_no": [
+                    "Sr. No.",
+                    "Sr. No",
+                    "No."
+                ],
+                "particulars": [
+                    "Particulars",
+                    "Material",
+                    "Item"
+                ],
+                "qty_required": [
+                    "Qty. Required Kgs.",
+                    "Qty Required",
+                    "Required"
+                ],
+                "issued_qty": [
+                    "Issued Qty. Kgs.",
+                    "Issued Qty",
+                    "Issued"
+                ],
+                "lot_no": [
+                    "Suppliers Lot No. IMI No. / A.R.No.",
+                    "Lot No.",
+                    "IMI No."
+                ],
+                "remarks": [
+                    "Remarks"
+                ]
+            },
+            "noise_markers": [
+                "Form No.",
+                "Rev:"
+            ]
+        },
+        "test_parameters_table": [],
+        "footer_fields": {
+            "issued_by": {
+                "label": "Issued By"
+            },
+            "issued_date": {
+                "label": "Date",
+                "expected_label": [
+                    "Date",
+                    "21-01-26"
+                ]
+            },
+            "received_by": {
+                "label": "Received By"
+            },
+            "production_incharge": {
+                "label": "Production In-charge",
+                "expected_label": [
+                    "Production In-charge",
+                    "Production Executive"
+                ]
+            }
+        }
+    }
+}

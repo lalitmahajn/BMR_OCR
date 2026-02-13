@@ -1,0 +1,124 @@
+{
+    "page_type": "PRODUCT_SPEC",
+    "document_metadata": {
+        "document_type": "View Product Specification",
+        "page_numbers": [
+            1
+        ],
+        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD"
+    },
+    "extraction_template": {
+        "header_fields": {
+            "shelf_life": {
+                "label": "Shelf Life",
+                "validation_rules": {
+                    "required": true
+                }
+            },
+            "product_code": {
+                "label": "Product Specification",
+                "expected_label": [
+                    "Product Specification >>",
+                    "Product Specification"
+                ]
+            }
+        },
+        "table_config": {
+            "parameter_column_keywords": [
+                "Selected Parameters",
+                "Parameters",
+                "Parameter"
+            ],
+            "index_column_keywords": [
+                "no.",
+                "no",
+                "sr. no",
+                "index"
+            ],
+            "header_identifier_keywords": [
+                "selected parameters",
+                "parameters",
+                "parameter"
+            ],
+            "extract_all_columns": true,
+            "column_mapping": {
+                "no": [
+                    "No.",
+                    "No",
+                    "Sr. No"
+                ],
+                "selected_parameters": [
+                    "Selected Parameters",
+                    "Parameters"
+                ],
+                "factory_specifications": [
+                    "Factory Specifications",
+                    "Factory Spec"
+                ],
+                "marketing_specifications": [
+                    "Marketing Specifications",
+                    "Marketing Spec"
+                ],
+                "unit": [
+                    "Unit"
+                ],
+                "test_method": [
+                    "Test Method"
+                ]
+            },
+            "noise_markers": [
+                "Special Instructions",
+                "Main Page",
+                "Quality Control Module"
+            ]
+        },
+        "test_parameters_table": [
+            {
+                "parameter": "Charge"
+            },
+            {
+                "parameter": "Ionicity"
+            },
+            {
+                "parameter": "pH"
+            },
+            {
+                "parameter": "Physical Appearance"
+            },
+            {
+                "parameter": "Presence of Grains/Gel"
+            },
+            {
+                "parameter": "Solid Content"
+            },
+            {
+                "parameter": "Solubility"
+            },
+            {
+                "parameter": "Specific Gravity"
+            },
+            {
+                "parameter": "Stability"
+            },
+            {
+                "parameter": "Turbidity"
+            },
+            {
+                "parameter": "Viscosity"
+            },
+            {
+                "parameter": "Wet Strength"
+            }
+        ],
+        "footer_fields": {
+            "batch_no": {
+                "label": "No:",
+                "expected_label": [
+                    "B. No:",
+                    "No:",
+                    "Batch No"
+                ]
+            }
+        }
+    }
+}

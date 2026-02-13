@@ -1,0 +1,117 @@
+{
+    "page_type": "SOP",
+    "base_width": 1000,
+    "base_height": 1414,
+    "extraction_template": {
+        "header_fields": {
+            "DOC_TITLE": {
+                "regex": "(?m)^.{0,30}(?:STANDARD|RICHARD)\\s*OPERATING\\s*PROCEDURE",
+                "type": "string"
+            },
+            "SOP_NO": {
+                "label": "SOP NO.",
+                "type": "string"
+            },
+            "REVISION": {
+                "label": "REVISION",
+                "type": "string"
+            },
+            "EFFECTIVE_DATE": {
+                "label": "EFFECTIVE DATE",
+                "type": "date"
+            },
+            "PRODUCT_NAME": {
+                "label": "NAME OF PRODUCT",
+                "type": "string"
+            },
+            "PAGE_INFO": {
+                "label": "Page",
+                "regex": "Page\\s*\\d+\\s*of\\s*\\d+",
+                "type": "string"
+            },
+            "SCOPE": {
+                "regex": "(?s)(?:#+\\s*)?1\\.\\s*SCOPE\\s*(.*?)(?=Product\\s*5065\\.)",
+                "type": "string"
+            },
+            "BATCH_SIZE_COPY": {
+                "label": "Batch Size Copy",
+                "regex": "Copy:?\\s*([\\d,]+\\s*kg)",
+                "type": "string"
+            },
+            "IMPORTANT_NOTES": {
+                "regex": "(?s)(?:#+\\s*)?2\\.1\\s*IMPORTANT\\s*NOTES\\s*(.*?)(?=\\n#+\\s*2\\.2|\\Z)",
+                "type": "string"
+            },
+            "PRE_CHECKS": {
+                "regex": "(?s)(?:#+\\s*)?2\\.2\\s*PRE\\s*CHECKS\\s*(.*?)(?=\\||\\Z)",
+                "type": "string"
+            },
+            "PRE_CHECKS_CONT": {
+                "regex": "(?s)\\s*(.+?)(?=\\n#+\\s*2\\.3)",
+                "type": "string"
+            },
+            "PRE_OPERATING_STEPS": {
+                "regex": "(?s)(?:#+\\s*)?2\\.3\\s*PRE\\s*OPERATING\\s*STEPS\\s*(.*?)(?=\\n#+\\s*3)",
+                "type": "string"
+            },
+            "BATCH_OPERATING_PROCEDURE": {
+                "regex": "(?s)(?:#+\\s*)?3\\.1\\s*BATCH\\s*OPERATING\\s*PROCEDURE\\s*(.*?)(?=\\||\\Z)",
+                "type": "string"
+            },
+            "BATCH_PROCEDURE_CONT": {
+                "regex": "(?s)\\A\\s*(?=\\d+\\)|\\*\\*NOTE)(.*?)(?=\\||\\n#+\\s*3\\.2|\\Z)",
+                "type": "string"
+            },
+            "PACKING_MATERIAL": {
+                "regex": "(?s)(?:#+\\s*)?4\\.\\s*PACKING\\s*OF\\s*MATERIAL\\s*(.*?)(?=\\n#+\\s*5|\\Z)",
+                "type": "string"
+            }
+        },
+        "table_config": {
+            "extract_all_columns": true,
+            "dynamic_rows": true,
+            "parameter_column_keywords": [
+                "RAW MATERIAL NAME",
+                "RAW MATERIAL",
+                "PARAMETER",
+                "TEST",
+                "DESCRIPTION",
+                "Material Name"
+            ],
+            "result_column_keywords": [
+                "QTY (KGS)",
+                "SPECIFICATION LIMITS",
+                "RESULT",
+                "VALUE",
+                "QTY",
+                "Limits",
+                "RECIPE %",
+                "SOLID %"
+            ],
+            "index_column_keywords": [
+                "S.N.",
+                "SR.NO",
+                "NO."
+            ]
+        },
+        "footer_fields": {
+            "PREPARED_BY": {
+                "label": "PREPARED BY",
+                "type": "string"
+            },
+            "CHECKED_BY": {
+                "label": "CHECKED BY",
+                "type": "string"
+            },
+            "APPROVED_BY": {
+                "label": "APPROVED BY",
+                "type": "string"
+            },
+            "ISSUED_BY_DATE": {
+                "label": "Issued By",
+                "regex": "Issued\\s*by\\s*(\\d{2}/\\d{2}/\\d{2})",
+                "type": "string"
+            }
+        }
+    }
+}

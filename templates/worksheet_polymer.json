@@ -1,0 +1,205 @@
+{
+    "page_type": "WORKSHEET_POLYMER",
+    "document_metadata": {
+        "document_type": "WORKSHEET FOR POLYMER PRODUCT",
+        "page_numbers": [
+            3,
+            4,
+            5
+        ],
+        "company_name": "RISHABH METALS & CHEMICAL PVT LTD.",
+        "document_no": "POLY/01/00",
+        "revision_no": "03"
+    },
+    "extraction_template": {
+        "header_fields": {
+            "product_code": {
+                "label": "Product Code:",
+                "validation_rules": {
+                    "type": "string"
+                }
+            },
+            "ar_no": {
+                "label": "AR. No.",
+                "validation_rules": {
+                    "type": "string"
+                }
+            },
+            "batch_no": {
+                "label": "Batch No.",
+                "validation_rules": {
+                    "type": "numeric"
+                }
+            },
+            "containers_packs": {
+                "label": "No. of containers/packs",
+                "validation_rules": {
+                    "type": "string"
+                }
+            },
+            "batch_quantity": {
+                "label": "Batch Quantity",
+                "validation_rules": {
+                    "type": "numeric_with_unit"
+                }
+            },
+            "sampled_quantity": {
+                "label": "Sampled quantity",
+                "validation_rules": {
+                    "type": "string"
+                }
+            },
+            "sampling_date": {
+                "label": "Sampling date",
+                "validation_rules": {
+                    "type": "date"
+                }
+            },
+            "analysis_date": {
+                "label": "Date of Analysis",
+                "validation_rules": {
+                    "type": "date"
+                }
+            },
+            "analyzed_by": {
+                "label": "Analyzed by",
+                "validation_rules": {
+                    "type": "string"
+                }
+            },
+            "released_date": {
+                "label": "Released Date",
+                "validation_rules": {
+                    "type": "date"
+                }
+            }
+        },
+        "test_parameters_table": [
+            {
+                "sr_no": 1,
+                "parameter": "Physical Appearance",
+                "observation_label": "Observation:"
+            },
+            {
+                "sr_no": 2,
+                "parameter": "Viscosity",
+                "observation_label": "Observation:"
+            },
+            {
+                "sr_no": 3,
+                "parameter": "pH",
+                "observation_label": "Observation:"
+            },
+            {
+                "sr_no": 4,
+                "parameter": "Specific Gravity",
+                "observation_label": "Observation:"
+            },
+            {
+                "sr_no": 5,
+                "parameter": "Solubility",
+                "observation_label": "Observation:"
+            },
+            {
+                "sr_no": 6,
+                "parameter": "Ionicity",
+                "observation_label": "Observation: cationic/Anionic/Nonionic"
+            },
+            {
+                "sr_no": 7,
+                "parameter": "Turbidity",
+                "result_label": "Turbidity ="
+            },
+            {
+                "sr_no": 8,
+                "parameter": "Charge",
+                "result_label": "meq/liter"
+            },
+            {
+                "sr_no": 9,
+                "parameter": "Solid Content - Weight (A) (I)",
+                "result_label": "(I) .* (A). "
+            },
+            {
+                "sr_no": 9,
+                "parameter": "Solid Content - Net Weight (C) (I)",
+                "result_label": "(I) .* (C). "
+            },
+            {
+                "sr_no": 9,
+                "parameter": "Solid Content - Weight (A) (II)",
+                "result_label": "(II) .* (A) "
+            },
+            {
+                "sr_no": 9,
+                "parameter": "Solid Content - Net Weight (C) (II)",
+                "result_label": "(II) .* (C) "
+            },
+            {
+                "sr_no": 9,
+                "parameter": "Solid Content - Avg Result",
+                "result_label": "Avg. ="
+            },
+            {
+                "sr_no": 10,
+                "parameter": "Stability - pH (Initial)",
+                "result_label": "Initial\n"
+            },
+            {
+                "sr_no": 10,
+                "parameter": "Stability - Viscosity (Initial)",
+                "result_label": "Initial\n\n"
+            },
+            {
+                "sr_no": 10,
+                "parameter": "Stability - pH (32h)",
+                "result_label": "Initial\n\n\n\n"
+            },
+            {
+                "sr_no": 10,
+                "parameter": "Stability - Viscosity (32h)",
+                "result_label": "Initial\n\n\n\n\n"
+            },
+            {
+                "sr_no": 11,
+                "parameter": "Other Test",
+                "result_label": "Other Test"
+            }
+        ],
+        "table_config": {
+            "parameter_column_keywords": [
+                "parameter",
+                "test"
+            ],
+            "result_column_keywords": [
+                "observation",
+                "result",
+                "finding"
+            ]
+        },
+        "footer_fields": {
+            "compliance_statement": {
+                "label": "The product complies/under deviation/not complies to the specification"
+            },
+            "remark": {
+                "label": "Remark: Approved / Rejected"
+            },
+            "prepared_by_signature": {
+                "label": "Prepared By"
+            },
+            "reviewed_by_signature": {
+                "label": "Reviewed By"
+            },
+            "approved_by_signature": {
+                "label": "Approved By"
+            }
+        },
+        "noise_markers": [
+            "MASTER COPY",
+            "CONTROLLED COPY",
+            "Page No.",
+            "REV:",
+            "|"
+        ]
+    }
+}

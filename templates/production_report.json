@@ -1,0 +1,51 @@
+{
+    "page_type": "PRODUCTION_REPORT",
+    "document_metadata": {
+        "document_type": "PRODUCTION_REPORT",
+        "page_numbers": [
+            2
+        ]
+    },
+    "extraction_template": {
+        "header_fields": {
+            "production_date": {
+                "label": "D+",
+                "validation_rules": {
+                    "type": "string"
+                }
+            }
+        },
+        "test_parameters_table": [],
+        "table_config": {
+            "parameter_column_keywords": [
+                "Name of the Product",
+                "Product"
+            ],
+            "result_column_keywords": [
+                "Batch Number",
+                "Quantity"
+            ]
+        },
+        "footer_fields": {
+            "prepared_by": {
+                "label": "Prepared by",
+                "validation_rules": {
+                    "type": "signature"
+                }
+            },
+            "reviewed_by": {
+                "label": "Reviewed by",
+                "validation_rules": {
+                    "type": "signature"
+                }
+            }
+        },
+        "noise_markers": [
+            "Format No",
+            "PRODUCTION REPORT",
+            "|",
+            "Supervisor",
+            "Manager"
+        ]
+    }
+}

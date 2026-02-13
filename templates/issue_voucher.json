@@ -1,0 +1,99 @@
+{
+    "page_type": "ISSUE_VOUCHER",
+    "document_metadata": {
+        "document_type": "Issue -Mtrl Voucher",
+        "page_numbers": [
+            1
+        ],
+        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD"
+    },
+    "extraction_template": {
+        "header_fields": {
+            "title": {
+                "label": "## Issue -Mtrl Voucher",
+                "expected_label": [
+                    "## Issue -Mtrl Voucher",
+                    "Issue -Mtrl Voucher"
+                ]
+            },
+            "voucher_no": {
+                "label": "No. :",
+                "expected_label": [
+                    "No. :",
+                    "No :"
+                ],
+                "validation_rules": {
+                    "type": "string",
+                    "regex": "\\d{2}-\\d{2}/\\d{4}"
+                }
+            },
+            "ref_no": {
+                "label": "Ref.",
+                "expected_label": [
+                    "Ref.",
+                    "Ref"
+                ]
+            },
+            "dated": {
+                "label": "Dated",
+                "expected_label": [
+                    "Dated",
+                    "Date"
+                ]
+            }
+        },
+        "table_config": {
+            "parameter_column_keywords": [
+                "Item Name",
+                "Item"
+            ],
+            "index_column_keywords": [
+                "Item Name",
+                "Item"
+            ],
+            "header_identifier_keywords": [
+                "godown",
+                "batch",
+                "quantity"
+            ],
+            "extract_all_columns": true,
+            "column_mapping": {
+                "item_name": [
+                    "Item Name"
+                ],
+                "godown": [
+                    "Godown"
+                ],
+                "batch_lot": [
+                    "Batch/Lot",
+                    "Batch",
+                    "Lot"
+                ],
+                "quantity": [
+                    "Quantity"
+                ]
+            },
+            "noise_markers": [
+                "Narration:",
+                "Checked by",
+                "Verified by"
+            ]
+        },
+        "test_parameters_table": [],
+        "footer_fields": {
+            "narration": {
+                "label": "Narration:",
+                "expected_label": [
+                    "Narration:",
+                    "Narration"
+                ]
+            },
+            "checked_by": {
+                "label": "Checked by"
+            },
+            "verified_by": {
+                "label": "Verified by"
+            }
+        }
+    }
+}

@@ -1,0 +1,177 @@
+{
+    "page_type": "QC_TEST_REPORT",
+    "document_metadata": {
+        "document_type": "QC_TEST_REPORT",
+        "page_numbers": [
+            1
+        ],
+        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD."
+    },
+    "extraction_template": {
+        "header_fields": {
+            "product_name": {
+                "label": "Product Name",
+                "validation_rules": {
+                    "type": "string",
+                    "required": true
+                }
+            },
+            "ar_no": {
+                "label": "AR No.",
+                "validation_rules": {
+                    "type": "string",
+                    "regex": "^[A-Z0-9- ]+$"
+                }
+            },
+            "batch_no": {
+                "label": "Batch No.",
+                "validation_rules": {
+                    "type": "numeric"
+                }
+            },
+            "mfg_date": {
+                "label": "Manufacturing Date",
+                "validation_rules": {
+                    "type": "date"
+                }
+            },
+            "exp_date": {
+                "label": "Exp. Date",
+                "validation_rules": {
+                    "type": "date"
+                }
+            },
+            "approval_date_header": {
+                "label": "Approval Date",
+                "validation_rules": {
+                    "type": "date"
+                }
+            },
+            "packing_details": {
+                "label": "Packing Details",
+                "validation_rules": {
+                    "type": "string"
+                }
+            },
+            "quantity": {
+                "label": "Quantity",
+                "validation_rules": {
+                    "type": "numeric_with_unit"
+                }
+            }
+        },
+        "test_parameters_table": [
+            {
+                "sr_no": 1,
+                "parameter": "Physical Appearance"
+            },
+            {
+                "sr_no": 2,
+                "parameter": "Viscosity"
+            },
+            {
+                "sr_no": 3,
+                "parameter": "PH"
+            },
+            {
+                "sr_no": 4,
+                "parameter": "Specific Gravity @ 25°C"
+            },
+            {
+                "sr_no": 5,
+                "parameter": "Solid Content / Active %"
+            },
+            {
+                "sr_no": 6,
+                "parameter": "Ionicity"
+            },
+            {
+                "sr_no": 7,
+                "parameter": "Charge"
+            },
+            {
+                "sr_no": 8,
+                "parameter": "Solubility"
+            },
+            {
+                "sr_no": 9,
+                "parameter": "Turbidity"
+            },
+            {
+                "sr_no": 10,
+                "parameter": "Color Gardner"
+            },
+            {
+                "sr_no": 11,
+                "parameter": "Presence of Grains / Gel"
+            },
+            {
+                "sr_no": 12,
+                "parameter": "Stability Test / Boring Test"
+            },
+            {
+                "sr_no": 13,
+                "parameter": "Performance Test / Cobb Value"
+            },
+            {
+                "sr_no": 14,
+                "parameter": "Tensile Strength Test / Chloride Content"
+            }
+        ],
+        "table_config": {
+            "parameter_column_keywords": [
+                "parameter",
+                "field",
+                "test"
+            ],
+            "result_column_keywords": [
+                "result",
+                "value"
+            ]
+        },
+        "footer_fields": {
+            "final_result": {
+                "label": "RESULT",
+                "validation_rules": {
+                    "type": "enum",
+                    "options": [
+                        "APPROVED",
+                        "REJECTED"
+                    ]
+                }
+            },
+            "remark": {
+                "label": "REMARKS",
+                "validation_rules": {
+                    "type": "string"
+                }
+            },
+            "analyzed_by": {
+                "label": "Analyzed By / Date",
+                "validation_rules": {
+                    "type": "string"
+                }
+            },
+            "reviewed_by": {
+                "label": "Reviewed By / Date",
+                "validation_rules": {
+                    "type": "string"
+                }
+            },
+            "approved_by": {
+                "label": "Approved By / Date",
+                "validation_rules": {
+                    "type": "string"
+                }
+            }
+        },
+        "noise_markers": [
+            "FORM NO",
+            "REV:",
+            "INCHARGE",
+            "APPROVED BY",
+            "ANALYZED BY",
+            "|"
+        ]
+    }
+}

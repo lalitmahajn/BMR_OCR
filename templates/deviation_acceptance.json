@@ -1,0 +1,125 @@
+{
+    "page_type": "DEVIATION_ACCEPTANCE",
+    "document_metadata": {
+        "document_type": "ACCEPTANCE UNDER DEVIATION FOR RAW MATERIAL/ FINISHED PRODUCTS/PACKING MATERIAL",
+        "page_numbers": [
+            1
+        ],
+        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD"
+    },
+    "extraction_template": {
+        "header_fields": {
+            "name_of_material": {
+                "label": "Name of RM/FP/PM",
+                "validation_rules": {
+                    "required": true
+                }
+            },
+            "lot_batch_no": {
+                "label": "Supplier Lot No./Batch No",
+                "validation_rules": {
+                    "required": true
+                }
+            },
+            "ar_no": {
+                "label": "IMI/A.R No",
+                "expected_label": [
+                    "IMI/A.R No",
+                    "A.R. No",
+                    "AR No"
+                ]
+            },
+            "date_of_testing": {
+                "label": "Date of Testing",
+                "validation_rules": {
+                    "is_date": true
+                }
+            },
+            "quantity": {
+                "label": "Quantity"
+            },
+            "vendor_name": {
+                "label": "Vendor/Supplier Name"
+            }
+        },
+        "table_config": {
+            "parameter_column_keywords": [
+                "Parameters",
+                "Parameter"
+            ],
+            "extract_all_columns": true,
+            "column_mapping": {
+                "parameter": [
+                    "Parameters",
+                    "Parameter"
+                ],
+                "std_specification": [
+                    "Std. Specification",
+                    "Standard Specification"
+                ],
+                "inhouse_specification": [
+                    "Inhouse RM specification",
+                    "In-house Specification"
+                ],
+                "test_results": [
+                    "Test Results",
+                    "Results"
+                ],
+                "remarks": [
+                    "Remarks",
+                    "Remark"
+                ]
+            },
+            "noise_markers": [
+                "Kindly permit",
+                "Approved By",
+                "Signature",
+                "Preapproval By",
+                "Form No",
+                "CONTROLLED COPY",
+                "Copy No",
+                "Issued by"
+            ]
+        },
+        "test_parameters_table": [
+            {
+                "parameter": "Viscosity",
+                "extract_columns": [
+                    "std_specification",
+                    "inhouse_specification",
+                    "test_results",
+                    "remarks"
+                ]
+            }
+        ],
+        "footer_fields": {
+            "approval_qcm": {
+                "label": "Approved By: QCM"
+            },
+            "qcm_date": {
+                "label": "Date",
+                "validation_rules": {
+                    "is_date": true
+                }
+            },
+            "preapproval_qam": {
+                "label": "Preapproval By: QAM"
+            },
+            "qam_date": {
+                "label": "Date",
+                "validation_rules": {
+                    "is_date": true
+                }
+            },
+            "approval_ed": {
+                "label": "Approved By: ED"
+            },
+            "ed_date": {
+                "label": "Date",
+                "validation_rules": {
+                    "is_date": true
+                }
+            }
+        }
+    }
+}

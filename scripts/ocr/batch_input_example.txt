@@ -1,0 +1,117 @@
+# BATCH INPUT FILE (JSONL FORMAT)
+
+## What is it?
+A JSONL (JSON Lines) file where each line is a separate JSON object representing one OCR job.
+
+## Example Structure:
+
+```json
+{
+  "custom_id": "page_1",
+  "body": {
+    "document": {
+      "type": "document_url",
+      "document_url": "data:application/pdf;base64,JVBERi0x..."
+    },
+    "include_image_base64": false
+  }
+}
+```
+
+## Fields Breakdown:
+
+### 1. `custom_id` (Required)
+- **Your identifier** for tracking this specific request
+- Examples: "page_1", "document_a", "invoice_001"
+- You'll receive this ID back in the results
+
+### 2. `body` (Required)
+The actual OCR request parameters
+
+### 3. `body.document` (Required)
+The document to process. Two formats:
+
+#### Option A: Base64-encoded data
+```json
+"document": {
+  "type": "image_url",  // or "document_url" for PDFs
+  "image_url": "data:image/jpeg;base64,/9j/4AAQSkZJRg..."
+}
+```
+
+#### Option B: Public URL
+```json
+"document": {
+  "type": "document_url",
+  "document_url": "https://example.com/document.pdf"
+}
+```
+
+### 4. `body.include_image_base64` (Optional)
+- `true`: Return base64-encoded images in response (increases size)
+- `false`: Don't include images (default, recommended)
+
+---
+
+## For Multiple Pages:
+
+Create multiple lines in the file - one per page:
+
+```jsonl
+{"custom_id": "page_1", "body": {"document": {"type": "image_url", "image_url": "data:image/jpeg;base64,..."}, "include_image_base64": false}}
+{"custom_id": "page_2", "body": {"document": {"type": "image_url", "image_url": "data:image/jpeg;base64,..."}, "include_image_base64": false}}
+{"custom_id": "page_3", "body": {"document": {"type": "image_url", "image_url": "data:image/jpeg;base64,..."}, "include_image_base64": false}}
+```
+
+---
+
+## For Your Use Case (30-page PDF):
+
+**Option 1:** Single PDF (what we did)
+- One line with entire PDF base64-encoded
+- Mistral processes all 30 pages
+- Cost: 30 × $0.001 = $0.03
+
+**Option 2:** Individual images
+- 30 lines, one per page image
+- More control over individual pages
+- Same cost: 30 × $0.001 = $0.03
+
+---
+
+## Workflow:
+
+1. **Create** `batch_input.jsonl` with your requests
+2. **Upload** file to Mistral
+3. **Submit** batch job
+4. **Wait** for processing (async)
+5. **Download** results (also JSONL format)
+
+---
+
+## Output Format (from batch):
+
+Results also come as JSONL:
+
+```json
+{
+  "custom_id": "page_1",
+  "response": {
+    "status_code": 200,
+    "body": {
+      "model": "mistral-ocr-latest",
+      "pages": [
+        {
+          "markdown": "| Header | Data |\n| --- | --- |"
+        }
+      ],
+      "usage_info": {
+        "pages_processed": 1,
+        "doc_size_bytes": 278748
+      }
+    }
+  }
+}
+```
+
+You match results back to requests using the `custom_id`.

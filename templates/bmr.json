@@ -1,0 +1,167 @@
+{
+    "page_type": "BMR",
+    "base_width": 1000,
+    "base_height": 1414,
+    "extraction_template": {
+        "header_fields": {
+            "DOC_TITLE": {
+                "regex": "(?i)(?:BATCH\\s*MANUFACTURING\\s*RECORD|BATCH\\s*PROCESS\\s*RECORD)",
+                "type": "string"
+            },
+            "PRODUCT_NAME": {
+                "label": "Name of Product",
+                "regex": "NAME\\s*OF\\s*PRODUCT:\\s*(\\d+)",
+                "type": "string"
+            },
+            "BMR_NO": {
+                "label": "BMR No",
+                "regex": "B\\.M\\.R\\.\\s*Form\\s*No\\.?\\s*:\\s*([^\\|\\n]+)",
+                "type": "string"
+            },
+            "PAGE_INFO": {
+                "label": "Page",
+                "regex": "Page\\s*No\\.?\\s*:\\s*(\\d+\\s*of\\s*\\d+)",
+                "type": "string"
+            },
+            "EFFECTIVE_DATE": {
+                "label": "Effective Date",
+                "regex": "BMR\\s*Effective\\s*Date\\s*:\\s*(\\d{2}/\\d{2}/\\d{4})",
+                "type": "date"
+            },
+            "SUPERSEDES": {
+                "label": "SUPERSEDES_KEY",
+                "regex": "Supersedes[^:]*:\\s*([^\\|\\n]+)",
+                "type": "string"
+            },
+            "EQUIPMENT_TAG": {
+                "label": "EQUIPMENT_TAG_KEY",
+                "regex": "Equipment\\s*Tag\\s*No[^:]*:\\s*([^\\|\\n]+)",
+                "type": "string"
+            },
+            "REFER_SOP": {
+                "label": "Refer SOP",
+                "regex": "(?i)Refer\\s*SOP[:\\s]*([\\w/\\s]+?)(?=\\||\\n)",
+                "type": "string"
+            },
+            "START_DATE": {
+                "label": "START_DATE_KEY",
+                "regex": "(?:Batch|Process)\\s*Start\\s*Date[^:]*:\\s*([\\d/]+)",
+                "type": "string"
+            },
+            "PROCESS_SHIFT": {
+                "label": "Process Start Shift",
+                "regex": "Process\\s*Start\\s*Shift[^:]*:\\s*([^\\|\\n]+)",
+                "type": "string"
+            },
+            "BATCH_NO": {
+                "label": "Batch No",
+                "regex": "(?i)BATCH\\s*NUMBER[\\s\\n]*([^\\s\\|]+)",
+                "type": "string"
+            },
+            "TOTAL_TIME": {
+                "label": "TOTAL_TIME_KEY",
+                "regex": "Total\\s*Time\\s*Cycle[^:]*:\\s*([\\d:]+)",
+                "type": "string"
+            },
+            "COMPLETION_DATE": {
+                "label": "COMPLETION_DATE_KEY",
+                "regex": "Completion\\s*Date[^:]*:\\s*([\\d/]+)",
+                "type": "string"
+            },
+            "ACTUAL_YIELD": {
+                "label": "ACTUAL_YIELD_KEY",
+                "regex": "Actual\\s*Yield\\s*Percentage[\\s\\S]*?([\\d\\.]+%?)",
+                "type": "string"
+            },
+            "THEORETICAL_YIELD": {
+                "label": "THEORETICAL_YIELD_KEY",
+                "regex": "Theoretical\\s*Yield\\s*Percentage[\\s\\S]*?([\\d\\.\\s%\\-]+)(?=\\s*\\|)",
+                "type": "string"
+            },
+            "PHYSICAL_APPEARANCE": {
+                "label": "Physical Appearance",
+                "regex": "Phy\\.?\\s*App\\.?\\s*:\\s*([^\\n\\|]+)",
+                "type": "string"
+            },
+            "SP_GRAVITY": {
+                "label": "Sp. Gravity",
+                "regex": "Sp\\.?\\s*Gravity\\s*:\\s*([\\d\\.]+)",
+                "type": "string"
+            },
+            "PH": {
+                "label": "pH",
+                "regex": "pH\\s*:\\s*([\\d\\.]+)",
+                "type": "string"
+            },
+            "VISCOSITY": {
+                "label": "Viscosity",
+                "regex": "Viscosity\\s*:\\s*([\\d\\.]+)",
+                "type": "string"
+            },
+            "SOLID_CONTENT": {
+                "label": "Solid Content",
+                "regex": "Solid\\s*Content\\s*:\\s*([\\d\\.]+)",
+                "type": "string"
+            }
+        },
+        "table_config": {
+            "extract_all_columns": true,
+            "dynamic_rows": true,
+            "header_identifier_keywords": [
+                "BATCH ACTIVITY",
+                "RM NAME",
+                "Input Caps.",
+                "Packing",
+                "Packing Details",
+                "Batch Process Details"
+            ],
+            "parameter_column_keywords": [
+                "BATCH ACTIVITY",
+                "RM NAME",
+                "Packing",
+                "Input Caps",
+                "Output Caps",
+                "Actual Yield Percentage",
+                "Theoretical Yield Percentage",
+                "Batch Process Details"
+            ],
+            "result_column_keywords": [
+                "TOTAL TIME",
+                "QTY (KGS)",
+                "Total Packing",
+                "REMARKS",
+                "RECEIVED BY",
+                "Actual Yield Percentage",
+                "Theoretical Yield Percentage",
+                "Yield",
+                "Output Caps.",
+                "Total Loss",
+                "Start Time",
+                "End Time",
+                "Temperature"
+            ],
+            "index_column_keywords": [
+                "S.N.",
+                "SR.NO",
+                "NO."
+            ]
+        },
+        "footer_fields": {
+            "PREPARED_BY": {
+                "label": "PREPARED BY",
+                "regex": "(?i)PREPARED\\s*BY[\\s\\|]*([\\w\\s]+?)(?=\\||\\n)",
+                "type": "string"
+            },
+            "REVIEWED_BY": {
+                "label": "REVIEWED BY",
+                "regex": "(?i)REVIEWED\\s*BY[\\s\\|]*([\\w\\s]+?)(?=\\||\\n)",
+                "type": "string"
+            },
+            "APPROVED_BY": {
+                "label": "APPROVED BY",
+                "regex": "(?i)APPROVED\\s*BY[\\s\\|]*([\\w\\s]+?)(?=\\||\\n)",
+                "type": "string"
+            }
+        }
+    }
+}
