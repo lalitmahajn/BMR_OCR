@@ -2,44 +2,45 @@
     "page_type": "ISSUE_VOUCHER",
     "document_metadata": {
         "document_type": "Issue -Mtrl Voucher",
-        "page_numbers": [
-            1
-        ],
         "company_name": "RISHABH METALS & CHEMICALS PVT. LTD"
     },
     "extraction_template": {
         "header_fields": {
-            "title": {
+            "TITLE": {
                 "label": "## Issue -Mtrl Voucher",
                 "expected_label": [
                     "## Issue -Mtrl Voucher",
                     "Issue -Mtrl Voucher"
-                ]
+                ],
+                "regex": "Issue\\s*-?Mtrl\\s*Voucher",
+                "type": "string"
             },
-            "voucher_no": {
+            "VOUCHER_NO": {
                 "label": "No. :",
                 "expected_label": [
                     "No. :",
                     "No :"
                 ],
-                "validation_rules": {
-                    "type": "string",
-                    "regex": "\\d{2}-\\d{2}/\\d{4}"
-                }
+                "regex": "No\\.?\\s*[:\\-]?\\s*(\\d{2}-\\d{2}/\\d{4})",
+                "type": "string"
             },
-            "ref_no": {
+            "REF_NO": {
                 "label": "Ref.",
                 "expected_label": [
                     "Ref.",
                     "Ref"
-                ]
+                ],
+                "regex": "Ref\\.?\\s*[:\\-]?\\s*([^\\n]+?)(?=\\s*(?:dt\\.|Dated|$))",
+                "type": "string"
             },
-            "dated": {
+            "DATED": {
                 "label": "Dated",
                 "expected_label": [
                     "Dated",
                     "Date"
-                ]
+                ],
+                "regex": "Dated\\s*[:\\-]?\\s*(\\d{2}-[A-Za-z]{3}-\\d{2})",
+                "type": "date"
             }
         },
         "table_config": {
@@ -57,6 +58,7 @@
                 "quantity"
             ],
             "extract_all_columns": true,
+            "dynamic_rows": true,
             "column_mapping": {
                 "item_name": [
                     "Item Name"
@@ -81,18 +83,24 @@
         },
         "test_parameters_table": [],
         "footer_fields": {
-            "narration": {
+            "NARRATION": {
                 "label": "Narration:",
                 "expected_label": [
                     "Narration:",
                     "Narration"
-                ]
+                ],
+                "regex": "Narration\\s*[:\\-]?\\s*([^\\n]+)",
+                "type": "string"
             },
-            "checked_by": {
-                "label": "Checked by"
+            "CHECKED_BY": {
+                "label": "Checked by",
+                "regex": "Checked\\s*by\\s*[:\\-]?\\s*([^\\n]+?)(?=\\s*(?:Verified|Authorised|$))",
+                "type": "string"
             },
-            "verified_by": {
-                "label": "Verified by"
+            "VERIFIED_BY": {
+                "label": "Verified by",
+                "regex": "Verified\\s*by\\s*[:\\-]?\\s*([^\\n]+?)(?=\\s*(?:Authorised|$))",
+                "type": "string"
             }
         }
     }

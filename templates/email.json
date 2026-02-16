@@ -2,28 +2,33 @@
     "page_type": "EMAIL",
     "document_metadata": {
         "document_type": "Rishabh Metals & Chemicals Pvt Ltd Mail",
-        "page_numbers": [
-            1
-        ],
-        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD"
+        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD."
     },
     "extraction_template": {
         "header_fields": {
-            "subject": {
+            "SUBJECT": {
                 "label": "Wet",
                 "expected_label": [
                     "Wet & % Wet Strength",
                     "Subject"
-                ]
+                ],
+                "regex": "(?:^|Mail\\s*-\\s*)([^\\n]+?)(?=\\n.*message)",
+                "type": "string"
             },
-            "to_email": {
-                "label": "To:"
+            "TO_EMAIL": {
+                "label": "To:",
+                "regex": "To:\\s*([^\\n]+)",
+                "type": "string"
             },
-            "cc_email": {
-                "label": "Cc:"
+            "CC_EMAIL": {
+                "label": "Cc:",
+                "regex": "Cc:\\s*([^\\n]+)",
+                "type": "string"
             },
-            "message_count": {
-                "label": "message"
+            "MESSAGE_COUNT": {
+                "label": "message",
+                "regex": "(\\d+)\\s*message",
+                "type": "string"
             }
         },
         "table_config": {
@@ -45,6 +50,7 @@
                 "sample"
             ],
             "extract_all_columns": true,
+            "dynamic_rows": true,
             "noise_markers": [
                 "Thanks & Regards",
                 "R & D Dept",
@@ -53,21 +59,25 @@
         },
         "test_parameters_table": [],
         "footer_fields": {
-            "signature": {
+            "SIGNATURE": {
                 "label": "Thanks",
                 "expected_label": [
                     "Thanks & Regards",
                     "Thanks",
                     "Regards"
-                ]
+                ],
+                "regex": "Thanks\\s*&?\\s*Regards[,.]?\\s*([^\\n]+)",
+                "type": "string"
             },
-            "department": {
+            "DEPARTMENT": {
                 "label": "Dept",
                 "expected_label": [
                     "Dept.",
                     "Dept",
                     "Department"
-                ]
+                ],
+                "regex": "(?:R\\s*&\\s*D|Quality|Production)\\s*Dept\\.?",
+                "type": "string"
             }
         }
     }

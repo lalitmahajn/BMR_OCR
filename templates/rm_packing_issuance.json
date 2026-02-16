@@ -2,102 +2,84 @@
     "page_type": "RM_PACKING_ISSUANCE",
     "document_metadata": {
         "document_type": "Raw Material & Packing Material Issuance Record",
-        "page_numbers": [
-            1
-        ],
-        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD"
+        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD.",
+        "document_title": "RAW MATERIAL & PACKING MATERIAL ISSUANCE RECORD",
+        "document_no": "STR/WI-20-02/F/004",
+        "revision_no": "00",
+        "effective_date": "01/10/2025",
+        "review_date": "30/09/2028",
+        "stamp": "MASTER COPY"
     },
     "extraction_template": {
         "header_fields": {
-            "title": {
-                "label": "TITLE:",
-                "expected_label": [
-                    "TITLE:"
-                ]
+            "PRODUCT": {
+                "label": "Product:",
+                "regex": "Product\\s*[:\\-]?\\s*([^\\n|]+)",
+                "type": "string"
             },
-            "document_no": {
-                "label": "DOCUMENT NO.",
-                "expected_label": [
-                    "DOCUMENT NO.",
-                    "DOC. NO."
-                ]
+            "BATCH_NO": {
+                "label": "Batch No:",
+                "regex": "Batch\\s*No\\s*[:\\-]?\\s*([A-Za-z0-9/\\-\\.]+)",
+                "type": "string"
             },
-            "revision_no": {
-                "label": "REVISION NO.",
-                "expected_label": [
-                    "REVISION NO.",
-                    "REV. NO."
-                ]
-            },
-            "effective_date": {
-                "label": "EFFECTIVE DATE"
-            },
-            "review_date": {
-                "label": "REVIEW DATE"
-            },
-            "product": {
-                "label": "Product:"
-            },
-            "batch_no": {
-                "label": "Batch No:"
-            },
-            "date": {
-                "label": "Date:"
+            "DATE": {
+                "label": "Date:",
+                "regex": "Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             }
         },
         "table_config": {
+            "extract_all_columns": true,
+            "dynamic_rows": true,
             "parameter_column_keywords": [
                 "Raw Material",
                 "Material"
             ],
-            "index_column_keywords": [
-                "sr. no.",
-                "sr. no",
-                "no."
-            ],
-            "header_identifier_keywords": [
-                "raw material",
-                "ar no",
-                "barrel",
-                "weight",
-                "bags"
-            ],
-            "extract_all_columns": true,
             "column_mapping": {
                 "sr_no": [
-                    "Sr. No."
+                    "Sr. No.",
+                    "Sr.No."
                 ],
                 "raw_material": [
                     "Raw Material"
                 ],
                 "ar_no": [
-                    "AR No."
+                    "AR No.",
+                    "AR No"
                 ],
                 "barrel_carboy_count": [
                     "No. of Barrel & Carboy"
                 ],
                 "barrel_condition": [
-                    "Barrel & Carboy Condition"
+                    "Barrel & Carboy Condition (Seal or Damage)",
+                    "Condition (Seal or Damage)"
                 ],
                 "labeling": [
-                    "Labeling on each"
+                    "Labeling on each and Every Barrel & Carboy (Specific weight of this barrel & Carboy)",
+                    "Labeling on each",
+                    "Specific weight"
                 ],
                 "bags_count": [
                     "No. of Bags"
                 ],
                 "bags_condition": [
+                    "Bags Condition (Seal or Damage)",
                     "Bags Condition"
                 ],
                 "weight": [
-                    "Weight (Kg)"
+                    "Weight (Kg)",
+                    "Weight"
                 ],
                 "expire_date": [
-                    "Expire Date Checked"
+                    "Expire Date Checked (If expired then Approval Mail)",
+                    "Expire Date"
                 ],
                 "physical_appearance": [
+                    "Physical Appearance (If Possible)",
                     "Physical Appearance"
                 ],
                 "excess_shortage": [
+                    "Excess/Shortage Quantity (If Any)",
                     "Excess/Shortage"
                 ],
                 "remark": [
@@ -111,49 +93,49 @@
                 ]
             },
             "noise_markers": [
-                "PREPARED",
+                "PREPARED & ISSUED BY",
                 "REVIEWED BY",
                 "APPROVED BY",
-                "Page 1 of"
+                "Page 1 of 1",
+                "CONTROLLED COPY"
             ]
         },
-        "test_parameters_table": [],
         "footer_fields": {
-            "prepared_signature": {
-                "label": "SIGNATURE:",
+            "PREPARED_ISSUED_BY": {
+                "label": "PREPARED & ISSUED BY:",
                 "expected_label": [
                     "SIGNATURE:"
-                ]
+                ],
+                "type": "signature"
             },
-            "prepared_date": {
+            "PREPARED_DATE": {
                 "label": "DATE:",
-                "expected_label": [
-                    "DATE:"
-                ]
+                "regex": "PREPARED[\\s\\S]*?DATE\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             },
-            "reviewed_signature": {
-                "label": "SIGNATURE:",
+            "REVIEWED_BY": {
+                "label": "REVIEWED BY:",
                 "expected_label": [
                     "SIGNATURE:"
-                ]
+                ],
+                "type": "signature"
             },
-            "reviewed_date": {
+            "REVIEWED_DATE": {
                 "label": "DATE:",
-                "expected_label": [
-                    "DATE:"
-                ]
+                "regex": "REVIEWED[\\s\\S]*?DATE\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             },
-            "approved_signature": {
-                "label": "SIGNATURE:",
+            "APPROVED_BY": {
+                "label": "APPROVED BY:",
                 "expected_label": [
                     "SIGNATURE:"
-                ]
+                ],
+                "type": "signature"
             },
-            "approved_date": {
+            "APPROVED_DATE": {
                 "label": "DATE:",
-                "expected_label": [
-                    "DATE:"
-                ]
+                "regex": "APPROVED[\\s\\S]*?DATE\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             }
         }
     }

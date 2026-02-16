@@ -20,6 +20,39 @@ class MarkdownExtractionEngine:
     def __init__(self):
         pass
 
+    def _normalize_columns(
+        self, raw_rows: List[Dict[str, str]], column_mapping: Dict[str, List[str]]
+    ) -> List[Dict[str, str]]:
+        """Maps OCR column headers to normalized template keys using fuzzy matching."""
+        from thefuzz import fuzz
+
+        # Build mapping: OCR header → normalized key (cached for all rows)
+        header_map = {}
+        if raw_rows:
+            sample_keys = list(raw_rows[0].keys())
+            for raw_key in sample_keys:
+                if raw_key.startswith("_"):
+                    header_map[raw_key] = raw_key  # Preserve internal keys
+                    continue
+                best_score = 0
+                best_norm = None
+                for norm_key, aliases in column_mapping.items():
+                    for alias in aliases:
+                        score = fuzz.ratio(alias.lower(), raw_key.lower())
+                        if score > best_score and score > 70:
+                            best_score = score
+                            best_norm = norm_key
+                header_map[raw_key] = best_norm or raw_key
+
+        normalized = []
+        for row in raw_rows:
+            new_row = {}
+            for raw_key, val in row.items():
+                norm_key = header_map.get(raw_key, raw_key)
+                new_row[norm_key] = val
+            normalized.append(new_row)
+        return normalized
+
     def extract_field(
         self,
         markdown: str,
@@ -27,14 +60,14 @@ class MarkdownExtractionEngine:
         boundary_labels: Optional[List[str]] = None,
         fallback_name: Optional[str] = None,
         start_pos: int = 0,
-    ) -> (Optional[str], int):
+    ) -> (Optional[str], int, float):
         """
         Extracts a single field value based on expected labels and regex.
         Uses lookahead to avoid consuming adjacent fields.
-        Returns extracted value and the end position of the match.
+        Returns extracted value, end position, and confidence score.
         """
         if not markdown:
-            return None, start_pos
+            return None, start_pos, 0.0
 
         # 1. Gather potential labels
         labels = []
@@ -150,10 +183,13 @@ class MarkdownExtractionEngine:
                             f"Value '{val}' failed regex '{regex_pattern}' for label '{label}'"
                         )
                         continue
+                    # Regex Passed + Label Found = High Confidence
+                    if val is not None:
+                        return val, start_pos + match.end(), 0.95
 
-                # Return valid match even if value is empty (e.g. anchor fields)
+                # Label Found (No Regex or No Validation) = Medium Confidence
                 if val is not None:
-                    return val, start_pos + match.end()
+                    return val, start_pos + match.end(), 0.80
 
         # FALLBACK: Direct Regex Extraction
         # If label search failed but a custom regex is provided, try extracting with it directly
@@ -175,14 +211,15 @@ class MarkdownExtractionEngine:
                 logger.debug(
                     f"Direct Regex extraction success for '{display_label}': '{val[:50]}...'"
                 )
-                return val, start_pos + direct_match.end()
+                # Regex Fallback (No Label) = Low Confidence
+                return val, start_pos + direct_match.end(), 0.70
             else:
                 logger.debug(f"Fallback regex failed for '{display_label}'")
 
         logger.warning(
             f"Could not extract value for label '{fallback_name or 'Unknown'}'"
         )
-        return None, start_pos
+        return None, start_pos, 0.0
 
     def extract_table_data(
         self, markdown: str, table_config: Optional[TableConfig] = None
@@ -390,7 +427,7 @@ class MarkdownExtractionEngine:
         results = {}
         current_pos = 0
         for f_def in fields_def:
-            val, current_pos = self.extract_field(
+            val, current_pos, confidence = self.extract_field(
                 markdown, f_def, start_pos=current_pos
             )
             results[f_def.name] = val
@@ -419,7 +456,7 @@ class MarkdownExtractionEngine:
             for key, config in ext.header_fields.items():
                 # Handle simplified string config (backwards compatibility)
                 if isinstance(config, str):
-                    val, end_pos = self.extract_field(
+                    val, end_pos, confidence = self.extract_field(
                         markdown,
                         FieldDefinition(
                             name=key, type=FieldType.STRING, expected_label=[config]
@@ -428,7 +465,7 @@ class MarkdownExtractionEngine:
                         start_pos=header_cursor,
                     )
                 else:
-                    val, end_pos = self.extract_field(
+                    val, end_pos, confidence = self.extract_field(
                         markdown,
                         config,
                         fallback_name=key,
@@ -442,28 +479,130 @@ class MarkdownExtractionEngine:
 
                 results["headers"][key] = {
                     "value": val,
+                    "confidence": confidence,
                     "config": config,
                 }
 
-        # 2. Extract Table Rows
-        if ext.test_parameters_table or (
+        # 2. Extract Named Tables (new format)
+        if ext.tables:
+            all_raw_rows = self.extract_table_data(markdown, ext.table_config)
+            results["tables"] = {}
+
+            for table_name, table_cfg in ext.tables.items():
+                # Filter rows by section_header if specified
+                if table_cfg.section_header:
+                    from thefuzz import fuzz
+
+                    matched_rows = []
+                    in_section = False
+                    for row in all_raw_rows:
+                        section = row.get("_table_name", "")
+                        if (
+                            section
+                            and fuzz.partial_ratio(
+                                table_cfg.section_header.lower(), section.lower()
+                            )
+                            > 75
+                        ):
+                            in_section = True
+                        elif section and in_section:
+                            # New section started, stop collecting
+                            break
+                        if in_section:
+                            matched_rows.append(row)
+
+                    if not matched_rows:
+                        # Fallback: try matching column headers
+                        if table_cfg.column_mapping:
+                            target_cols = set()
+                            for aliases in table_cfg.column_mapping.values():
+                                target_cols.update(a.lower() for a in aliases)
+                            for row in all_raw_rows:
+                                row_cols = set(
+                                    k.lower()
+                                    for k in row.keys()
+                                    if not k.startswith("_")
+                                )
+                                overlap = sum(
+                                    1
+                                    for tc in target_cols
+                                    if any(fuzz.ratio(tc, rc) > 70 for rc in row_cols)
+                                )
+                                if overlap >= 2:
+                                    matched_rows.append(row)
+                    table_rows = matched_rows
+                else:
+                    # No section_header — try column-header matching
+                    if table_cfg.column_mapping:
+                        from thefuzz import fuzz
+
+                        target_cols = set()
+                        for aliases in table_cfg.column_mapping.values():
+                            target_cols.update(a.lower() for a in aliases)
+
+                        matched_rows = []
+                        for row in all_raw_rows:
+                            row_cols = set(
+                                k.lower() for k in row.keys() if not k.startswith("_")
+                            )
+                            overlap = sum(
+                                1
+                                for tc in target_cols
+                                if any(fuzz.ratio(tc, rc) > 70 for rc in row_cols)
+                            )
+                            if overlap >= 2:
+                                matched_rows.append(row)
+                        table_rows = matched_rows if matched_rows else all_raw_rows
+                    else:
+                        table_rows = all_raw_rows
+
+                # Normalize columns using column_mapping
+                if table_cfg.column_mapping and table_rows:
+                    table_rows = self._normalize_columns(
+                        table_rows, table_cfg.column_mapping
+                    )
+
+                # Store as dynamic rows with config
+                results["tables"][table_name] = []
+                for raw_row in table_rows:
+                    keys = list(raw_row.keys())
+                    param_col = (
+                        keys[1] if len(keys) >= 2 else (keys[0] if keys else "Unknown")
+                    )
+                    tpl = TableRowTemplate(parameter=str(raw_row.get(param_col, "Row")))
+                    results["tables"][table_name].append(
+                        {"config": tpl, "extracted": raw_row}
+                    )
+
+                logger.info(
+                    f"Table '{table_name}': extracted {len(results['tables'][table_name])} rows"
+                )
+
+        # 2b. Extract Single Table (legacy format — backward compatible)
+        elif ext.test_parameters_table or (
             ext.table_config and ext.table_config.dynamic_rows
         ):
             all_raw_rows = self.extract_table_data(markdown, ext.table_config)
 
+            # Normalize columns if column_mapping is present
+            if ext.table_config and ext.table_config.column_mapping and all_raw_rows:
+                all_raw_rows = self._normalize_columns(
+                    all_raw_rows, ext.table_config.column_mapping
+                )
+
             # Dynamic Rows Extraction
             if ext.table_config and ext.table_config.dynamic_rows:
                 for raw_row in all_raw_rows:
-                    # Construct a generic result object for each row
-                    # We use the first column as the "parameter" for identification if possible
                     keys = list(raw_row.keys())
                     param_col = (
                         keys[1] if len(keys) >= 2 else (keys[0] if keys else "Unknown")
                     )
 
+                    tpl = TableRowTemplate(parameter=str(raw_row.get(param_col, "Row")))
+
                     results["rows"].append(
                         {
-                            "config": {"parameter": raw_row.get(param_col, "Row")},
+                            "config": tpl,
                             "extracted": raw_row,
                         }
                     )
@@ -545,7 +684,7 @@ class MarkdownExtractionEngine:
                 # Handle list (legacy)
                 if isinstance(config, list):
                     for i, label in enumerate(config):
-                        raw_val, footer_cursor = self.extract_field(
+                        raw_val, footer_cursor, confidence = self.extract_field(
                             markdown,
                             FieldDefinition(
                                 name=f"{key}_{i}",
@@ -556,6 +695,8 @@ class MarkdownExtractionEngine:
                             start_pos=footer_cursor,
                         )
                         if not raw_val:
+                            # Fallback to table search (Low Confidence)
+                            confidence = 0.6
                             for row in all_raw_rows:
                                 if any(
                                     label.lower() in str(v).lower()
@@ -582,6 +723,7 @@ class MarkdownExtractionEngine:
                                         break
                         results["footers"][f"{key}_{i}"] = {
                             "value": raw_val,
+                            "confidence": confidence,
                             "config": {"label": label},
                         }
                     continue
@@ -592,7 +734,7 @@ class MarkdownExtractionEngine:
                     if (hasattr(config, "label") and config.label)
                     else (config.get("label") if isinstance(config, dict) else key)
                 )
-                raw_val, footer_cursor = self.extract_field(
+                raw_val, footer_cursor, confidence = self.extract_field(
                     markdown,
                     FieldDefinition(
                         name=key, type=FieldType.STRING, expected_label=[label]
@@ -602,6 +744,8 @@ class MarkdownExtractionEngine:
                 )
 
                 if not raw_val:
+                    # Fallback to table search
+                    confidence = 0.6
                     for row in all_raw_rows:
                         # Check keys
                         best_col = next(
@@ -627,6 +771,248 @@ class MarkdownExtractionEngine:
                         if idx != -1:
                             raw_val = raw_val[:idx].strip()
 
-                results["footers"][key] = {"value": raw_val, "config": config}
+                results["footers"][key] = {
+                    "value": raw_val,
+                    "confidence": confidence,
+                    "config": config,
+                }
 
         return results
+
+    def extract_packing_details(self, markdown: str, template: Any) -> Dict[str, Any]:
+        """
+        Specialized extraction for Packing Details (P27, P28).
+        Handles headers embedded within table rows.
+        """
+        # 1. Standard Extraction first
+        base_res = self.process_nested_template(markdown, template)
+
+        # 2. Extract Embedded Headers from Rows
+        header_data = base_res.get("headers", {})
+        all_rows = [r["extracted"] for r in base_res["rows"]]
+        packing_rows = []
+
+        # Track processed rows to skip them in the final body table
+        processed_row_indices = set()
+
+        for i, row in enumerate(all_rows):
+            row_vals = list(row.values())
+            row_text = " ".join([str(v) for v in row_vals]).lower()
+
+            # --- Embedded Header Detection Logic ---
+
+            # Product Name & Batch No
+            if "name of product" in row_text:
+                processed_row_indices.add(i)
+                for val in row_vals:
+                    v_str = str(val)
+                    if "Name of Product" in v_str:
+                        prod_match = re.search(
+                            r"Name\s*of\s*Product\s*[:\\-]*\s*(.*?)\s*(?:Batch|$)",
+                            v_str,
+                            re.IGNORECASE,
+                        )
+                        if prod_match:
+                            header_data["PRODUCT_NAME"] = {
+                                "value": prod_match.group(1).strip(),
+                                "confidence": 0.90,
+                                "config": "PRODUCT_NAME",
+                            }
+
+                        batch_match = re.search(
+                            r"Batch\s*No\\.?\s*[:\\-]*\s*(.*)", v_str, re.IGNORECASE
+                        )
+                        if batch_match:
+                            header_data["BATCH_NO"] = {
+                                "value": batch_match.group(1).strip(),
+                                "confidence": 0.90,
+                                "config": "BATCH_NO",
+                            }
+
+            # Total Qty & Tare Wet
+            if "total qty" in row_text:
+                processed_row_indices.add(i)
+                for val in row_vals:
+                    v_str = str(val)
+                    if "Total Qty" in v_str:
+                        qty_match = re.search(
+                            r"Total\s*Qty\s*[:\\-]*\s*(.*?)\s*(?:Tare|$)",
+                            v_str,
+                            re.IGNORECASE,
+                        )
+                        if qty_match:
+                            header_data["TOTAL_QTY"] = {
+                                "value": qty_match.group(1).strip(),
+                                "confidence": 0.90,
+                                "config": "TOTAL_QTY",
+                            }
+
+                        tare_match = re.search(
+                            r"Tare\s*Wet\\.?\s*[:\\-]*\s*(.*)", v_str, re.IGNORECASE
+                        )
+                        if tare_match:
+                            header_data["TARE_WT"] = {
+                                "value": tare_match.group(1).strip(),
+                                "confidence": 0.90,
+                                "config": "TARE_WT",
+                            }
+
+            # Balance ID & Calibration
+            if "balance id" in row_text:
+                processed_row_indices.add(i)
+                for val in row_vals:
+                    v_str = str(val)
+                    if "Balance ID" in v_str:
+                        bal_match = re.search(
+                            r"Balance\s*ID\\.?No\\.?\s*[:\\-]*\s*(.*?)\s*(?:Calibration|$)",
+                            v_str,
+                            re.IGNORECASE,
+                        )
+                        if bal_match:
+                            header_data["BALANCE_ID"] = {
+                                "value": bal_match.group(1).strip(),
+                                "confidence": 0.90,
+                                "config": "BALANCE_ID",
+                            }
+
+                        cal_match = re.search(
+                            r"Calibration\s*status\s*[:\\-]*\s*(.*)",
+                            v_str,
+                            re.IGNORECASE,
+                        )
+                        if cal_match:
+                            header_data["CALIBRATION_STATUS"] = {
+                                "value": cal_match.group(1).strip(),
+                                "confidence": 0.90,
+                                "config": "CALIBRATION_STATUS",
+                            }
+
+            # Page Info / Ref BMR
+            if "page no" in row_text and "PAGE_INFO" not in header_data:
+                page_match = re.search(
+                    r"Page\s*No\\.?[\s\\-]*(\d+\s*of\s*\\d+)", row_text, re.IGNORECASE
+                )
+                if page_match:
+                    header_data["PAGE_INFO"] = {
+                        "value": page_match.group(1),
+                        "confidence": 0.90,
+                        "config": "PAGE_INFO",
+                    }
+
+            if "ref. bmr no" in row_text and "REF_BMR_NO" not in header_data:
+                bmr_match = re.search(
+                    r"Ref\.\s*BMR\s*No\\.?\s*[:\\-]*\s*([\w\\-\\.]+)",
+                    row_text,
+                    re.IGNORECASE,
+                )
+                if bmr_match:
+                    header_data["REF_BMR_NO"] = {
+                        "value": bmr_match.group(1),
+                        "confidence": 0.90,
+                        "config": "REF_BMR_NO",
+                    }
+
+            # Identify valid body rows (Packing Table)
+            # Heuristic: If it has "Drum No" or looks like data, and wasn't consumed as a header row
+            if i not in processed_row_indices:
+                # Filter out pure garbage/merged header fragments
+                if "net wet =" in row_text or "gross wet =" in row_text:
+                    continue  # Sub-header rows
+                if any(k in row_text for k in ["drum no", "tare wt"]):
+                    continue  # Table header row
+
+                packing_rows.append(
+                    {
+                        "config": TableRowTemplate(parameter="Packing Entry"),
+                        "extracted": row,
+                    }
+                )
+
+        # Update results
+        base_res["headers"] = header_data
+        base_res["rows"] = packing_rows
+        return base_res
+
+    def extract_checklist(self, markdown: str, template: Any) -> Dict[str, Any]:
+        """
+        Specialized extraction for BMR Checklist (P29, P30).
+        Interprets checkmarks (☑) as Status (Yes/No/NA).
+        """
+        base_res = self.process_nested_template(markdown, template)
+
+        # Clean up Headers
+        header_data = base_res.get("headers", {})
+        if "DOCUMENT_NO" not in header_data or not header_data["DOCUMENT_NO"].get(
+            "value"
+        ):
+            doc_match = re.search(
+                r"DOCUMENT\s*NO\.?\s*\|\s*([\w\-/]+)", markdown, re.IGNORECASE
+            )
+            if doc_match:
+                header_data["DOCUMENT_NO"] = {
+                    "value": doc_match.group(1).strip(),
+                    "confidence": 0.90,
+                    "config": "DOCUMENT_NO",
+                }
+
+        base_res["headers"] = header_data
+
+        # Process Rows for Checkmarks
+        all_rows = [r["extracted"] for r in base_res["rows"]]
+        checklist_rows = []
+
+        for row in all_rows:
+            row_vals = list(row.values())
+            row_text = " ".join([str(v) for v in row_vals]).lower()
+
+            # Skip header rows
+            if "review points" in row_text or "attachments" in row_text:
+                continue
+
+            # Identify Status based on Checkmark position
+            status = "PENDING"
+            point = ""
+
+            # Find the checkmark
+            checkmark_col_idx = -1
+            clean_values = [str(v).strip() for v in row_vals]
+
+            # Find Point (longest text)
+            longest_val = max(clean_values, key=len) if clean_values else ""
+            if (
+                len(longest_val) > 5
+                and "☑" not in longest_val
+                and "✓" not in longest_val
+            ):
+                point = longest_val
+
+            # Find Status
+            for idx, val in enumerate(clean_values):
+                if "☑" in val or "✓" in val:
+                    checkmark_col_idx = idx
+                    break
+
+            if checkmark_col_idx != -1:
+                # Heuristic mapping for P29/P30
+                # Usually: Sr(0) | Point(1) | Yes(2) | No(3) | NA(4)
+                if checkmark_col_idx == 2:
+                    status = "Yes"
+                elif checkmark_col_idx == 3:
+                    status = "No"
+                elif checkmark_col_idx == 4:
+                    status = "NA"
+                else:
+                    status = "Checked (Unknown Col)"
+
+            if point:
+                checklist_rows.append(
+                    {
+                        "config": TableRowTemplate(
+                            parameter=point[:50].replace("\n", " ").strip() + "..."
+                        ),  # Summary label
+                        "extracted": {"Point": point, "Status": status},
+                    }
+                )
+
+        base_res["rows"] = checklist_rows
+        return base_res

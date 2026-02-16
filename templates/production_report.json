@@ -2,17 +2,16 @@
     "page_type": "PRODUCTION_REPORT",
     "document_metadata": {
         "document_type": "PRODUCTION_REPORT",
-        "page_numbers": [
-            2
-        ]
+        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD.",
+        "document_title": "PRODUCTION REPORT",
+        "form_no": "QAD / RJ / DP-07 / F / 002"
     },
     "extraction_template": {
         "header_fields": {
-            "production_date": {
+            "PRODUCTION_DATE": {
                 "label": "D+",
-                "validation_rules": {
-                    "type": "string"
-                }
+                "regex": "D\\+\\s*([\\d/]+)",
+                "type": "date"
             }
         },
         "test_parameters_table": [],
@@ -24,20 +23,54 @@
             "result_column_keywords": [
                 "Batch Number",
                 "Quantity"
-            ]
+            ],
+            "index_column_keywords": [
+                "Sr.No.",
+                "SR.NO"
+            ],
+            "column_mapping": {
+                "sr_no": [
+                    "Sr.No.",
+                    "SR.NO"
+                ],
+                "product_name": [
+                    "Name of the Product",
+                    "Product"
+                ],
+                "batch_number": [
+                    "Batch Number"
+                ],
+                "batch_size": [
+                    "Batch Size",
+                    "Batch Size (Kgs.)"
+                ],
+                "quantity_produced": [
+                    "Quantity Produced",
+                    "Quantity Produced (Kgs.)"
+                ],
+                "packing_details": [
+                    "Packing Details"
+                ]
+            },
+            "extract_all_columns": true,
+            "dynamic_rows": true
         },
         "footer_fields": {
-            "prepared_by": {
+            "PREPARED_BY": {
                 "label": "Prepared by",
-                "validation_rules": {
-                    "type": "signature"
-                }
+                "expected_label": [
+                    "Production Supervisor"
+                ],
+                "regex": "Prepared\\s*by\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Production|Reviewed|$))",
+                "type": "signature"
             },
-            "reviewed_by": {
+            "REVIEWED_BY": {
                 "label": "Reviewed by",
-                "validation_rules": {
-                    "type": "signature"
-                }
+                "expected_label": [
+                    "Production Manager"
+                ],
+                "regex": "Reviewed\\s*by\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Production|Format|$))",
+                "type": "signature"
             }
         },
         "noise_markers": [

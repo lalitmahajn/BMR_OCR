@@ -1,167 +1,417 @@
 {
     "page_type": "BMR",
-    "base_width": 1000,
-    "base_height": 1414,
+    "document_metadata": {
+        "document_type": "BATCH MANUFACTURING RECORD",
+        "company_name": "RISHABH METALS AND CHEMICALS PVT. LTD.",
+        "document_title": "BATCH MANUFACTURING RECORD (BMR)",
+        "stamp": "MASTER COPY",
+        "pagination_pattern": "Page\\s*No\\.?\\s*:?\\s*(\\d+)\\s*of\\s*(\\d+)"
+    },
     "extraction_template": {
         "header_fields": {
-            "DOC_TITLE": {
-                "regex": "(?i)(?:BATCH\\s*MANUFACTURING\\s*RECORD|BATCH\\s*PROCESS\\s*RECORD)",
-                "type": "string"
-            },
             "PRODUCT_NAME": {
-                "label": "Name of Product",
-                "regex": "NAME\\s*OF\\s*PRODUCT:\\s*(\\d+)",
+                "label": "NAME OF PRODUCT:",
+                "regex": "NAME\\s*OF\\s*PRODUCT\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*REV|$)",
                 "type": "string"
             },
-            "BMR_NO": {
-                "label": "BMR No",
-                "regex": "B\\.M\\.R\\.\\s*Form\\s*No\\.?\\s*:\\s*([^\\|\\n]+)",
+            "PRODUCT_REV": {
+                "label": "REV :",
+                "regex": "NAME\\s*OF\\s*PRODUCT.*?REV\\s*[:\\-]?\\s*(\\d+)",
                 "type": "string"
             },
-            "PAGE_INFO": {
-                "label": "Page",
-                "regex": "Page\\s*No\\.?\\s*:\\s*(\\d+\\s*of\\s*\\d+)",
+            "BMR_FORM_NO": {
+                "label": "B.M.R. Form No.:",
+                "regex": "B\\.?M\\.?R\\.?\\s*Form\\s*No\\.?\\s*[:\\-]?\\s*([^,\\n|]+)",
                 "type": "string"
             },
-            "EFFECTIVE_DATE": {
-                "label": "Effective Date",
-                "regex": "BMR\\s*Effective\\s*Date\\s*:\\s*(\\d{2}/\\d{2}/\\d{4})",
-                "type": "date"
-            },
-            "SUPERSEDES": {
-                "label": "SUPERSEDES_KEY",
-                "regex": "Supersedes[^:]*:\\s*([^\\|\\n]+)",
-                "type": "string"
-            },
-            "EQUIPMENT_TAG": {
-                "label": "EQUIPMENT_TAG_KEY",
-                "regex": "Equipment\\s*Tag\\s*No[^:]*:\\s*([^\\|\\n]+)",
+            "BMR_REV": {
+                "label": "REV :",
+                "regex": "B\\.?M\\.?R\\.?\\s*Form.*?REV\\s*[:\\-]?\\s*(\\d+)",
                 "type": "string"
             },
             "REFER_SOP": {
-                "label": "Refer SOP",
-                "regex": "(?i)Refer\\s*SOP[:\\s]*([\\w/\\s]+?)(?=\\||\\n)",
+                "label": "Refer SOP:",
+                "regex": "Refer\\s*SOP\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*REV|$)",
                 "type": "string"
             },
-            "START_DATE": {
-                "label": "START_DATE_KEY",
-                "regex": "(?:Batch|Process)\\s*Start\\s*Date[^:]*:\\s*([\\d/]+)",
+            "SOP_REV": {
+                "label": "REV :",
+                "regex": "Refer\\s*SOP.*?REV\\s*[:\\-]?\\s*(\\d+)",
                 "type": "string"
             },
-            "PROCESS_SHIFT": {
-                "label": "Process Start Shift",
-                "regex": "Process\\s*Start\\s*Shift[^:]*:\\s*([^\\|\\n]+)",
+            "PAGE_INFO": {
+                "label": "B.M.R. Page No.:",
+                "regex": "Page\\s*No\\.?\\s*[:\\-]?\\s*(\\d+\\s*of\\s*\\d+)",
                 "type": "string"
             },
-            "BATCH_NO": {
-                "label": "Batch No",
-                "regex": "(?i)BATCH\\s*NUMBER[\\s\\n]*([^\\s\\|]+)",
+            "EFFECTIVE_DATE": {
+                "label": "BMR Effective Date:",
+                "regex": "BMR\\s*Effective\\s*Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
+            },
+            "SUPERSEDES": {
+                "label": "Supersedes:",
+                "regex": "Supersedes\\s*[:\\-]?\\s*REV\\s*[:\\-]?\\s*(\\d+)",
                 "type": "string"
             },
-            "TOTAL_TIME": {
-                "label": "TOTAL_TIME_KEY",
-                "regex": "Total\\s*Time\\s*Cycle[^:]*:\\s*([\\d:]+)",
+            "PROCESS_START_SHIFT": {
+                "label": "Process Start Shift:",
+                "regex": "Process\\s*Start\\s*Shift\\s*[:\\-]?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Process\\s*Completion|$)",
                 "type": "string"
             },
-            "COMPLETION_DATE": {
-                "label": "COMPLETION_DATE_KEY",
-                "regex": "Completion\\s*Date[^:]*:\\s*([\\d/]+)",
+            "PROCESS_COMPLETION_SHIFT": {
+                "label": "Process Completion Shift:",
+                "regex": "Process\\s*Completion\\s*Shift\\s*[:\\-]?\\s*([^\\n|]+)",
                 "type": "string"
             },
-            "ACTUAL_YIELD": {
-                "label": "ACTUAL_YIELD_KEY",
-                "regex": "Actual\\s*Yield\\s*Percentage[\\s\\S]*?([\\d\\.]+%?)",
+            "BATCH_START_DATE_TIME": {
+                "label": "Batch Start Date & Time :",
+                "regex": "Batch\\s*Start\\s*Date\\s*&?\\s*Time\\s*[:\\-]?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Completion|$)",
                 "type": "string"
             },
-            "THEORETICAL_YIELD": {
-                "label": "THEORETICAL_YIELD_KEY",
-                "regex": "Theoretical\\s*Yield\\s*Percentage[\\s\\S]*?([\\d\\.\\s%\\-]+)(?=\\s*\\|)",
+            "COMPLETION_DATE_TIME": {
+                "label": "Completion Date & Time :",
+                "regex": "Completion\\s*Date\\s*&?\\s*Time\\s*[:\\-]?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Total|$)",
+                "type": "string"
+            },
+            "TOTAL_TIME_CYCLE": {
+                "label": "Total Time Cycle (Hrs) :",
+                "regex": "Total\\s*Time\\s*Cycle\\s*\\(?Hrs\\)?\\s*[:\\-]?\\s*([^\\n|]+)",
+                "type": "string"
+            },
+            "EQUIPMENT_TAG_NO": {
+                "label": "Equipment Tag No.:",
+                "regex": "Equipment\\s*Tag\\s*No\\.?\\s*[:\\-]?\\s*([^/\\n|]+?)(?=\\s*/?\\s*BATCH|$)",
+                "type": "string"
+            },
+            "BATCH_NUMBER": {
+                "label": "BATCH NUMBER",
+                "regex": "BATCH\\s*NUMBER\\s*[:\\-]?\\s*([A-Za-z0-9/\\-]+)",
+                "type": "string"
+            },
+            "STIRRER_BELT_CHECK": {
+                "label": "Stirrer Belt Condition Check by",
+                "regex": "Stirrer\\s*Belt\\s*Condition\\s*Check\\s*by\\s*[:\\-]?\\s*([^\\n|]+)",
+                "type": "string"
+            },
+            "REACTOR_CLEANED_BY": {
+                "label": "Reactor Cleaned by",
+                "regex": "Reactor\\s*Cleaned\\s*by\\s*[:\\-]?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Reactor\\s*Cleaning|$)",
+                "type": "string"
+            },
+            "REACTOR_CLEANING_CHECKED": {
+                "label": "Reactor Cleaning Checked",
+                "regex": "Reactor\\s*Cleaning\\s*Checked\\s*[:\\-]?\\s*([^\\n|]+)",
+                "type": "string"
+            },
+            "BATCH_START_DATE": {
+                "label": "Batch Start Date :",
+                "regex": "Batch\\s*Start\\s*Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
+            },
+            "BATCH_STARTED_EXECUTIVE": {
+                "label": "Batch Started by (Prod. Executive)",
+                "regex": "Batch\\s*Started\\s*by\\s*\\(?Prod\\.?\\s*Executive\\)?\\s*[:\\-]?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Batch\\s*Started\\s*by\\s*\\(?Operator|$)",
+                "type": "string"
+            },
+            "BATCH_STARTED_OPERATOR": {
+                "label": "Batch Started by (Operator)",
+                "regex": "Batch\\s*Started\\s*by\\s*\\(?Operator\\)?\\s*[:\\-]?\\s*([^\\n|]+)",
+                "type": "string"
+            },
+            "BATCH_COMPLETED_EXECUTIVE": {
+                "label": "Batch Completed by (Prod. Executive)",
+                "regex": "Batch\\s*Completed\\s*by\\s*\\(?Prod\\.?\\s*Executive\\)?\\s*[:\\-]?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Batch\\s*Completed\\s*by\\s*\\(?Operator|$)",
+                "type": "string"
+            },
+            "BATCH_COMPLETED_OPERATOR": {
+                "label": "Batch Completed by (Operator)",
+                "regex": "Batch\\s*Completed\\s*by\\s*\\(?Operator\\)?\\s*[:\\-]?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "PHYSICAL_APPEARANCE": {
-                "label": "Physical Appearance",
-                "regex": "Phy\\.?\\s*App\\.?\\s*:\\s*([^\\n\\|]+)",
+                "label": "Phy. App. :",
+                "regex": "Phy\\.?\\s*App\\.?\\s*[:\\-]?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "SP_GRAVITY": {
-                "label": "Sp. Gravity",
-                "regex": "Sp\\.?\\s*Gravity\\s*:\\s*([\\d\\.]+)",
+                "label": "Sp. Gravity :",
+                "regex": "Sp\\.?\\s*Gravity\\s*[:\\-]?\\s*([\\d\\.]+)",
                 "type": "string"
             },
             "PH": {
-                "label": "pH",
-                "regex": "pH\\s*:\\s*([\\d\\.]+)",
+                "label": "pH :",
+                "regex": "pH\\s*[:\\-]?\\s*([\\d\\.]+)",
                 "type": "string"
             },
             "VISCOSITY": {
-                "label": "Viscosity",
-                "regex": "Viscosity\\s*:\\s*([\\d\\.]+)",
+                "label": "Viscosity :",
+                "regex": "Viscosity\\s*[:\\-]?\\s*([\\d\\.]+)",
                 "type": "string"
             },
             "SOLID_CONTENT": {
-                "label": "Solid Content",
-                "regex": "Solid\\s*Content\\s*:\\s*([\\d\\.]+)",
+                "label": "Solid Content :",
+                "regex": "Solid\\s*Content\\s*[:\\-]?\\s*([\\d\\.]+)",
                 "type": "string"
+            },
+            "FINAL_OUTPUT": {
+                "label": "Final Results : Output : Kgs",
+                "regex": "Output\\s*[:\\-]?\\s*([\\d,\\.]+)\\s*Kgs",
+                "type": "string"
+            },
+            "PACKING_DETAILS": {
+                "label": "Packing Details :",
+                "regex": "Packing\\s*Details\\s*[:\\-]?\\s*([^\\n|]+)",
+                "type": "string"
+            }
+        },
+        "tables": {
+            "batch_reconciliation": {
+                "section_header": "Batch Reconciliation",
+                "extract_all_columns": true,
+                "column_mapping": {
+                    "input_caps": [
+                        "Input Caps. (Kgs)",
+                        "Input Caps."
+                    ],
+                    "output_caps": [
+                        "Output Caps. (Kgs)",
+                        "Output Caps."
+                    ],
+                    "total_loss": [
+                        "Total Loss (Kgs)",
+                        "Total Loss"
+                    ],
+                    "actual_yield": [
+                        "Actual Yield Percentage",
+                        "Actual Yield"
+                    ],
+                    "theoretical_yield": [
+                        "Theoretical Yield Percentage",
+                        "Theoretical Yield"
+                    ]
+                },
+                "static_text": {
+                    "target_yield": "98% -100 %"
+                }
+            },
+            "time_cycle": {
+                "section_header": "Time Cycle",
+                "extract_all_columns": true,
+                "dynamic_rows": true,
+                "column_mapping": {
+                    "sn": [
+                        "S.N.",
+                        "S.No."
+                    ],
+                    "batch_activity": [
+                        "BATCH ACTIVITY"
+                    ],
+                    "start_time": [
+                        "START TIME (Hrs)",
+                        "START TIME"
+                    ],
+                    "end_time": [
+                        "END TIME (Hrs)",
+                        "END TIME"
+                    ],
+                    "total_time": [
+                        "TOTAL TIME (Hrs)",
+                        "TOTAL TIME"
+                    ],
+                    "remarks": [
+                        "REMARKS"
+                    ]
+                },
+                "summary_rows": {
+                    "total_time": {
+                        "label": "Total Time"
+                    }
+                }
+            },
+            "packing_material": {
+                "section_header": "Packing Material",
+                "extract_all_columns": true,
+                "dynamic_rows": true,
+                "column_mapping": {
+                    "sn": [
+                        "S.N.",
+                        "S.No."
+                    ],
+                    "packing": [
+                        "Packing"
+                    ],
+                    "packing_details": [
+                        "Packing Details"
+                    ],
+                    "total_packing": [
+                        "Total Packing (Kgs)",
+                        "Total Packing"
+                    ],
+                    "imi_ar_no": [
+                        "I.M.I. / AR No.",
+                        "IMI / AR No."
+                    ],
+                    "received_by": [
+                        "Received By"
+                    ],
+                    "checked_by": [
+                        "Checked By"
+                    ],
+                    "remarks": [
+                        "Remarks"
+                    ]
+                },
+                "summary_rows": {
+                    "total": {
+                        "label": "Total",
+                        "additional": "No. of Unit :"
+                    }
+                }
+            },
+            "material_charging": {
+                "extract_all_columns": true,
+                "dynamic_rows": true,
+                "column_mapping": {
+                    "sn": [
+                        "S.N.",
+                        "S.No."
+                    ],
+                    "rm_name": [
+                        "RM NAME",
+                        "Raw Material"
+                    ],
+                    "qty_kgs": [
+                        "QTY (KGS)",
+                        "QTY"
+                    ],
+                    "imi_ar_no": [
+                        "I.M.I. / A.R. NUMBER",
+                        "IMI / AR No."
+                    ],
+                    "received_by": [
+                        "RECEIVED BY"
+                    ],
+                    "checked_by": [
+                        "CHECKED BY"
+                    ],
+                    "remarks": [
+                        "REMARKS"
+                    ]
+                },
+                "summary_rows": {
+                    "total_qty": {
+                        "label": "Total Qty (Kgs)"
+                    }
+                }
+            },
+            "batch_process": {
+                "extract_all_columns": true,
+                "dynamic_rows": true,
+                "multi_page": true,
+                "column_mapping": {
+                    "sn": [
+                        "S.N.",
+                        "S.No."
+                    ],
+                    "batch_process_details": [
+                        "Batch Process Details",
+                        "Batch Process"
+                    ],
+                    "qty_kgs": [
+                        "QTY (Kgs)",
+                        "QTY"
+                    ],
+                    "start_time": [
+                        "Start Time"
+                    ],
+                    "end_time": [
+                        "End Time"
+                    ],
+                    "temperature": [
+                        "Temperature"
+                    ],
+                    "remarks": [
+                        "Remarks",
+                        "REMARKS"
+                    ]
+                }
             }
         },
         "table_config": {
             "extract_all_columns": true,
             "dynamic_rows": true,
-            "header_identifier_keywords": [
-                "BATCH ACTIVITY",
-                "RM NAME",
-                "Input Caps.",
-                "Packing",
-                "Packing Details",
-                "Batch Process Details"
-            ],
             "parameter_column_keywords": [
                 "BATCH ACTIVITY",
-                "RM NAME",
                 "Packing",
-                "Input Caps",
-                "Output Caps",
-                "Actual Yield Percentage",
-                "Theoretical Yield Percentage",
-                "Batch Process Details"
+                "Input Caps."
             ],
             "result_column_keywords": [
                 "TOTAL TIME",
-                "QTY (KGS)",
                 "Total Packing",
                 "REMARKS",
-                "RECEIVED BY",
-                "Actual Yield Percentage",
-                "Theoretical Yield Percentage",
-                "Yield",
                 "Output Caps.",
-                "Total Loss",
-                "Start Time",
-                "End Time",
-                "Temperature"
+                "Actual Yield"
             ],
             "index_column_keywords": [
                 "S.N.",
-                "SR.NO",
-                "NO."
+                "SR.NO"
             ]
         },
         "footer_fields": {
+            "REMARKS": {
+                "label": "Remarks (If any)",
+                "regex": "Remarks\\s*\\(?If\\s*any\\)?\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Reviewed|Approved|PREPARED|$))",
+                "type": "string"
+            },
+            "INTERNAL_PREPARED_BY": {
+                "label": "Prepared By",
+                "expected_label": [
+                    "Executive - Production"
+                ],
+                "type": "signature"
+            },
+            "INTERNAL_REVIEWED_BY": {
+                "label": "Reviewed By",
+                "expected_label": [
+                    "Incharge - Production",
+                    "In-Charge - Production"
+                ],
+                "type": "signature"
+            },
             "PREPARED_BY": {
                 "label": "PREPARED BY",
-                "regex": "(?i)PREPARED\\s*BY[\\s\\|]*([\\w\\s]+?)(?=\\||\\n)",
-                "type": "string"
+                "expected_label": [
+                    "INCHARGE - PRODUCTION",
+                    "IN-CHARGE (PRODUCTION)",
+                    "INCHARGE (PRODUCTION)"
+                ],
+                "type": "signature"
             },
             "REVIEWED_BY": {
                 "label": "REVIEWED BY",
-                "regex": "(?i)REVIEWED\\s*BY[\\s\\|]*([\\w\\s]+?)(?=\\||\\n)",
-                "type": "string"
+                "expected_label": [
+                    "MANAGER - PRODUCTION",
+                    "MANAGER (PRODUCTION)"
+                ],
+                "type": "signature"
             },
             "APPROVED_BY": {
                 "label": "APPROVED BY",
-                "regex": "(?i)APPROVED\\s*BY[\\s\\|]*([\\w\\s]+?)(?=\\||\\n)",
-                "type": "string"
+                "expected_label": [
+                    "MANAGER - Q.A.",
+                    "MANAGER (Q.A.)",
+                    "MANAGER (QA)"
+                ],
+                "type": "signature"
             }
-        }
+        },
+        "noise_markers": [
+            "MASTER COPY",
+            "CONTROLLED COPY",
+            "Copy No.",
+            "Issued by",
+            "|"
+        ]
     }
 }

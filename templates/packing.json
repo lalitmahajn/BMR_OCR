@@ -1,51 +1,57 @@
 {
     "page_type": "PACKING_DETAILS",
-    "base_width": 1000,
-    "base_height": 1414,
+    "document_metadata": {
+        "document_type": "PACKING DETAILS",
+        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD.",
+        "document_title": "Packing Details",
+        "stamp": "MASTER COPY",
+        "ref_bmr_no": "RR-08-14",
+        "pagination_pattern": "Page\\s*No\\.-(\\d+)\\s*of\\s*(\\d+)"
+    },
     "extraction_template": {
         "header_fields": {
             "PRODUCT_NAME": {
-                "label": "Name of Product",
-                "regex": "Name\\s*of\\s*Product\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "label": "Name of Product :",
+                "regex": "Name\\s*of\\s*Product\\s*[:\\-]?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "BATCH_NO": {
-                "label": "Batch No",
-                "regex": "Batch\\s*No\\.\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "label": "Batch No. :",
+                "regex": "Batch\\s*No\\.?\\s*[:\\-]?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "TOTAL_QTY": {
-                "label": "Total Qty",
-                "regex": "Total\\s*Qty\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "label": "Total Qty:",
+                "regex": "Total\\s*Qty\\s*[:\\-]?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "TARE_WT": {
-                "label": "Tare Wet",
-                "regex": "Tare\\s*Wet\\.?\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "label": "Tare Wet.:",
+                "regex": "Tare\\s*Wet\\.?\\s*[:\\-]?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "BALANCE_ID": {
-                "label": "Balance ID",
-                "regex": "Balance\\s*ID\\.No\\.\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "label": "Balance ID.No. :",
+                "regex": "Balance\\s*ID\\.?\\s*No\\.?\\s*[:\\-]?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "CALIBRATION_STATUS": {
-                "label": "Calibration Status",
-                "regex": "Calibration\\s*status\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "label": "Calibration status:",
+                "regex": "Calibration\\s*status\\s*[:\\-]?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "RINSING_STATUS": {
-                "label": "Rinsing Status",
-                "regex": "Rinsed\\s*\\(Yes\\s*/\\s*No\\)\\s*[:\\-]?\\s*([^\\|\\n]+)",
+                "label": "All Carboy's/Barrels/IBC Rinsed (Yes / No):",
+                "regex": "Rinsed\\s*\\(?Yes\\s*/\\s*No\\)?\\s*[:\\-]?\\s*([^\\n|]+)",
                 "type": "string"
             },
-            "REF_BMR_NO": {
-                "label": "Ref. BMR No.",
-                "regex": "Ref\\.\\s*BMR\\s*No\\.\\s*[:\\-]?\\s*([^\\|\\n]+)",
-                "type": "string"
+            "SIGNATURE_DATE": {
+                "label": "Signature and Date:",
+                "regex": "Signature\\s*and\\s*Date\\s*[:\\-]?\\s*([^\\n|]+)",
+                "type": "signature"
             },
             "PAGE_INFO": {
-                "label": "Page Info",
+                "label": "Page No.",
                 "regex": "Page\\s*No\\.-(\\d+\\s*of\\s*\\d+)",
                 "type": "string"
             }
@@ -53,27 +59,36 @@
         "table_config": {
             "extract_all_columns": true,
             "dynamic_rows": true,
-            "header_identifier_keywords": [
-                "Packing Details",
-                "Drum No.",
-                "Gross Wet",
-                "Gross Wgt"
-            ],
-            "end_identifier_keywords": [
+            "multi_page": true,
+            "calculation_rule": "Net wet = Gross wet - Tare Wet",
+            "column_mapping": {
+                "drum_no": [
+                    "Drum No."
+                ],
+                "gross_wet": [
+                    "Gross Wet.",
+                    "Gross Wgt."
+                ],
+                "done_by": [
+                    "Done By"
+                ],
+                "checked_by": [
+                    "Checked By"
+                ]
+            },
+            "noise_markers": [
                 "CONTROLLED COPY",
-                "Net wet",
-                "Issued by"
+                "Copy No.",
+                "Issued by",
+                "Net wet"
             ],
-            "parameter_column_keywords": [
-                "Drum No."
-            ],
-            "result_column_keywords": [
-                "Gross Wet.",
-                "Gross Wgt.",
-                "Done By",
-                "Checked By"
-            ],
-            "index_column_keywords": []
-        }
+            "checked_by_note": "One common checked by sign from drum No. 01 to 10 and after same till end"
+        },
+        "noise_markers": [
+            "MASTER COPY",
+            "CONTROLLED COPY",
+            "Copy No.",
+            "Issued by"
+        ]
     }
 }

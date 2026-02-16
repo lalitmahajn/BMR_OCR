@@ -1,70 +1,204 @@
 {
     "page_type": "SOP",
-    "base_width": 1000,
-    "base_height": 1414,
+    "document_metadata": {
+        "document_type": "STANDARD OPERATING PROCEDURE",
+        "company_name": "RISHABH METALS AND CHEMICALS PVT. LTD.",
+        "document_title": "STANDARD OPERATING PROCEDURE",
+        "stamp": "MASTER COPY",
+        "pagination_pattern": "Page\\s*(\\d+)\\s*of\\s*(\\d+)"
+    },
     "extraction_template": {
         "header_fields": {
-            "DOC_TITLE": {
-                "regex": "(?m)^.{0,30}(?:STANDARD|RICHARD)\\s*OPERATING\\s*PROCEDURE",
-                "type": "string"
-            },
             "SOP_NO": {
-                "label": "SOP NO.",
+                "label": "SOP NO.:",
+                "regex": "SOP\\s*NO\\.?\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:REVISION|$))",
                 "type": "string"
             },
             "REVISION": {
-                "label": "REVISION",
+                "label": "REVISION:",
+                "regex": "REVISION\\s*[:\\-]?\\s*(\\d+)",
+                "type": "string"
+            },
+            "PRODUCT_NAME": {
+                "label": "NAME OF PRODUCT:",
+                "regex": "NAME\\s*OF\\s*PRODUCT\\s*[:\\-]?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "EFFECTIVE_DATE": {
-                "label": "EFFECTIVE DATE",
+                "label": "EFFECTIVE DATE:",
+                "regex": "EFFECTIVE\\s*DATE\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
-            },
-            "PRODUCT_NAME": {
-                "label": "NAME OF PRODUCT",
-                "type": "string"
             },
             "PAGE_INFO": {
                 "label": "Page",
-                "regex": "Page\\s*\\d+\\s*of\\s*\\d+",
+                "regex": "Page\\s*(\\d+\\s*of\\s*\\d+)",
                 "type": "string"
             },
             "SCOPE": {
-                "regex": "(?s)(?:#+\\s*)?1\\.\\s*SCOPE\\s*(.*?)(?=Product\\s*5065\\.)",
-                "type": "string"
-            },
-            "BATCH_SIZE_COPY": {
-                "label": "Batch Size Copy",
-                "regex": "Copy:?\\s*([\\d,]+\\s*kg)",
+                "label": "1. SCOPE",
+                "regex": "SCOPE\\s*[:\\-]?\\s*([^\\n]+(?:Product\\s*\\d+))",
                 "type": "string"
             },
             "IMPORTANT_NOTES": {
-                "regex": "(?s)(?:#+\\s*)?2\\.1\\s*IMPORTANT\\s*NOTES\\s*(.*?)(?=\\n#+\\s*2\\.2|\\Z)",
-                "type": "string"
+                "label": "2.1 IMPORTANT NOTES",
+                "regex": "(?s)IMPORTANT\\s*NOTES\\s*(.*?)(?=2\\.2|PRE\\s*CHECKS|$)",
+                "type": "text_block",
+                "multi_page": true,
+                "continuation_regex": "(?s)^\\s*((?:\\d+\\)|\\*|\\-|\\d+\\.)\\s+.*?)(?=PREPARED|CHECKED|APPROVED|$)"
             },
             "PRE_CHECKS": {
-                "regex": "(?s)(?:#+\\s*)?2\\.2\\s*PRE\\s*CHECKS\\s*(.*?)(?=\\||\\Z)",
-                "type": "string"
-            },
-            "PRE_CHECKS_CONT": {
-                "regex": "(?s)\\s*(.+?)(?=\\n#+\\s*2\\.3)",
-                "type": "string"
+                "label": "2.2 PRE CHECKS",
+                "regex": "(?s)PRE\\s*CHECKS\\s*(.*?)(?=2\\.3|PRE\\s*OPERATING|PREPARED|$)",
+                "type": "text_block",
+                "multi_page": true,
+                "continuation_regex": "(?s)^\\s*((?:\\d+\\)|\\*|\\-|\\d+\\.)\\s+.*?)(?=PREPARED|CHECKED|APPROVED|$)"
             },
             "PRE_OPERATING_STEPS": {
-                "regex": "(?s)(?:#+\\s*)?2\\.3\\s*PRE\\s*OPERATING\\s*STEPS\\s*(.*?)(?=\\n#+\\s*3)",
-                "type": "string"
+                "label": "2.3 PRE OPERATING STEPS",
+                "regex": "(?s)PRE\\s*OPERATING\\s*STEPS\\s*(.*?)(?=3\\.|BATCH\\s*OPERATING|PREPARED|$)",
+                "type": "text_block",
+                "multi_page": true,
+                "continuation_regex": "(?s)^\\s*((?:\\d+\\)|\\*|\\-|\\d+\\.)\\s+.*?)(?=PREPARED|CHECKED|APPROVED|$)"
             },
             "BATCH_OPERATING_PROCEDURE": {
-                "regex": "(?s)(?:#+\\s*)?3\\.1\\s*BATCH\\s*OPERATING\\s*PROCEDURE\\s*(.*?)(?=\\||\\Z)",
-                "type": "string"
-            },
-            "BATCH_PROCEDURE_CONT": {
-                "regex": "(?s)\\A\\s*(?=\\d+\\)|\\*\\*NOTE)(.*?)(?=\\||\\n#+\\s*3\\.2|\\Z)",
-                "type": "string"
+                "label": "3.1 BATCH OPERATING PROCEDURE",
+                "regex": "(?s)BATCH\\s*OPERATING\\s*PROCEDURE\\s*(.*?)(?=3\\.2|4\\.|PACKING|PREPARED|$)",
+                "type": "text_block",
+                "multi_page": true,
+                "continuation_regex": "(?s)^\\s*((?:\\d+\\)|\\*|\\-|\\d+\\.)\\s+.*?)(?=PREPARED|CHECKED|APPROVED|$)"
             },
             "PACKING_MATERIAL": {
-                "regex": "(?s)(?:#+\\s*)?4\\.\\s*PACKING\\s*OF\\s*MATERIAL\\s*(.*?)(?=\\n#+\\s*5|\\Z)",
-                "type": "string"
+                "label": "4. PACKING OF MATERIAL",
+                "regex": "(?s)PACKING\\s*OF\\s*MATERIAL\\s*(.*?)(?=5\\.|RESPONSIBILITY|PREPARED|$)",
+                "type": "text_block",
+                "multi_page": true,
+                "continuation_regex": "(?s)^\\s*((?:\\d+\\)|\\*|\\-|\\d+\\.)\\s+.*?)(?=PREPARED|CHECKED|APPROVED|$)"
+            }
+        },
+        "tables": {
+            "standard_recipe": {
+                "section_header": "1.1 STANDARD RECIPE",
+                "extract_all_columns": true,
+                "dynamic_rows": true,
+                "column_mapping": {
+                    "sn": [
+                        "S.N.",
+                        "S.No."
+                    ],
+                    "raw_material_name": [
+                        "RAW MATERIAL NAME"
+                    ],
+                    "qty_kgs": [
+                        "QTY (KGS)",
+                        "QTY"
+                    ],
+                    "recipe_percent": [
+                        "RECIPE %",
+                        "RECIPE"
+                    ],
+                    "remarks": [
+                        "REMARKS"
+                    ]
+                },
+                "summary_rows": {
+                    "batch_input": {
+                        "label": "Batch Input/ Theoretical Capacity",
+                        "regex": "Batch\\s*Input/?\\s*Theoretical\\s*Capacity\\s*[\\|]?\\s*([\\d,]+\\s*Kgs)"
+                    },
+                    "batch_output": {
+                        "label": "Batch Output/ Practical Yield",
+                        "regex": "Batch\\s*Output/?\\s*Practical\\s*Yield\\s*[\\|]?\\s*([\\d,]+\\s*Kgs)"
+                    },
+                    "yield_range_kgs": {
+                        "label": "Output Yield Range in Kgs",
+                        "regex": "Output\\s*Yield\\s*Range\\s*in\\s*Kgs\\s*[\\|]?\\s*([\\d\\s\\-]+)"
+                    },
+                    "yield_range_percent": {
+                        "label": "Output Yield Range in Percentage",
+                        "regex": "Output\\s*Yield\\s*Range\\s*in\\s*Percentage\\s*[\\|]?\\s*([\\d\\s\\-]+)"
+                    }
+                }
+            },
+            "batch_recipe": {
+                "section_header": "1.2 BATCH RECIPE",
+                "extract_all_columns": true,
+                "dynamic_rows": true,
+                "column_mapping": {
+                    "sn": [
+                        "S.N.",
+                        "S.No."
+                    ],
+                    "raw_material_name": [
+                        "RAW MATERIAL NAME"
+                    ],
+                    "qty_kgs": [
+                        "QTY (KGS)",
+                        "QTY"
+                    ],
+                    "solid_percent": [
+                        "SOLID %",
+                        "SOLID"
+                    ],
+                    "remarks": [
+                        "REMARKS"
+                    ]
+                },
+                "summary_rows": {
+                    "batch_input": {
+                        "label": "Batch Input/ Theoretical Capacity",
+                        "regex": "Batch\\s*Input/?\\s*Theoretical\\s*Capacity\\s*[\\|]?\\s*([\\d,]+\\s*Kgs)"
+                    }
+                }
+            },
+            "product_specifications": {
+                "section_header": "3.2 AIM FOR PRODUCT SPECIFICATIONS",
+                "extract_all_columns": true,
+                "dynamic_rows": true,
+                "column_mapping": {
+                    "sn": [
+                        "S.N.",
+                        "S.No."
+                    ],
+                    "parameter": [
+                        "PARAMETER"
+                    ],
+                    "specification_limits": [
+                        "SPECIFICATION LIMITS"
+                    ]
+                }
+            },
+            "responsibility": {
+                "section_header": "5. RESPONSIBILITY",
+                "extract_all_columns": true,
+                "dynamic_rows": true,
+                "column_mapping": {
+                    "sn": [
+                        "S.N.",
+                        "S.No."
+                    ],
+                    "activity": [
+                        "Activity"
+                    ],
+                    "role": [
+                        "Role"
+                    ]
+                }
+            },
+            "revision_history": {
+                "section_header": "6. REVISION HISTORY",
+                "extract_all_columns": true,
+                "dynamic_rows": true,
+                "column_mapping": {
+                    "revision_no": [
+                        "REVISION NO."
+                    ],
+                    "effective_date": [
+                        "EFFECTIVE DATE"
+                    ],
+                    "description_of_change": [
+                        "DESCRIPTION OF CHANGE"
+                    ]
+                }
             }
         },
         "table_config": {
@@ -72,46 +206,70 @@
             "dynamic_rows": true,
             "parameter_column_keywords": [
                 "RAW MATERIAL NAME",
-                "RAW MATERIAL",
-                "PARAMETER",
-                "TEST",
-                "DESCRIPTION",
-                "Material Name"
+                "RAW MATERIAL"
             ],
             "result_column_keywords": [
                 "QTY (KGS)",
-                "SPECIFICATION LIMITS",
-                "RESULT",
-                "VALUE",
-                "QTY",
-                "Limits",
                 "RECIPE %",
                 "SOLID %"
             ],
             "index_column_keywords": [
                 "S.N.",
-                "SR.NO",
-                "NO."
-            ]
+                "SR.NO"
+            ],
+            "column_mapping": {
+                "sn": [
+                    "S.N.",
+                    "S.No."
+                ],
+                "raw_material_name": [
+                    "RAW MATERIAL NAME"
+                ],
+                "qty_kgs": [
+                    "QTY (KGS)",
+                    "QTY"
+                ],
+                "recipe_percent": [
+                    "RECIPE %"
+                ],
+                "solid_percent": [
+                    "SOLID %"
+                ],
+                "remarks": [
+                    "REMARKS"
+                ]
+            }
         },
         "footer_fields": {
             "PREPARED_BY": {
-                "label": "PREPARED BY",
-                "type": "string"
+                "label": "PREPARED BY:",
+                "expected_label": [
+                    "IN-CHARGE (PRODUCTION)"
+                ],
+                "type": "signature"
             },
             "CHECKED_BY": {
-                "label": "CHECKED BY",
-                "type": "string"
+                "label": "CHECKED BY:",
+                "expected_label": [
+                    "MANAGER (PRODUCTION)"
+                ],
+                "type": "signature"
             },
             "APPROVED_BY": {
-                "label": "APPROVED BY",
-                "type": "string"
-            },
-            "ISSUED_BY_DATE": {
-                "label": "Issued By",
-                "regex": "Issued\\s*by\\s*(\\d{2}/\\d{2}/\\d{2})",
-                "type": "string"
+                "label": "APPROVED BY:",
+                "expected_label": [
+                    "MANAGER (QA)",
+                    "MANAGER (Q.A.)"
+                ],
+                "type": "signature"
             }
-        }
+        },
+        "noise_markers": [
+            "MASTER COPY",
+            "CONTROLLED COPY",
+            "Copy No.",
+            "Issued by",
+            "|"
+        ]
     }
 }

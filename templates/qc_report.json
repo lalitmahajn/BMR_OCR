@@ -5,59 +5,52 @@
         "page_numbers": [
             1
         ],
-        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD."
+        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD.",
+        "document_title": "FINISHED GOOD Q. C. TEST REPORT FOR SPECIALITY CHEMICALS",
+        "form_no": "SR-12-06",
+        "revision": "00"
     },
     "extraction_template": {
         "header_fields": {
-            "product_name": {
+            "PRODUCT_NAME": {
                 "label": "Product Name",
-                "validation_rules": {
-                    "type": "string",
-                    "required": true
-                }
+                "regex": "Product\\s*Name\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Manufacturing|Batch|AR|$))",
+                "type": "string"
             },
-            "ar_no": {
+            "AR_NO": {
                 "label": "AR No.",
-                "validation_rules": {
-                    "type": "string",
-                    "regex": "^[A-Z0-9- ]+$"
-                }
+                "regex": "AR\\s*No\\.?\\s*[:\\-]?\\s*([A-Z0-9\\s]+?)(?=\\s*(?:Approval|Batch|$))",
+                "type": "string"
             },
-            "batch_no": {
+            "BATCH_NO": {
                 "label": "Batch No.",
-                "validation_rules": {
-                    "type": "numeric"
-                }
+                "regex": "Batch\\s*No\\.?\\s*[:\\-]?\\s*(\\d[\\d\\s]*?)(?=\\s*(?:Packing|Quantity|$))",
+                "type": "string"
             },
-            "mfg_date": {
+            "MFG_DATE": {
                 "label": "Manufacturing Date",
-                "validation_rules": {
-                    "type": "date"
-                }
+                "regex": "Manufacturing\\s*Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             },
-            "exp_date": {
+            "EXP_DATE": {
                 "label": "Exp. Date",
-                "validation_rules": {
-                    "type": "date"
-                }
+                "regex": "Exp\\.?\\s*Date\\s*[=:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             },
-            "approval_date_header": {
+            "APPROVAL_DATE": {
                 "label": "Approval Date",
-                "validation_rules": {
-                    "type": "date"
-                }
+                "regex": "Approval\\s*Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             },
-            "packing_details": {
+            "PACKING_DETAILS": {
                 "label": "Packing Details",
-                "validation_rules": {
-                    "type": "string"
-                }
+                "regex": "Packing\\s*Details\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Quantity|Exp|$))",
+                "type": "string"
             },
-            "quantity": {
+            "QUANTITY": {
                 "label": "Quantity",
-                "validation_rules": {
-                    "type": "numeric_with_unit"
-                }
+                "regex": "Quantity\\s*[:\\-]?\\s*([\\d,]+\\s*(?:KGS|Kgs|kg)?)",
+                "type": "string"
             }
         },
         "test_parameters_table": [
@@ -130,39 +123,29 @@
             ]
         },
         "footer_fields": {
-            "final_result": {
+            "FINAL_RESULT": {
                 "label": "RESULT",
-                "validation_rules": {
-                    "type": "enum",
-                    "options": [
-                        "APPROVED",
-                        "REJECTED"
-                    ]
-                }
+                "regex": "RESULT\\s*[:\\-]?\\s*(APPROVED|REJECTED)",
+                "type": "string"
             },
-            "remark": {
+            "REMARK": {
                 "label": "REMARKS",
-                "validation_rules": {
-                    "type": "string"
-                }
+                "regex": "REMARKS?\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Analyzed|Form|$))",
+                "type": "string"
             },
-            "analyzed_by": {
+            "ANALYZED_BY": {
                 "label": "Analyzed By / Date",
-                "validation_rules": {
-                    "type": "string"
-                }
+                "regex": "Analyzed\\s*By\\s*/\\s*Date\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Approved|QC|$))",
+                "type": "string"
             },
-            "reviewed_by": {
+            "REVIEWED_BY": {
                 "label": "Reviewed By / Date",
-                "validation_rules": {
-                    "type": "string"
-                }
+                "type": "string"
             },
-            "approved_by": {
+            "APPROVED_BY": {
                 "label": "Approved By / Date",
-                "validation_rules": {
-                    "type": "string"
-                }
+                "regex": "Approved\\s*By\\s*/\\s*Date\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:FORM|$))",
+                "type": "string"
             }
         },
         "noise_markers": [

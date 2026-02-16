@@ -15,7 +15,6 @@ from dotenv import load_dotenv
 
 from app.engines.ocr import OCRAdapter, OCRResult
 from app.schemas.template import ROI
-from app.utils.mistral_parser import parse_qc_report, clean_ocr_artifacts
 
 
 # Load environment variables
@@ -93,8 +92,12 @@ class MistralOCRAdapter(OCRAdapter):
             if not markdown_text:
                 return OCRResult("", 0.0)
 
-            # Clean OCR artifacts
-            cleaned_text = clean_ocr_artifacts(markdown_text)
+            # Clean OCR artifacts (inline)
+            import re as _re
+
+            cleaned_text = _re.sub(r"\s+", " ", markdown_text)
+            cleaned_text = _re.sub(r"[_]{3,}", "", cleaned_text)
+            cleaned_text = _re.sub(r"\.{3,}", "", cleaned_text).strip()
 
             # 2. Save to Cache
             try:
@@ -204,15 +207,3 @@ class MistralOCRAdapter(OCRAdapter):
         except Exception as e:
             logger.error(f"PDF OCR extraction failed: {e}")
             return []
-
-    def parse_qc_report_fields(self, markdown: str) -> dict:
-        """
-        Parse QC report fields from markdown
-
-        Args:
-            markdown: Markdown text from OCR
-
-        Returns:
-            Dictionary with extracted fields
-        """
-        return parse_qc_report(markdown)

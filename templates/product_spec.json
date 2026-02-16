@@ -2,25 +2,23 @@
     "page_type": "PRODUCT_SPEC",
     "document_metadata": {
         "document_type": "View Product Specification",
-        "page_numbers": [
-            1
-        ],
-        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD"
+        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD."
     },
     "extraction_template": {
         "header_fields": {
-            "shelf_life": {
+            "SHELF_LIFE": {
                 "label": "Shelf Life",
-                "validation_rules": {
-                    "required": true
-                }
+                "regex": "Shelf\\s*Life\\s*[:\\-]?\\s*([^\\n|]+)",
+                "type": "string"
             },
-            "product_code": {
+            "PRODUCT_CODE": {
                 "label": "Product Specification",
                 "expected_label": [
                     "Product Specification >>",
                     "Product Specification"
-                ]
+                ],
+                "regex": "Product\\s*Specification\\s*>+\\s*([\\w]+)",
+                "type": "string"
             }
         },
         "table_config": {
@@ -111,13 +109,15 @@
             }
         ],
         "footer_fields": {
-            "batch_no": {
+            "BATCH_NO": {
                 "label": "No:",
                 "expected_label": [
                     "B. No:",
                     "No:",
                     "Batch No"
-                ]
+                ],
+                "regex": "B\\.?\\s*No[:\\-]?\\s*[-]?\\s*(\\d[\\d]+)",
+                "type": "string"
             }
         }
     }

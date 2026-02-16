@@ -1,30 +1,32 @@
 {
     "page_type": "STORES_REQUISITION",
     "document_metadata": {
-        "document_type": "Stores Requisition Slip Polymer Plant",
-        "page_numbers": [
-            1
-        ],
-        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD"
+        "document_type": "STORES REQUISITION SLIP",
+        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD.",
+        "document_title": "STORES REQUISITION SLIP POLYMER PLANT",
+        "form_no": "SR-20-08,Rev:00"
     },
     "extraction_template": {
         "header_fields": {
-            "batch_no": {
+            "BATCH_NO": {
                 "label": "B. No.",
-                "expected_label": [
-                    "B. No.",
-                    "B.No.",
-                    "Batch No"
-                ]
+                "regex": "B\\.?\\s*No\\.?\\s*[:\\-]?\\s*([A-Z0-9/\\-]+)",
+                "type": "string"
             },
-            "date": {
-                "label": "Date:"
+            "DATE": {
+                "label": "Date :",
+                "regex": "Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             },
-            "product_name": {
-                "label": "Product Name:"
+            "PRODUCT_NAME": {
+                "label": "Product Name :",
+                "regex": "Product\\s*Name\\s*[:\\-]?\\s*([^\\n|]+)",
+                "type": "string"
             },
-            "batch_capacity": {
-                "label": "Batch Capacity:"
+            "BATCH_CAPACITY": {
+                "label": "Batch Capacity :",
+                "regex": "Batch\\s*Capacity\\s*[:\\-]?\\s*([\\d,]+\\s*(?:Kgs|KGS|kg)?)",
+                "type": "string"
             }
         },
         "table_config": {
@@ -33,43 +35,27 @@
                 "Material",
                 "Item"
             ],
-            "index_column_keywords": [
-                "sr. no.",
-                "sr. no",
-                "no.",
-                "no"
-            ],
-            "header_identifier_keywords": [
-                "particulars",
-                "qty",
-                "issued",
-                "remarks"
-            ],
             "extract_all_columns": true,
+            "dynamic_rows": true,
             "column_mapping": {
                 "sr_no": [
                     "Sr. No.",
-                    "Sr. No",
-                    "No."
+                    "Sr.No."
                 ],
                 "particulars": [
-                    "Particulars",
-                    "Material",
-                    "Item"
+                    "Particulars"
                 ],
                 "qty_required": [
                     "Qty. Required Kgs.",
-                    "Qty Required",
-                    "Required"
+                    "Qty. Required"
                 ],
                 "issued_qty": [
                     "Issued Qty. Kgs.",
-                    "Issued Qty",
-                    "Issued"
+                    "Issued Qty."
                 ],
-                "lot_no": [
+                "suppliers_lot_no": [
                     "Suppliers Lot No. IMI No. / A.R.No.",
-                    "Lot No.",
+                    "Suppliers Lot No.",
                     "IMI No."
                 ],
                 "remarks": [
@@ -77,31 +63,28 @@
                 ]
             },
             "noise_markers": [
-                "Form No.",
-                "Rev:"
+                "Form No.:",
+                "Rev:",
+                "Production In-charge",
+                "Production Executive"
             ]
         },
-        "test_parameters_table": [],
         "footer_fields": {
-            "issued_by": {
-                "label": "Issued By"
+            "ISSUED_BY": {
+                "label": "Issued By",
+                "type": "signature"
             },
-            "issued_date": {
-                "label": "Date",
-                "expected_label": [
-                    "Date",
-                    "21-01-26"
-                ]
-            },
-            "received_by": {
-                "label": "Received By"
-            },
-            "production_incharge": {
-                "label": "Production In-charge",
+            "PRODUCTION_INCHARGE": {
+                "label": "Production In-charge / Production Executive",
                 "expected_label": [
                     "Production In-charge",
                     "Production Executive"
-                ]
+                ],
+                "type": "signature"
+            },
+            "RECEIVED_BY": {
+                "label": "Received By",
+                "type": "signature"
             }
         }
     }

@@ -1,91 +1,73 @@
 import sys
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from app.core.config import settings
-from app.models.domain import Document, Page, Field
+from pathlib import Path
+from loguru import logger
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import Session
+
+sys.path.append(str(Path(__file__).parent.parent))
+
+from app.engines.storage import StorageEngine
+from app.models.domain import Page, Field
+
+# Setup logging
+logger.remove()
+logger.add(sys.stderr, level="INFO")
 
 
 def verify_db():
-    print(f"Connecting to DB: {settings.DATABASE_URL}")
-    engine = create_engine(settings.DATABASE_URL)
-    Session = sessionmaker(bind=engine)
-    session = Session()
+    storage = StorageEngine()
+    session = storage.get_session()
 
-    # DEBUG: List ALL pages
-    all_pages = session.query(Page).all()
-    print(f"Total Pages in DB: {len(all_pages)}")
-    for p in all_pages:
-        print(f" - Page ID={p.id}, DocID={p.document_id}, PageNum={p.page_number}")
+    try:
+        # Check P27/P28 (Packing Details)
+        logger.info("--- Checking Packing Details (P27/P28) ---")
+        packing_pages = session.scalars(
+            select(Page).where(Page.page_type == "PACKING_DETAILS")
+        ).all()
 
-    # Find all documents with this name
-    doc_name = "SOP_EXTRACT_RUN_FINAL.pdf"
-    docs = session.query(Document).filter_by(filename=doc_name).all()
+        if not packing_pages:
+            logger.error("❌ No PACKING_DETAILS pages found in DB!")
+        else:
+            for p in packing_pages:
+                fields = {f.name: f.ocr_value for f in p.fields}
+                logger.info(
+                    f"Page {p.page_number} (ID: {p.id}): Found {len(fields)} fields"
+                )
+                required = ["PRODUCT_NAME", "BATCH_NO", "TOTAL_QTY"]
+                missing = [k for k in required if k not in fields]
+                if missing:
+                    logger.error(f"  ❌ Missing headers: {missing}")
+                else:
+                    logger.info(
+                        f"  ✅ Headers found: Product='{fields.get('PRODUCT_NAME')}', Batch='{fields.get('BATCH_NO')}'"
+                    )
 
-    if not docs:
-        print(f"Document {doc_name} NOT FOUND in DB.")
-        return
+        # Check P29/P30 (Checklist)
+        logger.info("\n--- Checking Checklist (P29/P30) ---")
+        checklist_pages = session.scalars(
+            select(Page).where(Page.page_type == "BMR_CHECKLIST")
+        ).all()
 
-    print(f"Found {len(docs)} Documents with name {doc_name}:")
+        if not checklist_pages:
+            logger.error("❌ No BMR_CHECKLIST pages found in DB!")
+        else:
+            for p in checklist_pages:
+                fields = {f.name: f.ocr_value for f in p.fields}
+                logger.info(
+                    f"Page {p.page_number} (ID: {p.id}): Found {len(fields)} fields"
+                )
 
-    selected_doc = None
-    for d in docs:
-        page_count = session.query(Page).filter_by(document_id=d.id).count()
-        print(f" - ID={d.id}, Created={d.ingested_at}, Pages={page_count}")
-        if page_count > 0:
-            selected_doc = d
+                # Check for status
+                status_fields = [f for f in fields.values() if f in ["Yes", "No", "NA"]]
+                if len(status_fields) > 0:
+                    logger.info(
+                        f"  ✅ Found {len(status_fields)} status fields (Yes/No/NA)"
+                    )
+                else:
+                    logger.warning("  ⚠️ No status fields found")
 
-    if not selected_doc:
-        print("No document with pages found.")
-        return
-
-    doc = selected_doc
-    print(f"\nVerifying details for Document ID={doc.id}...")
-
-    # List Pages
-    pages = (
-        session.query(Page)
-        .filter_by(document_id=doc.id)
-        .order_by(Page.page_number)
-        .all()
-    )
-    print(f"Found {len(pages)} Pages.")
-
-    for p in pages:
-        print(f"\n--- Page {p.page_number} ({p.page_type}) ---")
-        fields = session.query(Field).filter_by(page_id=p.id).all()
-        print(f"Extracted {len(fields)} Fields:")
-
-        # Group by Table vs Header
-        headers = []
-        tables = []
-        for f in fields:
-            if f.name.startswith("TABLE_"):
-                tables.append(f)
-            else:
-                headers.append(f)
-
-        print(f"  Headers ({len(headers)}):")
-        for h in headers:
-            val_snippet = (
-                (h.ocr_value[:50] + "...")
-                if h.ocr_value and len(h.ocr_value) > 50
-                else h.ocr_value
-            )
-            print(f"    - {h.name}: {val_snippet}")
-
-        print(f"  Table Fields ({len(tables)}):")
-        # Print first few table fields to verify structure
-        for t in tables[:5]:
-            val_snippet = (
-                (t.ocr_value[:50] + "...")
-                if t.ocr_value and len(t.ocr_value) > 50
-                else t.ocr_value
-            )
-            print(f"    - {t.name}: {val_snippet}")
-        if len(tables) > 5:
-            print(f"    ... and {len(tables) - 5} more.")
-
-    session.close()
+    finally:
+        session.close()
 
 
 if __name__ == "__main__":

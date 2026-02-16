@@ -30,6 +30,11 @@ class ConfigField(BaseModel):
     model_config = {"extra": "allow"}
     label: Optional[str] = None
     value: Optional[str] = None
+    regex: Optional[str] = None
+    type: Optional[str] = "string"
+    expected_label: Optional[List[str]] = None
+    multi_page: Optional[bool] = False
+    continuation_regex: Optional[str] = None
     validation_rules: Optional[ValidationRule] = None
 
 
@@ -56,6 +61,9 @@ class TableConfig(BaseModel):
     dynamic_rows: Optional[bool] = False
     column_mapping: Optional[Dict[str, List[str]]] = None
     noise_markers: Optional[List[str]] = None
+    multi_page: Optional[bool] = False
+    section_header: Optional[str] = None
+    summary_rows: Optional[Dict[str, Any]] = None
 
 
 class ExtractionTemplate(BaseModel):
@@ -63,6 +71,7 @@ class ExtractionTemplate(BaseModel):
     header_fields: Optional[Dict[str, ConfigField]] = None
     test_parameters_table: Optional[List[TableRowTemplate]] = None
     table_config: Optional[TableConfig] = None
+    tables: Optional[Dict[str, TableConfig]] = None
     footer_fields: Optional[Dict[str, Any]] = None
     noise_markers: Optional[List[str]] = None
 

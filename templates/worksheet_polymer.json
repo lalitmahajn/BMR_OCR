@@ -2,163 +2,181 @@
     "page_type": "WORKSHEET_POLYMER",
     "document_metadata": {
         "document_type": "WORKSHEET FOR POLYMER PRODUCT",
-        "page_numbers": [
-            3,
-            4,
-            5
-        ],
         "company_name": "RISHABH METALS & CHEMICAL PVT LTD.",
+        "document_title": "WORKSHEET FOR POLYMER PRODUCT",
         "document_no": "POLY/01/00",
-        "revision_no": "03"
+        "revision_no": "03",
+        "stamp": "MASTER COPY",
+        "effective_date": "",
+        "next_revision_due": ""
     },
     "extraction_template": {
         "header_fields": {
-            "product_code": {
+            "PRODUCT_CODE": {
                 "label": "Product Code:",
-                "validation_rules": {
-                    "type": "string"
-                }
+                "regex": "Product\\s*Code\\s*[:\\-]?\\s*([^\\n|]+)",
+                "type": "string"
             },
-            "ar_no": {
+            "AR_NO": {
                 "label": "AR. No.",
-                "validation_rules": {
-                    "type": "string"
-                }
+                "regex": "AR\\.?\\s*No\\.?\\s*[:\\-]?\\s*([A-Z0-9\\s]+?)(?=\\s*(?:Batch|$))",
+                "type": "string"
             },
-            "batch_no": {
+            "BATCH_NO": {
                 "label": "Batch No.",
-                "validation_rules": {
-                    "type": "numeric"
-                }
+                "regex": "Batch\\s*No\\.?\\s*[:\\-]?\\s*(\\d[\\d\\s]*?)(?=\\s*(?:No\\.|containers|$))",
+                "type": "string"
             },
-            "containers_packs": {
-                "label": "No. of containers/packs",
-                "validation_rules": {
-                    "type": "string"
-                }
+            "CONTAINERS_PACKS": {
+                "label": "No. of containers / packs",
+                "regex": "No\\.\\s*of\\s*containers?\\s*/?\\s*packs?\\s*[:\\-]?\\s*([^\\n|]+)",
+                "type": "string"
             },
-            "batch_quantity": {
+            "BATCH_QUANTITY": {
                 "label": "Batch Quantity",
-                "validation_rules": {
-                    "type": "numeric_with_unit"
-                }
+                "regex": "Batch\\s*Quantity\\s*[:\\-]?\\s*([\\d,]+\\s*(?:Kg|KGS|kg)?)",
+                "type": "string"
             },
-            "sampled_quantity": {
+            "SAMPLED_QUANTITY": {
                 "label": "Sampled quantity",
-                "validation_rules": {
-                    "type": "string"
-                }
+                "regex": "Sampled\\s*quantity\\s*[:\\-]?\\s*([^\\n|]+)",
+                "type": "string"
             },
-            "sampling_date": {
+            "SAMPLING_DATE": {
                 "label": "Sampling date",
-                "validation_rules": {
-                    "type": "date"
-                }
+                "regex": "Sampling\\s*date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             },
-            "analysis_date": {
+            "ANALYSIS_DATE": {
                 "label": "Date of Analysis",
-                "validation_rules": {
-                    "type": "date"
-                }
+                "regex": "Date\\s*of\\s*Analysis\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             },
-            "analyzed_by": {
+            "ANALYZED_BY": {
                 "label": "Analyzed by",
-                "validation_rules": {
-                    "type": "string"
-                }
+                "regex": "Analyzed\\s*by\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Released|$))",
+                "type": "string"
             },
-            "released_date": {
+            "RELEASED_DATE": {
                 "label": "Released Date",
-                "validation_rules": {
-                    "type": "date"
-                }
+                "regex": "Released\\s*Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             }
         },
         "test_parameters_table": [
             {
                 "sr_no": 1,
                 "parameter": "Physical Appearance",
-                "observation_label": "Observation:"
+                "observation_label": "Observation:",
+                "regex": "Observation\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Complies|Does|Conditions|$))"
             },
             {
                 "sr_no": 2,
                 "parameter": "Viscosity",
-                "observation_label": "Observation:"
+                "observation_label": "Observation:",
+                "regex": "Observation\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Complies|Does|Conditions|$))"
             },
             {
                 "sr_no": 3,
                 "parameter": "pH",
-                "observation_label": "Observation:"
+                "observation_label": "Observation:",
+                "regex": "Observation\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Complies|Does|Conditions|$))"
             },
             {
                 "sr_no": 4,
                 "parameter": "Specific Gravity",
-                "observation_label": "Observation:"
+                "observation_label": "Observation:",
+                "regex": "Observation\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Complies|Does|Conditions|$))"
             },
             {
                 "sr_no": 5,
                 "parameter": "Solubility",
-                "observation_label": "Observation:"
+                "observation_label": "Observation:",
+                "regex": "Observation\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Complies|Does|Conditions|$))"
             },
             {
                 "sr_no": 6,
                 "parameter": "Ionicity",
-                "observation_label": "Observation: cationic/Anionic/Nonionic"
+                "observation_label": "Observation: cationic / Anionic / Non ionic",
+                "regex": "Observation\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Complies|Does|Conditions|$))"
             },
             {
                 "sr_no": 7,
                 "parameter": "Turbidity",
-                "result_label": "Turbidity ="
+                "result_label": "Turbidity =",
+                "regex": "Turbidity\\s*=\\s*([^\\n|]+?)(?=\\s*(?:NTU|Complies|Does|$))"
             },
             {
                 "sr_no": 8,
                 "parameter": "Charge",
-                "result_label": "meq/liter"
+                "result_label": "meq/liter",
+                "regex": "=\\s*([\\d\\.]+)\\s*meq/liter"
             },
             {
                 "sr_no": 9,
-                "parameter": "Solid Content - Weight (A) (I)",
-                "result_label": "(I) .* (A). "
+                "parameter": "Solid Content - Weight (I)-(A)",
+                "result_label": "(I) .* (A)",
+                "regex": "\\(I\\).*?Weight of dried Sample.*?=\\s*\\(A\\)\\s*([\\d\\.]+)"
             },
             {
                 "sr_no": 9,
-                "parameter": "Solid Content - Net Weight (C) (I)",
-                "result_label": "(I) .* (C). "
+                "parameter": "Solid Content - Net Weight (I)-(C)",
+                "result_label": "(I) .* (C)",
+                "regex": "\\(I\\).*?Net weight of dried Sample.*?=\\s*\\(C\\)\\s*([\\d\\.]+)"
             },
             {
                 "sr_no": 9,
-                "parameter": "Solid Content - Weight (A) (II)",
-                "result_label": "(II) .* (A) "
+                "parameter": "Solid Content - Weight (II)-(A)",
+                "result_label": "(II) .* (A)",
+                "regex": "\\(II\\).*?Weight of dried Sample.*?=\\s*\\(A\\)\\s*([\\d\\.]+)"
             },
             {
                 "sr_no": 9,
-                "parameter": "Solid Content - Net Weight (C) (II)",
-                "result_label": "(II) .* (C) "
+                "parameter": "Solid Content - Net Weight (II)-(C)",
+                "result_label": "(II) .* (C)",
+                "regex": "\\(II\\).*?Net weight of dried Sample.*?=\\s*\\(C\\)\\s*([\\d\\.]+)"
             },
             {
                 "sr_no": 9,
                 "parameter": "Solid Content - Avg Result",
-                "result_label": "Avg. ="
+                "result_label": "Avg. =",
+                "regex": "Avg\\.\\s*=\\s*([^\\n|]+?)(?=\\s*(?:Complies|Does|$))"
             },
             {
                 "sr_no": 10,
-                "parameter": "Stability - pH (Initial)",
-                "result_label": "Initial\n"
+                "parameter": "Stability - 80°C - pH (Initial)",
+                "result_label": "Initial",
+                "regex": "Initial.*?pH\\s*[:\\-]?\\s*([\\d\\.]+)"
             },
             {
                 "sr_no": 10,
-                "parameter": "Stability - Viscosity (Initial)",
-                "result_label": "Initial\n\n"
+                "parameter": "Stability - 80°C - Viscosity (Initial)",
+                "result_label": "Initial",
+                "regex": "Initial.*?Viscosity\\s*[:\\-]?\\s*([\\d\\.]+)"
             },
             {
                 "sr_no": 10,
-                "parameter": "Stability - pH (32h)",
-                "result_label": "Initial\n\n\n\n"
+                "parameter": "Stability - 80°C - pH (24 Hrs)",
+                "result_label": "24 Hrs",
+                "regex": "24\\s*Hrs.*?pH\\s*[:\\-]?\\s*([\\d\\.]+)"
             },
             {
                 "sr_no": 10,
-                "parameter": "Stability - Viscosity (32h)",
-                "result_label": "Initial\n\n\n\n\n"
+                "parameter": "Stability - 80°C - Viscosity (24 Hrs)",
+                "result_label": "24 Hrs",
+                "regex": "24\\s*Hrs.*?Viscosity\\s*[:\\-]?\\s*([\\d\\.]+)"
+            },
+            {
+                "sr_no": 10,
+                "parameter": "Stability - 80°C - pH (72 Hrs)",
+                "result_label": "72 Hrs",
+                "regex": "72\\s*Hrs.*?pH\\s*[:\\-]?\\s*([\\d\\.]+)"
+            },
+            {
+                "sr_no": 10,
+                "parameter": "Stability - 80°C - Viscosity (72 Hrs)",
+                "result_label": "72 Hrs",
+                "regex": "72\\s*Hrs.*?Viscosity\\s*[:\\-]?\\s*([\\d\\.]+)"
             },
             {
                 "sr_no": 11,
@@ -175,23 +193,66 @@
                 "observation",
                 "result",
                 "finding"
-            ]
+            ],
+            "column_mapping": {
+                "sr_no": [
+                    "Sr. No.",
+                    "Sr.No."
+                ],
+                "test": [
+                    "Test"
+                ],
+                "results": [
+                    "Results"
+                ]
+            }
         },
         "footer_fields": {
-            "compliance_statement": {
-                "label": "The product complies/under deviation/not complies to the specification"
+            "ANALYZED_BY_DATE": {
+                "label": "Analyzed By / Date",
+                "regex": "Analyzed\\s*By\\s*/\\s*Date\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Reviewed|Approved|$))",
+                "type": "signature"
             },
-            "remark": {
-                "label": "Remark: Approved / Rejected"
+            "REVIEWED_BY_DATE": {
+                "label": "Reviewed By / Date",
+                "regex": "Reviewed\\s*By\\s*/\\s*Date\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Approved|$))",
+                "type": "signature"
             },
-            "prepared_by_signature": {
-                "label": "Prepared By"
+            "APPROVED_BY_DATE": {
+                "label": "Approved By / Date",
+                "regex": "Approved\\s*By\\s*/\\s*Date\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Prepared|$))",
+                "type": "signature"
             },
-            "reviewed_by_signature": {
-                "label": "Reviewed By"
+            "COMPLIANCE_STATEMENT": {
+                "label": " The product complies / under deviation / not complies to the specification",
+                "regex": "The\\s*product\\s*(?:complies|under\\s*deviation|not\\s*complies)\\s*to\\s*the\\s*specification",
+                "type": "string"
             },
-            "approved_by_signature": {
-                "label": "Approved By"
+            "REMARK": {
+                "label": "Remark: Approved / Rejected",
+                "regex": "Remark\\s*[:\\-]?\\s*(Approved|Rejected)",
+                "type": "string"
+            },
+            "PREPARED_BY": {
+                "label": "Prepared By",
+                "expected_label": [
+                    "Department Representative"
+                ],
+                "type": "signature"
+            },
+            "REVIEWED_BY_MNGR": {
+                "label": "Reviewed By",
+                "expected_label": [
+                    "Department Head"
+                ],
+                "type": "signature"
+            },
+            "APPROVED_BY_HEAD": {
+                "label": "Approved By",
+                "expected_label": [
+                    "QA Head"
+                ],
+                "type": "signature"
             }
         },
         "noise_markers": [
@@ -199,6 +260,8 @@
             "CONTROLLED COPY",
             "Page No.",
             "REV:",
+            "Copy No.",
+            "Issued by",
             "|"
         ]
     }

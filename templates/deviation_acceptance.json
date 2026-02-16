@@ -1,73 +1,74 @@
 {
     "page_type": "DEVIATION_ACCEPTANCE",
     "document_metadata": {
-        "document_type": "ACCEPTANCE UNDER DEVIATION FOR RAW MATERIAL/ FINISHED PRODUCTS/PACKING MATERIAL",
-        "page_numbers": [
-            1
-        ],
-        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD"
+        "document_type": "DEVIATION ACCEPTANCE",
+        "company_name": "RISHABH METALS & CHEMICALS PVT. LTD.",
+        "document_title": "ACCEPTANCE UNDER DEVIATION FOR RAW MATERIAL/ FINISHED PRODUCTS/PACKING MATERIAL",
+        "form_no": "RR-14-04, Rev: 00",
+        "stamp": "MASTER COPY"
     },
     "extraction_template": {
         "header_fields": {
-            "name_of_material": {
+            "NAME_OF_MATERIAL": {
                 "label": "Name of RM/FP/PM",
-                "validation_rules": {
-                    "required": true
-                }
+                "regex": "Name\\s*of\\s*RM/?FP/?PM\\s*[:\\-]?\\s*([^\\n|]+)",
+                "type": "string"
             },
-            "lot_batch_no": {
-                "label": "Supplier Lot No./Batch No",
-                "validation_rules": {
-                    "required": true
-                }
+            "SUPPLIER_LOT_BATCH_NO": {
+                "label": "Supplier Lot No. /Batch No",
+                "regex": "Supplier\\s*Lot\\s*No\\.?\\s*/?\\s*Batch\\s*No\\.?\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Quantity|$))",
+                "type": "string"
             },
-            "ar_no": {
-                "label": "IMI/A.R No",
-                "expected_label": [
-                    "IMI/A.R No",
-                    "A.R. No",
-                    "AR No"
-                ]
+            "QUANTITY": {
+                "label": "Quantity",
+                "regex": "Quantity\\s*[:\\-]?\\s*([\\d,]+\\s*(?:kg|KGS|Kgs|Nos|Ltrs)?)",
+                "type": "string"
             },
-            "date_of_testing": {
+            "IMI_AR_NO": {
+                "label": "IMI/ A.R No",
+                "regex": "IMI/?\\s*A\\.?R\\.?\\s*No\\.?\\s*[:\\-]?\\s*([A-Z0-9/\\-]+?)(?=\\s*(?:Vendor|$))",
+                "type": "string"
+            },
+            "VENDOR_NAME": {
+                "label": "Vendor/Supplier Name",
+                "regex": "Vendor/?Supplier\\s*Name\\s*[:\\-]?\\s*([^\\n|]+)",
+                "type": "string"
+            },
+            "DATE_OF_TESTING": {
                 "label": "Date of Testing",
-                "validation_rules": {
-                    "is_date": true
-                }
-            },
-            "quantity": {
-                "label": "Quantity"
-            },
-            "vendor_name": {
-                "label": "Vendor/Supplier Name"
+                "regex": "Date\\s*of\\s*Testing\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             }
         },
+        "test_parameters_table": [],
         "table_config": {
             "parameter_column_keywords": [
                 "Parameters",
                 "Parameter"
             ],
+            "result_column_keywords": [
+                "Test Results",
+                "Results"
+            ],
             "extract_all_columns": true,
+            "dynamic_rows": true,
             "column_mapping": {
-                "parameter": [
-                    "Parameters",
-                    "Parameter"
+                "parameters": [
+                    "Parameters"
                 ],
                 "std_specification": [
-                    "Std. Specification",
-                    "Standard Specification"
+                    "Std.Specification",
+                    "Std. Specification"
                 ],
                 "inhouse_specification": [
                     "Inhouse RM specification",
-                    "In-house Specification"
+                    "Inhouse Specification"
                 ],
                 "test_results": [
-                    "Test Results",
-                    "Results"
+                    "Test Results"
                 ],
                 "remarks": [
-                    "Remarks",
-                    "Remark"
+                    "Remarks"
                 ]
             },
             "noise_markers": [
@@ -81,44 +82,38 @@
                 "Issued by"
             ]
         },
-        "test_parameters_table": [
-            {
-                "parameter": "Viscosity",
-                "extract_columns": [
-                    "std_specification",
-                    "inhouse_specification",
-                    "test_results",
-                    "remarks"
-                ]
-            }
-        ],
         "footer_fields": {
-            "approval_qcm": {
-                "label": "Approved By: QCM"
+            "DEVIATION_STATEMENT": {
+                "label": "Kindly permit acceptance of the RM/FP/PM materials under deviation in respect of the above properties.",
+                "regex": "Kindly\\s*permit\\s*acceptance[\\s\\S]*?properties",
+                "type": "string"
             },
-            "qcm_date": {
+            "APPROVAL_QCM": {
+                "label": "Approved By: QCM",
+                "type": "signature"
+            },
+            "QCM_DATE": {
                 "label": "Date",
-                "validation_rules": {
-                    "is_date": true
-                }
+                "regex": "Approved\\s*By\\s*:\\s*QCM[\\s\\S]*?Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             },
-            "preapproval_qam": {
-                "label": "Preapproval By: QAM"
+            "PREAPPROVAL_QAM": {
+                "label": "Preapproval By : QAM",
+                "type": "signature"
             },
-            "qam_date": {
+            "QAM_DATE": {
                 "label": "Date",
-                "validation_rules": {
-                    "is_date": true
-                }
+                "regex": "Preapproval\\s*By\\s*:\\s*QAM[\\s\\S]*?Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             },
-            "approval_ed": {
-                "label": "Approved By: ED"
+            "APPROVAL_ED": {
+                "label": "Approved By: ED",
+                "type": "signature"
             },
-            "ed_date": {
+            "ED_DATE": {
                 "label": "Date",
-                "validation_rules": {
-                    "is_date": true
-                }
+                "regex": "Approved\\s*By\\s*:\\s*ED[\\s\\S]*?Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             }
         }
     }

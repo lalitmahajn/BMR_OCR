@@ -1,33 +1,76 @@
 {
     "page_type": "BMR_CHECKLIST",
-    "base_width": 1000,
-    "base_height": 1414,
+    "document_metadata": {
+        "document_type": "BMR REVIEW CHECKLIST",
+        "company_name": "RISHABH METALS AND CHEMICALS PVT. LTD.",
+        "document_title": "BMR REVIEW CHECKLIST",
+        "stamp": "MASTER COPY",
+        "pagination_pattern": "Page\\s*(\\d+)\\s*of\\s*(\\d+)"
+    },
     "extraction_template": {
         "header_fields": {
-            "DOC_TITLE": {
-                "label": "TITLE",
-                "regex": "TITLE\\s*[:\\-]?\\s*([^\\|\\n]+)",
-                "type": "string"
-            },
             "DOCUMENT_NO": {
                 "label": "DOCUMENT NO.",
-                "regex": "DOCUMENT\\s*NO\\.\\s*\\|\\s*([^\\|\\n]+)",
+                "regex": "DOCUMENT\\s*NO\\.?\\s*[:\\-|]?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "REVISION_NO": {
                 "label": "REVISION NO.",
-                "regex": "REVISION\\s*NO\\.\\s*\\|\\s*([^\\|\\n]+)",
+                "regex": "REVISION\\s*NO\\.?\\s*[:\\-|]?\\s*(\\d+)",
                 "type": "string"
             },
             "EFFECTIVE_DATE": {
                 "label": "EFFECTIVE DATE",
-                "regex": "EFFECTIVE\\s*DATE\\s*\\|\\s*(\\d{2}/\\d{2}/\\d{4})",
+                "regex": "EFFECTIVE\\s*DATE\\s*[:\\-|]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             },
             "REVIEW_DATE": {
                 "label": "REVIEW DATE",
-                "regex": "REVIEW\\s*DATE\\s*\\|\\s*(\\d{2}/\\d{2}/\\d{4})",
+                "regex": "REVIEW\\s*DATE\\s*[:\\-|]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
+            },
+            "PAGE_INFO": {
+                "label": "Page",
+                "regex": "Page\\s*(\\d+\\s*of\\s*\\d+)",
+                "type": "string"
+            }
+        },
+        "tables": {
+            "review_checklist": {
+                "extract_all_columns": true,
+                "dynamic_rows": true,
+                "multi_page": true,
+                "column_mapping": {
+                    "sr_no": [
+                        "Sr. No.",
+                        "S.N."
+                    ],
+                    "review_points": [
+                        "Review Points"
+                    ],
+                    "status": [
+                        "Status (Yes / No / Na)",
+                        "Status"
+                    ]
+                }
+            },
+            "attachments": {
+                "section_header": "SECTION: - B",
+                "extract_all_columns": true,
+                "dynamic_rows": true,
+                "column_mapping": {
+                    "sr_no": [
+                        "Sr. No.",
+                        "S.N."
+                    ],
+                    "attachments": [
+                        "Attachments"
+                    ],
+                    "status": [
+                        "Status (Yes / No / NA)",
+                        "Status"
+                    ]
+                }
             }
         },
         "table_config": {
@@ -59,6 +102,38 @@
             "index_column_keywords": [
                 "Sr. No."
             ]
-        }
+        },
+        "footer_fields": {
+            "PREPARED_ISSUED_BY": {
+                "label": "PREPARED & ISSUED BY",
+                "expected_label": [
+                    "QA EXECUTIVE"
+                ],
+                "type": "signature"
+            },
+            "REVIEWED_BY": {
+                "label": "REVIEWED BY",
+                "expected_label": [
+                    "ASST.QA MANAGER",
+                    "ASST. QA MANAGER"
+                ],
+                "type": "signature"
+            },
+            "APPROVED_BY": {
+                "label": "APPROVED BY",
+                "expected_label": [
+                    "QA MANAGER / MR",
+                    "QA MANAGER"
+                ],
+                "type": "signature"
+            }
+        },
+        "noise_markers": [
+            "MASTER COPY",
+            "CONTROLLED COPY",
+            "Copy No.",
+            "Issued by",
+            "|"
+        ]
     }
 }

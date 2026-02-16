@@ -181,9 +181,11 @@ class ValidationEngine:
     def __init__(self):
         pass
 
-    def validate_field(self, value: str, field_definition: Any) -> str:
+    def validate_field(
+        self, value: str, field_definition: Any, extraction_confidence: float = 0.0
+    ) -> str:
         """
-        Validate a single field value against its definition.
+        Validate a single field value against definition + confidence score.
         """
         if not value or value.strip() == "":
             return "RED"
@@ -201,10 +203,16 @@ class ValidationEngine:
 
         result = FieldValidator.validate_type(value, f_type, rules)
 
-        if result["valid"]:
+        if not result["valid"]:
+            return "RED"
+
+        # If format is valid, check extraction confidence
+        if extraction_confidence >= 0.90:
             return "GREEN"
-        else:
+        elif extraction_confidence >= 0.80:
             return "YELLOW"
+        else:
+            return "RED"
 
     def validate_all(
         self, page_data: Dict[str, str], fields_def: List[Any]

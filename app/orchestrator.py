@@ -111,9 +111,22 @@ class Orchestrator:
                     logger.info(
                         f"Using Nested Extraction for {classification_res.page_type}"
                     )
-                    nested_res = self.extraction_engine.process_nested_template(
-                        page_ocr_cache.text, template.extraction_template
-                    )
+
+                    # ROUTING: Database-safe specialized extraction
+                    if classification_res.page_type == PageType.PACKING_DETAILS:
+                        logger.info("Routing to Specialized Packing Details Extraction")
+                        nested_res = self.extraction_engine.extract_packing_details(
+                            page_ocr_cache.text, template.extraction_template
+                        )
+                    elif classification_res.page_type == PageType.BMR_CHECKLIST:
+                        logger.info("Routing to Specialized Checklist Extraction")
+                        nested_res = self.extraction_engine.extract_checklist(
+                            page_ocr_cache.text, template.extraction_template
+                        )
+                    else:
+                        nested_res = self.extraction_engine.process_nested_template(
+                            page_ocr_cache.text, template.extraction_template
+                        )
 
                     # Initialize cache for this page type if missing
                     if page_type_name not in header_cache:
@@ -123,28 +136,61 @@ class Orchestrator:
                     for key, data in nested_res["headers"].items():
                         val = data["value"]
                         config = data["config"]
+                        # Get confidence from extraction, default to 0.0
+                        extraction_conf = data.get("confidence", 0.0)
 
                         # PERSISTENCE LOGIC:
                         # If val is empty but we have a cached value for this doc type, use it
                         if not val and key in header_cache[page_type_name]:
                             val = header_cache[page_type_name][key]
                             logger.debug(f"Inherited header '{key}': {val}")
+                            # Inherited values are high confidence (verified previously)
+                            extraction_conf = 1.0
                         elif val:
                             # Update cache with fresh value
                             header_cache[page_type_name][key] = val
 
-                        conf_level = self.validator.validate_field(val, config)
+                        conf_level = self.validator.validate_field(
+                            val, config, extraction_confidence=extraction_conf
+                        )
                         f = Field(
                             page=db_page,
                             name=key,
                             ocr_value=val,
                             roi_coordinates="0,0,0,0",
+                            ocr_confidence=extraction_conf,
                             confidence_level=conf_level,
                         )
                         session.add(f)
 
-                    # 4b. Process Table Rows
-                    for row_data in nested_res["rows"]:
+                    # 4b. Process Named Tables (new format)
+                    if "tables" in nested_res and nested_res["tables"]:
+                        for table_name, table_rows in nested_res["tables"].items():
+                            for row_idx, row_data in enumerate(table_rows):
+                                extracted = row_data["extracted"]
+                                for col_name, col_val in extracted.items():
+                                    if col_name.startswith("_"):
+                                        continue  # Skip internal keys like _table_name
+                                    if col_val and str(col_val).strip():
+                                        # Table extraction is structure-based, assume medium-high confidence
+                                        table_conf = 0.85
+                                        f = Field(
+                                            page=db_page,
+                                            name=f"TABLE_{table_name}_{row_idx}_{col_name}",
+                                            ocr_value=str(col_val).strip(),
+                                            roi_coordinates="0,0,0,0",
+                                            ocr_confidence=table_conf,
+                                            confidence_level=self.validator.validate_field(
+                                                str(col_val), None, table_conf
+                                            ),
+                                        )
+                                        session.add(f)
+                            logger.info(
+                                f"Stored {len(table_rows)} rows for table '{table_name}' on page {i + 1}"
+                            )
+
+                    # 4c. Process Single-Table Rows (legacy format)
+                    for row_data in nested_res.get("rows", []):
                         extracted = row_data["extracted"]
                         config = row_data["config"]
                         ext_tpl = template.extraction_template
@@ -294,22 +340,53 @@ class Orchestrator:
                         if extract_all:
                             # Save ALL columns as separate fields
                             for col_name, col_val in extracted.items():
+                                if isinstance(col_val, dict):
+                                    logger.warning(
+                                        f"Unexpected dict value in column '{col_name}': {col_val}. Skipping."
+                                    )
+                                    continue
+
                                 if col_val and col_val.strip():
+                                    # Handle config being either an object (Pydantic) or a dict
+                                    if isinstance(config, dict):
+                                        param_name = config.get("parameter", "Unknown")
+                                    else:
+                                        param_name = getattr(
+                                            config, "parameter", "Unknown"
+                                        )
+
+                                    # Use fuzzy match score as confidence proxy if available
+                                    # Since we don't track per-column fuzzy score, use default
+                                    col_conf = 0.8 if res_key else 0.6
+
                                     f = Field(
                                         page=db_page,
-                                        name=f"TABLE_{config.parameter}_{col_name}",
+                                        name=f"TABLE_{param_name}_{col_name}",
                                         ocr_value=col_val.strip(),
                                         roi_coordinates="0,0,0,0",
-                                        confidence_level=conf_level,
+                                        ocr_confidence=col_conf,
+                                        confidence_level=self.validator.validate_field(
+                                            col_val, config, col_conf
+                                        ),
                                     )
                                     session.add(f)
                         else:
                             # Save only the result column (original behavior)
+                            # Use fuzzy match score as confidence proxy
+                            row_conf = (
+                                (highest_match / 100.0) if highest_match > 0 else 0.7
+                            )
+
+                            conf_level = self.validator.validate_field(
+                                val, config, extraction_confidence=row_conf
+                            )
+
                             f = Field(
                                 page=db_page,
                                 name=f"TABLE_{config.parameter}",
                                 ocr_value=val,
                                 roi_coordinates="0,0,0,0",
+                                ocr_confidence=row_conf,
                                 confidence_level=conf_level,
                             )
                             session.add(f)
@@ -353,12 +430,16 @@ class Orchestrator:
                                         continue
                                     break
 
-                        conf_level = self.validator.validate_field(val, config)
+                        extraction_conf = data.get("confidence", 0.0)
+                        conf_level = self.validator.validate_field(
+                            val, config, extraction_confidence=extraction_conf
+                        )
                         f = Field(
                             page=db_page,
                             name=key,
                             ocr_value=val,
                             roi_coordinates="0,0,0,0",
+                            ocr_confidence=extraction_conf,
                             confidence_level=conf_level,
                         )
                         session.add(f)
@@ -369,18 +450,22 @@ class Orchestrator:
                         logger.debug(
                             f"Extracting field {f_def.name} from Mistral source"
                         )
-                        extracted_value = self.extraction_engine.extract_field(
-                            page_ocr_cache.text, f_def
+                        extracted_value, _, extraction_conf = (
+                            self.extraction_engine.extract_field(
+                                page_ocr_cache.text, f_def
+                            )
                         )
                         conf_level = self.validator.validate_field(
-                            extracted_value, f_def
+                            extracted_value,
+                            f_def,
+                            extraction_confidence=extraction_conf,
                         )
                         db_field = Field(
                             page=db_page,
                             name=f_def.name,
                             roi_coordinates="0,0,0,0",
                             ocr_value=extracted_value,
-                            ocr_confidence=0.95,
+                            ocr_confidence=extraction_conf,
                             confidence_level=conf_level,
                         )
                         session.add(db_field)
