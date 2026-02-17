@@ -11,32 +11,32 @@
         "header_fields": {
             "SOP_NO": {
                 "label": "SOP NO.:",
-                "regex": "SOP\\s*NO\\.?\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:REVISION|$))",
+                "regex": "SOP\\s*NO\\.?\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:REVISION|\\||$))",
                 "type": "string"
             },
             "REVISION": {
                 "label": "REVISION:",
-                "regex": "REVISION\\s*[:\\-]?\\s*(\\d+)",
+                "regex": "REVISION\\s*[:\\-]?\\s*\\|?\\s*(\\d+)",
                 "type": "string"
             },
             "PRODUCT_NAME": {
                 "label": "NAME OF PRODUCT:",
-                "regex": "NAME\\s*OF\\s*PRODUCT\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "NAME\\s*OF\\s*PRODUCT\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "EFFECTIVE_DATE": {
                 "label": "EFFECTIVE DATE:",
-                "regex": "EFFECTIVE\\s*DATE\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "EFFECTIVE\\s*DATE\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             },
             "PAGE_INFO": {
                 "label": "Page",
-                "regex": "Page\\s*(\\d+\\s*of\\s*\\d+)",
+                "regex": "Page\\s*\\|?\\s*(\\d+\\s*of\\s*\\d+)",
                 "type": "string"
             },
             "SCOPE": {
                 "label": "1. SCOPE",
-                "regex": "SCOPE\\s*[:\\-]?\\s*([^\\n]+(?:Product\\s*\\d+))",
+                "regex": "SCOPE\\s*[:\\-]?\\s*\\|?\\s*([^\\n]+(?:Product\\s*\\d+))",
                 "type": "string"
             },
             "IMPORTANT_NOTES": {

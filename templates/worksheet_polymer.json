@@ -14,52 +14,52 @@
         "header_fields": {
             "PRODUCT_CODE": {
                 "label": "Product Code:",
-                "regex": "Product\\s*Code\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Product\\s*Code\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "AR_NO": {
                 "label": "AR. No.",
-                "regex": "AR\\.?\\s*No\\.?\\s*[:\\-]?\\s*([A-Z0-9\\s]+?)(?=\\s*(?:Batch|$))",
+                "regex": "AR\\.?\\s*No\\.?\\s*[:\\-]?\\s*\\|?\\s*([A-Z0-9\\s]+?)(?=\\s*(?:Batch|\\||$))",
                 "type": "string"
             },
             "BATCH_NO": {
                 "label": "Batch No.",
-                "regex": "Batch\\s*No\\.?\\s*[:\\-]?\\s*(\\d[\\d\\s]*?)(?=\\s*(?:No\\.|containers|$))",
+                "regex": "Batch\\s*No\\.?\\s*[:\\-]?\\s*\\|?\\s*(\\d[\\d\\s]*?)(?=\\s*(?:No\\.|containers|\\||$))",
                 "type": "string"
             },
             "CONTAINERS_PACKS": {
                 "label": "No. of containers / packs",
-                "regex": "No\\.\\s*of\\s*containers?\\s*/?\\s*packs?\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "No\\.\\s*of\\s*containers?\\s*/?\\s*packs?\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "BATCH_QUANTITY": {
                 "label": "Batch Quantity",
-                "regex": "Batch\\s*Quantity\\s*[:\\-]?\\s*([\\d,]+\\s*(?:Kg|KGS|kg)?)",
+                "regex": "Batch\\s*Quantity\\s*[:\\-]?\\s*\\|?\\s*([\\d,]+\\s*(?:Kg|KGS|kg)?)",
                 "type": "string"
             },
             "SAMPLED_QUANTITY": {
                 "label": "Sampled quantity",
-                "regex": "Sampled\\s*quantity\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Sampled\\s*quantity\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "SAMPLING_DATE": {
                 "label": "Sampling date",
-                "regex": "Sampling\\s*date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "Sampling\\s*date\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             },
             "ANALYSIS_DATE": {
                 "label": "Date of Analysis",
-                "regex": "Date\\s*of\\s*Analysis\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "Date\\s*of\\s*Analysis\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             },
             "ANALYZED_BY": {
                 "label": "Analyzed by",
-                "regex": "Analyzed\\s*by\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Released|$))",
+                "regex": "Analyzed\\s*by\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:Released|\\||$))",
                 "type": "string"
             },
             "RELEASED_DATE": {
                 "label": "Released Date",
-                "regex": "Released\\s*Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "Released\\s*Date\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             }
         },

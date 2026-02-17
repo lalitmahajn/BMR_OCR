@@ -11,27 +11,27 @@
         "header_fields": {
             "DOCUMENT_NO": {
                 "label": "DOCUMENT NO.",
-                "regex": "DOCUMENT\\s*NO\\.?\\s*[:\\-|]?\\s*([^\\n|]+)",
+                "regex": "DOCUMENT\\s*NO\\.?\\s*[:\\-|]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "REVISION_NO": {
                 "label": "REVISION NO.",
-                "regex": "REVISION\\s*NO\\.?\\s*[:\\-|]?\\s*(\\d+)",
+                "regex": "REVISION\\s*NO\\.?\\s*[:\\-|]?\\s*\\|?\\s*(\\d+)",
                 "type": "string"
             },
             "EFFECTIVE_DATE": {
                 "label": "EFFECTIVE DATE",
-                "regex": "EFFECTIVE\\s*DATE\\s*[:\\-|]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "EFFECTIVE\\s*DATE\\s*[:\\-|]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             },
             "REVIEW_DATE": {
                 "label": "REVIEW DATE",
-                "regex": "REVIEW\\s*DATE\\s*[:\\-|]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "REVIEW\\s*DATE\\s*[:\\-|]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             },
             "PAGE_INFO": {
                 "label": "Page",
-                "regex": "Page\\s*(\\d+\\s*of\\s*\\d+)",
+                "regex": "Page\\s*\\|?\\s*(\\d+\\s*of\\s*\\d+)",
                 "type": "string"
             }
         },

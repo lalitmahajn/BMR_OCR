@@ -21,7 +21,7 @@
                     "No. :",
                     "No :"
                 ],
-                "regex": "No\\.?\\s*[:\\-]?\\s*(\\d{2}-\\d{2}/\\d{4})",
+                "regex": "No\\.?\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}-\\d{2}/\\d{4})",
                 "type": "string"
             },
             "REF_NO": {
@@ -30,7 +30,7 @@
                     "Ref.",
                     "Ref"
                 ],
-                "regex": "Ref\\.?\\s*[:\\-]?\\s*([^\\n]+?)(?=\\s*(?:dt\\.|Dated|$))",
+                "regex": "Ref\\.?\\s*[:\\-]?\\s*\\|?\\s*([^\\n]+?)(?=\\s*(?:dt\\.|Dated|\\||$))",
                 "type": "string"
             },
             "DATED": {
@@ -39,7 +39,7 @@
                     "Dated",
                     "Date"
                 ],
-                "regex": "Dated\\s*[:\\-]?\\s*(\\d{2}-[A-Za-z]{3}-\\d{2})",
+                "regex": "Dated\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}-[A-Za-z]{3}-\\d{2})",
                 "type": "date"
             }
         },
@@ -89,17 +89,17 @@
                     "Narration:",
                     "Narration"
                 ],
-                "regex": "Narration\\s*[:\\-]?\\s*([^\\n]+)",
+                "regex": "Narration\\s*[:\\-]?\\s*\\|?\\s*([^\\n]+)",
                 "type": "string"
             },
             "CHECKED_BY": {
                 "label": "Checked by",
-                "regex": "Checked\\s*by\\s*[:\\-]?\\s*([^\\n]+?)(?=\\s*(?:Verified|Authorised|$))",
+                "regex": "Checked\\s*by\\s*[:\\-]?\\s*\\|?\\s*([^\\n]+?)(?=\\s*(?:Verified|Authorised|\\||$))",
                 "type": "string"
             },
             "VERIFIED_BY": {
                 "label": "Verified by",
-                "regex": "Verified\\s*by\\s*[:\\-]?\\s*([^\\n]+?)(?=\\s*(?:Authorised|$))",
+                "regex": "Verified\\s*by\\s*[:\\-]?\\s*\\|?\\s*([^\\n]+?)(?=\\s*(?:Authorised|\\||$))",
                 "type": "string"
             }
         }

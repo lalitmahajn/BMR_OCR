@@ -326,7 +326,22 @@ class MarkdownExtractionEngine:
                     if temp_rows and header_cols:
                         prev_cells = temp_rows[-1]
                         expected_cols = len(header_cols)
-                        # If previous row is incomplete and this line continues it
+
+                        # NEW: Handle wrapped lines (previous row full, current row short)
+                        if (
+                            len(prev_cells) == expected_cols
+                            and len(cells) < expected_cols
+                        ):
+                            # Heuristic: If line doesn't start with pipe, it's likely a wrap
+                            if not line_strip.startswith("|"):
+                                # Append all content to the last cell of previous row
+                                joined_content = " ".join(cells)
+                                temp_rows[-1][-1] = (
+                                    f"{prev_cells[-1]} {joined_content}".strip()
+                                )
+                                continue
+
+                        # Existing Merge: If previous row is incomplete and this line continues it
                         if len(prev_cells) < expected_cols and cells:
                             # Merge: append current cells to previous row
                             # Handle case where first cell of continuation may be part of last cell
@@ -813,21 +828,25 @@ class MarkdownExtractionEngine:
                             re.IGNORECASE,
                         )
                         if prod_match:
-                            header_data["PRODUCT_NAME"] = {
-                                "value": prod_match.group(1).strip(),
-                                "confidence": 0.90,
-                                "config": "PRODUCT_NAME",
-                            }
+                            val = prod_match.group(1).strip()
+                            if val:
+                                header_data["PRODUCT_NAME"] = {
+                                    "value": val,
+                                    "confidence": 0.90,
+                                    "config": "PRODUCT_NAME",
+                                }
 
                         batch_match = re.search(
                             r"Batch\s*No\\.?\s*[:\\-]*\s*(.*)", v_str, re.IGNORECASE
                         )
                         if batch_match:
-                            header_data["BATCH_NO"] = {
-                                "value": batch_match.group(1).strip(),
-                                "confidence": 0.90,
-                                "config": "BATCH_NO",
-                            }
+                            val = batch_match.group(1).strip()
+                            if val:
+                                header_data["BATCH_NO"] = {
+                                    "value": val,
+                                    "confidence": 0.90,
+                                    "config": "BATCH_NO",
+                                }
 
             # Total Qty & Tare Wet
             if "total qty" in row_text:

@@ -25,6 +25,7 @@ class Document(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     filename: Mapped[str] = mapped_column(String, index=True)
+    file_hash: Mapped[str] = mapped_column(String, index=True, nullable=True)
     ingested_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     status: Mapped[str] = mapped_column(
         String, default="PROCESSING"

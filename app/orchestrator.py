@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 from loguru import logger
-
+from sqlalchemy import select
 
 from app.engines.ingestion import IngestionEngine
 from app.engines.classification import PageClassificationEngine, PageType
@@ -32,18 +32,39 @@ class Orchestrator:
     def process_document(self, file_path: str):
         logger.info(f"Starting processing for {file_path}")
 
-        # 1. Ingestion
-        image_paths = self.ingestion.process_file(file_path)
+        # 0. Deduplication Check
+        file_path_obj = Path(file_path)
+        if not file_path_obj.exists():
+            logger.error(f"File not found: {file_path}")
+            return
 
-        # Create DB Document (Pending)
+        # Calculate hash (using ingestion engine's utility)
+        file_hash = self.ingestion._calculate_file_hash(file_path_obj)
+        logger.info(f"File Hash: {file_hash}")
+
         session = self.storage.get_session()
-        doc = Document(filename=Path(file_path).name)
-        self.storage.save_pending_document(session, doc)
-
-        # Persistence cache for header fields (keyed by page_type)
-        header_cache = {}
-
         try:
+            # Check if hash exists
+            existing_doc = session.scalar(
+                select(Document).where(Document.file_hash == file_hash)
+            )
+            if existing_doc:
+                logger.warning(
+                    f"Duplicate Document Detected! ID: {existing_doc.id}, Filename: {existing_doc.filename}"
+                )
+                logger.info("Skipping processing for duplicate document.")
+                return existing_doc.id
+
+            # 1. Ingestion
+            image_paths = self.ingestion.process_file(file_path)
+
+            # Create DB Document
+            doc = Document(filename=file_path_obj.name, file_hash=file_hash)
+            self.storage.save_pending_document(session, doc)
+
+            # Persistence cache for header fields (keyed by page_type)
+            header_cache = {}
+
             for i, img_path in enumerate(image_paths):
                 logger.info(f"Processing Page {i + 1}: {img_path}")
 

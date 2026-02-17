@@ -8,7 +8,7 @@
         "header_fields": {
             "SHELF_LIFE": {
                 "label": "Shelf Life",
-                "regex": "Shelf\\s*Life\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Shelf\\s*Life\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "PRODUCT_CODE": {
@@ -17,7 +17,7 @@
                     "Product Specification >>",
                     "Product Specification"
                 ],
-                "regex": "Product\\s*Specification\\s*>+\\s*([\\w]+)",
+                "regex": "Product\\s*Specification\\s*>+\\s*\\|?\\s*([\\w]+)",
                 "type": "string"
             }
         },
@@ -116,7 +116,7 @@
                     "No:",
                     "Batch No"
                 ],
-                "regex": "B\\.?\\s*No[:\\-]?\\s*[-]?\\s*(\\d[\\d]+)",
+                "regex": "B\\.?\\s*No[:\\-]?\\s*[-]?\\s*\\|?\\s*(\\d[\\d]+)",
                 "type": "string"
             }
         }

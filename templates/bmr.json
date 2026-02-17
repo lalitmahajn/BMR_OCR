@@ -11,157 +11,157 @@
         "header_fields": {
             "PRODUCT_NAME": {
                 "label": "NAME OF PRODUCT:",
-                "regex": "NAME\\s*OF\\s*PRODUCT\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*REV|$)",
+                "regex": "NAME\\s*OF\\s*PRODUCT\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:REV|\\||$))",
                 "type": "string"
             },
             "PRODUCT_REV": {
                 "label": "REV :",
-                "regex": "NAME\\s*OF\\s*PRODUCT.*?REV\\s*[:\\-]?\\s*(\\d+)",
+                "regex": "REV\\s*[:\\-]?\\s*\\|?\\s*(\\d+)",
                 "type": "string"
             },
             "BMR_FORM_NO": {
                 "label": "B.M.R. Form No.:",
-                "regex": "B\\.?M\\.?R\\.?\\s*Form\\s*No\\.?\\s*[:\\-]?\\s*([^,\\n|]+)",
+                "regex": "B\\.?M\\.?R\\.?\\s*Form\\s*No\\.?\\s*[:\\-]?\\s*\\|?\\s*([^,\\n|]+)",
                 "type": "string"
             },
             "BMR_REV": {
                 "label": "REV :",
-                "regex": "B\\.?M\\.?R\\.?\\s*Form.*?REV\\s*[:\\-]?\\s*(\\d+)",
+                "regex": "REV\\s*[:\\-]?\\s*\\|?\\s*(\\d+)",
                 "type": "string"
             },
             "REFER_SOP": {
                 "label": "Refer SOP:",
-                "regex": "Refer\\s*SOP\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*REV|$)",
+                "regex": "Refer\\s*SOP\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:REV|\\||$))",
                 "type": "string"
             },
             "SOP_REV": {
                 "label": "REV :",
-                "regex": "Refer\\s*SOP.*?REV\\s*[:\\-]?\\s*(\\d+)",
+                "regex": "REV\\s*[:\\-]?\\s*\\|?\\s*(\\d+)",
                 "type": "string"
             },
             "PAGE_INFO": {
                 "label": "B.M.R. Page No.:",
-                "regex": "Page\\s*No\\.?\\s*[:\\-]?\\s*(\\d+\\s*of\\s*\\d+)",
+                "regex": "Page\\s*No\\.?\\s*[:\\-]?\\s*\\|?\\s*(\\d+\\s*of\\s*\\d+)",
                 "type": "string"
             },
             "EFFECTIVE_DATE": {
                 "label": "BMR Effective Date:",
-                "regex": "BMR\\s*Effective\\s*Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "BMR\\s*Effective\\s*Date\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             },
             "SUPERSEDES": {
                 "label": "Supersedes:",
-                "regex": "Supersedes\\s*[:\\-]?\\s*REV\\s*[:\\-]?\\s*(\\d+)",
+                "regex": "Supersedes\\s*[:\\-]?\\s*REV\\s*[:\\-]?\\s*\\|?\\s*(\\d+)",
                 "type": "string"
             },
             "PROCESS_START_SHIFT": {
                 "label": "Process Start Shift:",
-                "regex": "Process\\s*Start\\s*Shift\\s*[:\\-]?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Process\\s*Completion|$)",
+                "regex": "Process\\s*Start\\s*Shift\\s*[:\\-]?\\s*\\|?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Process\\s*Completion|\\||$)",
                 "type": "string"
             },
             "PROCESS_COMPLETION_SHIFT": {
                 "label": "Process Completion Shift:",
-                "regex": "Process\\s*Completion\\s*Shift\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Process\\s*Completion\\s*Shift\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "BATCH_START_DATE_TIME": {
                 "label": "Batch Start Date & Time :",
-                "regex": "Batch\\s*Start\\s*Date\\s*&?\\s*Time\\s*[:\\-]?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Completion|$)",
+                "regex": "Batch\\s*Start\\s*Date\\s*&?\\s*Time\\s*[:\\-]?\\s*\\|?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Completion|\\||$)",
                 "type": "string"
             },
             "COMPLETION_DATE_TIME": {
                 "label": "Completion Date & Time :",
-                "regex": "Completion\\s*Date\\s*&?\\s*Time\\s*[:\\-]?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Total|$)",
+                "regex": "Completion\\s*Date\\s*&?\\s*Time\\s*[:\\-]?\\s*\\|?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Total|\\||$)",
                 "type": "string"
             },
             "TOTAL_TIME_CYCLE": {
                 "label": "Total Time Cycle (Hrs) :",
-                "regex": "Total\\s*Time\\s*Cycle\\s*\\(?Hrs\\)?\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Total\\s*Time\\s*Cycle\\s*\\(?Hrs\\)?\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "EQUIPMENT_TAG_NO": {
                 "label": "Equipment Tag No.:",
-                "regex": "Equipment\\s*Tag\\s*No\\.?\\s*[:\\-]?\\s*([^/\\n|]+?)(?=\\s*/?\\s*BATCH|$)",
+                "regex": "Equipment\\s*Tag\\s*No\\.?\\s*[:\\-]?\\s*\\|?\\s*([^/\\n|]+?)(?=\\s*/?\\s*BATCH|\\||$)",
                 "type": "string"
             },
             "BATCH_NUMBER": {
                 "label": "BATCH NUMBER",
-                "regex": "BATCH\\s*NUMBER\\s*[:\\-]?\\s*([A-Za-z0-9/\\-]+)",
+                "regex": "BATCH\\s*NUMBER\\s*[:\\-]?\\s*\\|?\\s*([A-Za-z0-9/\\-]+)",
                 "type": "string"
             },
             "STIRRER_BELT_CHECK": {
                 "label": "Stirrer Belt Condition Check by",
-                "regex": "Stirrer\\s*Belt\\s*Condition\\s*Check\\s*by\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Stirrer\\s*Belt\\s*Condition\\s*Check\\s*by\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "REACTOR_CLEANED_BY": {
                 "label": "Reactor Cleaned by",
-                "regex": "Reactor\\s*Cleaned\\s*by\\s*[:\\-]?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Reactor\\s*Cleaning|$)",
+                "regex": "Reactor\\s*Cleaned\\s*by\\s*[:\\-]?\\s*\\|?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Reactor\\s*Cleaning|\\||$)",
                 "type": "string"
             },
             "REACTOR_CLEANING_CHECKED": {
                 "label": "Reactor Cleaning Checked",
-                "regex": "Reactor\\s*Cleaning\\s*Checked\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Reactor\\s*Cleaning\\s*Checked\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "BATCH_START_DATE": {
                 "label": "Batch Start Date :",
-                "regex": "Batch\\s*Start\\s*Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "Batch\\s*Start\\s*Date\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             },
             "BATCH_STARTED_EXECUTIVE": {
                 "label": "Batch Started by (Prod. Executive)",
-                "regex": "Batch\\s*Started\\s*by\\s*\\(?Prod\\.?\\s*Executive\\)?\\s*[:\\-]?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Batch\\s*Started\\s*by\\s*\\(?Operator|$)",
+                "regex": "Batch\\s*Started\\s*by\\s*\\(?Prod\\.?\\s*Executive\\)?\\s*[:\\-]?\\s*\\|?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Batch\\s*Started\\s*by\\s*\\(?Operator|\\||$)",
                 "type": "string"
             },
             "BATCH_STARTED_OPERATOR": {
                 "label": "Batch Started by (Operator)",
-                "regex": "Batch\\s*Started\\s*by\\s*\\(?Operator\\)?\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Batch\\s*Started\\s*by\\s*\\(?Operator\\)?\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "BATCH_COMPLETED_EXECUTIVE": {
                 "label": "Batch Completed by (Prod. Executive)",
-                "regex": "Batch\\s*Completed\\s*by\\s*\\(?Prod\\.?\\s*Executive\\)?\\s*[:\\-]?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Batch\\s*Completed\\s*by\\s*\\(?Operator|$)",
+                "regex": "Batch\\s*Completed\\s*by\\s*\\(?Prod\\.?\\s*Executive\\)?\\s*[:\\-]?\\s*\\|?\\s*([^/\\n|]+?)(?=\\s*/?\\s*Batch\\s*Completed\\s*by\\s*\\(?Operator|\\||$)",
                 "type": "string"
             },
             "BATCH_COMPLETED_OPERATOR": {
                 "label": "Batch Completed by (Operator)",
-                "regex": "Batch\\s*Completed\\s*by\\s*\\(?Operator\\)?\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Batch\\s*Completed\\s*by\\s*\\(?Operator\\)?\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "PHYSICAL_APPEARANCE": {
                 "label": "Phy. App. :",
-                "regex": "Phy\\.?\\s*App\\.?\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Phy\\.?\\s*App\\.?\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "SP_GRAVITY": {
                 "label": "Sp. Gravity :",
-                "regex": "Sp\\.?\\s*Gravity\\s*[:\\-]?\\s*([\\d\\.]+)",
+                "regex": "Sp\\.?\\s*Gravity\\s*[:\\-]?\\s*\\|?\\s*([\\d\\.]+)",
                 "type": "string"
             },
             "PH": {
                 "label": "pH :",
-                "regex": "pH\\s*[:\\-]?\\s*([\\d\\.]+)",
+                "regex": "pH\\s*[:\\-]?\\s*\\|?\\s*([\\d\\.]+)",
                 "type": "string"
             },
             "VISCOSITY": {
                 "label": "Viscosity :",
-                "regex": "Viscosity\\s*[:\\-]?\\s*([\\d\\.]+)",
+                "regex": "Viscosity\\s*[:\\-]?\\s*\\|?\\s*([\\d\\.]+)",
                 "type": "string"
             },
             "SOLID_CONTENT": {
                 "label": "Solid Content :",
-                "regex": "Solid\\s*Content\\s*[:\\-]?\\s*([\\d\\.]+)",
+                "regex": "Solid\\s*Content\\s*[:\\-]?\\s*\\|?\\s*([\\d\\.]+)",
                 "type": "string"
             },
             "FINAL_OUTPUT": {
                 "label": "Final Results : Output : Kgs",
-                "regex": "Output\\s*[:\\-]?\\s*([\\d,\\.]+)\\s*Kgs",
+                "regex": "Output\\s*[:\\-]?\\s*\\|?\\s*([\\d,\\.]+)\\s*Kgs",
                 "type": "string"
             },
             "PACKING_DETAILS": {
                 "label": "Packing Details :",
-                "regex": "Packing\\s*Details\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Packing\\s*Details\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             }
         },
@@ -361,7 +361,7 @@
         "footer_fields": {
             "REMARKS": {
                 "label": "Remarks (If any)",
-                "regex": "Remarks\\s*\\(?If\\s*any\\)?\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Reviewed|Approved|PREPARED|$))",
+                "regex": "Remarks\\s*\\(?If\\s*any\\)?\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:Reviewed|Approved|PREPARED|\\||$))",
                 "type": "string"
             },
             "INTERNAL_PREPARED_BY": {

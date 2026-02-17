@@ -1,0 +1,160 @@
+{
+  "page_type": "WORKSHEET_POLYMER",
+  "fields": [
+    {
+      "name": "PRODUCT_CODE",
+      "value": "",
+      "confidence": 0.7
+    },
+    {
+      "name": "AR_NO",
+      "value": null,
+      "confidence": 0.0
+    },
+    {
+      "name": "BATCH_NO",
+      "value": null,
+      "confidence": 0.0
+    },
+    {
+      "name": "CONTAINERS_PACKS",
+      "value": "",
+      "confidence": 0.7
+    },
+    {
+      "name": "BATCH_QUANTITY",
+      "value": null,
+      "confidence": 0.0
+    },
+    {
+      "name": "SAMPLED_QUANTITY",
+      "value": "",
+      "confidence": 0.7
+    },
+    {
+      "name": "SAMPLING_DATE",
+      "value": null,
+      "confidence": 0.0
+    },
+    {
+      "name": "ANALYSIS_DATE",
+      "value": null,
+      "confidence": 0.0
+    },
+    {
+      "name": "ANALYZED_BY",
+      "value": null,
+      "confidence": 0.0
+    },
+    {
+      "name": "RELEASED_DATE",
+      "value": null,
+      "confidence": 0.0
+    },
+    {
+      "name": "TABLE_Physical Appearance",
+      "value": "Amber color visc liquid Complies / Does not-complies",
+      "confidence": 1.0
+    },
+    {
+      "name": "TABLE_Viscosity",
+      "value": "78 cps Complies / Does not-complies",
+      "confidence": 1.0
+    },
+    {
+      "name": "TABLE_pH",
+      "value": "3.70 Complies / Does not-complies",
+      "confidence": 1.0
+    },
+    {
+      "name": "TABLE_Specific Gravity",
+      "value": "1.060 Complies / Does not-complies",
+      "confidence": 1.0
+    },
+    {
+      "name": "TABLE_Solubility",
+      "value": "Soluble in water Complies / Does not-complies",
+      "confidence": 1.0
+    },
+    {
+      "name": "TABLE_Ionicity",
+      "value": "Observation: cationic / Anionic / Non-ionic Complies / Does not-complies",
+      "confidence": 1.0
+    },
+    {
+      "name": "TABLE_Turbidity",
+      "value": "1.4 NTU Complies / Does not-complies",
+      "confidence": 1.0
+    },
+    {
+      "name": "TABLE_Stability - 80\u00c2\u00b0C - pH (Initial)",
+      "value": "Observation: 3.70 Complies / Does not-complies",
+      "confidence": 1.0
+    },
+    {
+      "name": "TABLE_Stability - 80\u00c2\u00b0C - Viscosity (Initial)",
+      "value": "Observation: 78 cps Complies / Does not-complies",
+      "confidence": 1.0
+    },
+    {
+      "name": "TABLE_Stability - 80\u00c2\u00b0C - pH (24 Hrs)",
+      "value": "Observation: 3.70 Complies / Does not-complies",
+      "confidence": 1.0
+    },
+    {
+      "name": "TABLE_Stability - 80\u00c2\u00b0C - Viscosity (24 Hrs)",
+      "value": "Observation: 78 cps Complies / Does not-complies",
+      "confidence": 1.0
+    },
+    {
+      "name": "TABLE_Stability - 80\u00c2\u00b0C - pH (72 Hrs)",
+      "value": "Observation: 3.70 Complies / Does not-complies",
+      "confidence": 1.0
+    },
+    {
+      "name": "TABLE_Stability - 80\u00c2\u00b0C - Viscosity (72 Hrs)",
+      "value": "Observation: 78 cps Complies / Does not-complies",
+      "confidence": 1.0
+    },
+    {
+      "name": "ANALYZED_BY_DATE",
+      "value": "",
+      "confidence": 0.6
+    },
+    {
+      "name": "REVIEWED_BY_DATE",
+      "value": null,
+      "confidence": 0.6
+    },
+    {
+      "name": "APPROVED_BY_DATE",
+      "value": null,
+      "confidence": 0.6
+    },
+    {
+      "name": "COMPLIANCE_STATEMENT",
+      "value": null,
+      "confidence": 0.6
+    },
+    {
+      "name": "REMARK",
+      "value": null,
+      "confidence": 0.6
+    },
+    {
+      "name": "PREPARED_BY",
+      "value": "10 28/01/2025",
+      "confidence": 0.6
+    },
+    {
+      "name": "REVIEWED_BY_MNGR",
+      "value": "D. L. 28/01/26",
+      "confidence": 0.6
+    },
+    {
+      "name": "APPROVED_BY_HEAD",
+      "value": "C. H. Headlin 28/01/26",
+      "confidence": 0.6
+    }
+  ]
+}

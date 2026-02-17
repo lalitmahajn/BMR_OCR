@@ -14,42 +14,42 @@
         "header_fields": {
             "PRODUCT_NAME": {
                 "label": "Product Name",
-                "regex": "Product\\s*Name\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Manufacturing|Batch|AR|$))",
+                "regex": "Product\\s*Name\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:Manufacturing|Batch|AR|\\||$))",
                 "type": "string"
             },
             "AR_NO": {
                 "label": "AR No.",
-                "regex": "AR\\s*No\\.?\\s*[:\\-]?\\s*([A-Z0-9\\s]+?)(?=\\s*(?:Approval|Batch|$))",
+                "regex": "AR\\s*No\\.?\\s*[:\\-]?\\s*\\|?\\s*([A-Z0-9\\s]+?)(?=\\s*(?:Approval|Batch|\\||$))",
                 "type": "string"
             },
             "BATCH_NO": {
                 "label": "Batch No.",
-                "regex": "Batch\\s*No\\.?\\s*[:\\-]?\\s*(\\d[\\d\\s]*?)(?=\\s*(?:Packing|Quantity|$))",
+                "regex": "Batch\\s*No\\.?\\s*[:\\-]?\\s*\\|?\\s*(\\d[\\d\\s]*?)(?=\\s*(?:Packing|Quantity|\\||$))",
                 "type": "string"
             },
             "MFG_DATE": {
                 "label": "Manufacturing Date",
-                "regex": "Manufacturing\\s*Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "Manufacturing\\s*Date\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             },
             "EXP_DATE": {
                 "label": "Exp. Date",
-                "regex": "Exp\\.?\\s*Date\\s*[=:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "Exp\\.?\\s*Date\\s*[=:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             },
             "APPROVAL_DATE": {
                 "label": "Approval Date",
-                "regex": "Approval\\s*Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "Approval\\s*Date\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             },
             "PACKING_DETAILS": {
                 "label": "Packing Details",
-                "regex": "Packing\\s*Details\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Quantity|Exp|$))",
+                "regex": "Packing\\s*Details\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:Quantity|Exp|\\||$))",
                 "type": "string"
             },
             "QUANTITY": {
                 "label": "Quantity",
-                "regex": "Quantity\\s*[:\\-]?\\s*([\\d,]+\\s*(?:KGS|Kgs|kg)?)",
+                "regex": "Quantity\\s*[:\\-]?\\s*\\|?\\s*([\\d,]+\\s*(?:KGS|Kgs|kg)?)",
                 "type": "string"
             }
         },
@@ -125,17 +125,17 @@
         "footer_fields": {
             "FINAL_RESULT": {
                 "label": "RESULT",
-                "regex": "RESULT\\s*[:\\-]?\\s*(APPROVED|REJECTED)",
+                "regex": "RESULT\\s*[:\\-]?\\s*\\|?\\s*(APPROVED|REJECTED)",
                 "type": "string"
             },
             "REMARK": {
                 "label": "REMARKS",
-                "regex": "REMARKS?\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Analyzed|Form|$))",
+                "regex": "REMARKS?\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:Analyzed|Form|\\||$))",
                 "type": "string"
             },
             "ANALYZED_BY": {
                 "label": "Analyzed By / Date",
-                "regex": "Analyzed\\s*By\\s*/\\s*Date\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Approved|QC|$))",
+                "regex": "Analyzed\\s*By\\s*/\\s*Date\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:Approved|QC|\\||$))",
                 "type": "string"
             },
             "REVIEWED_BY": {
@@ -144,7 +144,7 @@
             },
             "APPROVED_BY": {
                 "label": "Approved By / Date",
-                "regex": "Approved\\s*By\\s*/\\s*Date\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:FORM|$))",
+                "regex": "Approved\\s*By\\s*/\\s*Date\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:FORM|\\||$))",
                 "type": "string"
             }
         },

@@ -11,32 +11,32 @@
         "header_fields": {
             "NAME_OF_MATERIAL": {
                 "label": "Name of RM/FP/PM",
-                "regex": "Name\\s*of\\s*RM/?FP/?PM\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Name\\s*of\\s*RM/?FP/?PM\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "SUPPLIER_LOT_BATCH_NO": {
                 "label": "Supplier Lot No. /Batch No",
-                "regex": "Supplier\\s*Lot\\s*No\\.?\\s*/?\\s*Batch\\s*No\\.?\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Quantity|$))",
+                "regex": "Supplier\\s*Lot\\s*No\\.?\\s*/?\\s*Batch\\s*No\\.?\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:Quantity|\\||$))",
                 "type": "string"
             },
             "QUANTITY": {
                 "label": "Quantity",
-                "regex": "Quantity\\s*[:\\-]?\\s*([\\d,]+\\s*(?:kg|KGS|Kgs|Nos|Ltrs)?)",
+                "regex": "Quantity\\s*[:\\-]?\\s*\\|?\\s*([\\d,]+\\s*(?:kg|KGS|Kgs|Nos|Ltrs)?)",
                 "type": "string"
             },
             "IMI_AR_NO": {
                 "label": "IMI/ A.R No",
-                "regex": "IMI/?\\s*A\\.?R\\.?\\s*No\\.?\\s*[:\\-]?\\s*([A-Z0-9/\\-]+?)(?=\\s*(?:Vendor|$))",
+                "regex": "IMI/?\\s*A\\.?R\\.?\\s*No\\.?\\s*[:\\-]?\\s*\\|?\\s*([A-Z0-9/\\-]+?)(?=\\s*(?:Vendor|\\||$))",
                 "type": "string"
             },
             "VENDOR_NAME": {
                 "label": "Vendor/Supplier Name",
-                "regex": "Vendor/?Supplier\\s*Name\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Vendor/?Supplier\\s*Name\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "DATE_OF_TESTING": {
                 "label": "Date of Testing",
-                "regex": "Date\\s*of\\s*Testing\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "Date\\s*of\\s*Testing\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             }
         },
@@ -94,7 +94,7 @@
             },
             "QCM_DATE": {
                 "label": "Date",
-                "regex": "Approved\\s*By\\s*:\\s*QCM[\\s\\S]*?Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "Approved\\s*By\\s*:\\s*QCM[\\s\\S]*?Date\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             },
             "PREAPPROVAL_QAM": {
@@ -103,7 +103,7 @@
             },
             "QAM_DATE": {
                 "label": "Date",
-                "regex": "Preapproval\\s*By\\s*:\\s*QAM[\\s\\S]*?Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "Preapproval\\s*By\\s*:\\s*QAM[\\s\\S]*?Date\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             },
             "APPROVAL_ED": {
@@ -112,7 +112,7 @@
             },
             "ED_DATE": {
                 "label": "Date",
-                "regex": "Approved\\s*By\\s*:\\s*ED[\\s\\S]*?Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "Approved\\s*By\\s*:\\s*ED[\\s\\S]*?Date\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             }
         }

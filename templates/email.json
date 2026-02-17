@@ -17,12 +17,12 @@
             },
             "TO_EMAIL": {
                 "label": "To:",
-                "regex": "To:\\s*([^\\n]+)",
+                "regex": "To:\\s*[:\\-]?\\s*\\|?\\s*([^\\n]+)",
                 "type": "string"
             },
             "CC_EMAIL": {
                 "label": "Cc:",
-                "regex": "Cc:\\s*([^\\n]+)",
+                "regex": "Cc:\\s*[:\\-]?\\s*\\|?\\s*([^\\n]+)",
                 "type": "string"
             },
             "MESSAGE_COUNT": {
@@ -66,7 +66,7 @@
                     "Thanks",
                     "Regards"
                 ],
-                "regex": "Thanks\\s*&?\\s*Regards[,.]?\\s*([^\\n]+)",
+                "regex": "Thanks\\s*&?\\s*Regards[,.]?\\s*\\|?\\s*([^\\n]+)",
                 "type": "string"
             },
             "DEPARTMENT": {

@@ -12,42 +12,42 @@
         "header_fields": {
             "PRODUCT_NAME": {
                 "label": "Name of Product :",
-                "regex": "Name\\s*of\\s*Product\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Name\\s*of\\s*Product\\s*[:\\-]?\\s*\\|?\\s*((?:(?!Batch)[^\\n|])*)",
                 "type": "string"
             },
             "BATCH_NO": {
                 "label": "Batch No. :",
-                "regex": "Batch\\s*No\\.?\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Batch\\s*No\\.?\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "TOTAL_QTY": {
                 "label": "Total Qty:",
-                "regex": "Total\\s*Qty\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Total\\s*Qty\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "TARE_WT": {
                 "label": "Tare Wet.:",
-                "regex": "Tare\\s*Wet\\.?\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Tare\\s*Wet\\.?\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "BALANCE_ID": {
                 "label": "Balance ID.No. :",
-                "regex": "Balance\\s*ID\\.?\\s*No\\.?\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Balance\\s*ID\\.?\\s*No\\.?\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "CALIBRATION_STATUS": {
                 "label": "Calibration status:",
-                "regex": "Calibration\\s*status\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Calibration\\s*status\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "RINSING_STATUS": {
                 "label": "All Carboy's/Barrels/IBC Rinsed (Yes / No):",
-                "regex": "Rinsed\\s*\\(?Yes\\s*/\\s*No\\)?\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Rinsed\\s*\\(?Yes\\s*/\\s*No\\)?\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "SIGNATURE_DATE": {
                 "label": "Signature and Date:",
-                "regex": "Signature\\s*and\\s*Date\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Signature\\s*and\\s*Date\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "signature"
             },
             "PAGE_INFO": {
@@ -81,8 +81,7 @@
                 "Copy No.",
                 "Issued by",
                 "Net wet"
-            ],
-            "checked_by_note": "One common checked by sign from drum No. 01 to 10 and after same till end"
+            ]
         },
         "noise_markers": [
             "MASTER COPY",

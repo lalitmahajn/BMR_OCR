@@ -15,17 +15,17 @@
             },
             "DATE": {
                 "label": "Date :",
-                "regex": "Date\\s*[:\\-]?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "regex": "Date\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             },
             "PRODUCT_NAME": {
                 "label": "Product Name :",
-                "regex": "Product\\s*Name\\s*[:\\-]?\\s*([^\\n|]+)",
+                "regex": "Product\\s*Name\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
                 "type": "string"
             },
             "BATCH_CAPACITY": {
                 "label": "Batch Capacity :",
-                "regex": "Batch\\s*Capacity\\s*[:\\-]?\\s*([\\d,]+\\s*(?:Kgs|KGS|kg)?)",
+                "regex": "Batch\\s*Capacity\\s*[:\\-]?\\s*\\|?\\s*([\\d,]+\\s*(?:Kgs|KGS|kg)?)",
                 "type": "string"
             }
         },

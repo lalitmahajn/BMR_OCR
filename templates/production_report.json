@@ -10,7 +10,7 @@
         "header_fields": {
             "PRODUCTION_DATE": {
                 "label": "D+",
-                "regex": "D\\+\\s*([\\d/]+)",
+                "regex": "D\\+\\s*\\|?\\s*([\\d/]+)",
                 "type": "date"
             }
         },
@@ -61,7 +61,7 @@
                 "expected_label": [
                     "Production Supervisor"
                 ],
-                "regex": "Prepared\\s*by\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Production|Reviewed|$))",
+                "regex": "Prepared\\s*by\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:Production|Reviewed|\\||$))",
                 "type": "signature"
             },
             "REVIEWED_BY": {
@@ -69,7 +69,7 @@
                 "expected_label": [
                     "Production Manager"
                 ],
-                "regex": "Reviewed\\s*by\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Production|Format|$))",
+                "regex": "Reviewed\\s*by\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:Production|Format|\\||$))",
                 "type": "signature"
             }
         },
