@@ -44,3 +44,5 @@ data/
 *_extraction_results.md
 *.txt
 scripts/
+debug_rows.json
+page3_fields.json
