@@ -675,6 +675,9 @@ class MarkdownExtractionEngine:
                         results["rows"].append(
                             {"config": row_tpl, "extracted": best_match}
                         )
+                    else:
+                        # Ensure the parameter appears in the output even if not found
+                        results["rows"].append({"config": row_tpl, "extracted": {}})
 
         # 3. Extract Footers
         if ext.footer_fields:

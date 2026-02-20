@@ -17,30 +17,25 @@
                 "regex": "Product\\s*Name\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:Manufacturing|Batch|AR|\\||$))",
                 "type": "string"
             },
-            "AR_NO": {
-                "label": "AR No.",
-                "regex": "AR\\s*No\\.?\\s*[:\\-]?\\s*\\|?\\s*([A-Z0-9\\s]+?)(?=\\s*(?:Approval|Batch|\\||$))",
-                "type": "string"
-            },
-            "BATCH_NO": {
-                "label": "Batch No.",
-                "regex": "Batch\\s*No\\.?\\s*[:\\-]?\\s*\\|?\\s*(\\d[\\d\\s]*?)(?=\\s*(?:Packing|Quantity|\\||$))",
-                "type": "string"
-            },
             "MFG_DATE": {
                 "label": "Manufacturing Date",
                 "regex": "Manufacturing\\s*Date\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
             },
-            "EXP_DATE": {
-                "label": "Exp. Date",
-                "regex": "Exp\\.?\\s*Date\\s*[=:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
-                "type": "date"
+            "AR_NO": {
+                "label": "AR No.",
+                "regex": "AR\\s*No\\.?\\s*[:\\-]?\\s*\\|?\\s*([A-Z0-9\\s]+?)(?=\\s*(?:Approval|Batch|\\||$))",
+                "type": "string"
             },
             "APPROVAL_DATE": {
                 "label": "Approval Date",
                 "regex": "Approval\\s*Date\\s*[:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
                 "type": "date"
+            },
+            "BATCH_NO": {
+                "label": "Batch No.",
+                "regex": "Batch\\s*No\\.?\\s*[:\\-]?\\s*\\|?\\s*(\\d[\\d\\s]*?)(?=\\s*(?:Packing|Quantity|\\||$))",
+                "type": "string"
             },
             "PACKING_DETAILS": {
                 "label": "Packing Details",
@@ -51,6 +46,11 @@
                 "label": "Quantity",
                 "regex": "Quantity\\s*[:\\-]?\\s*\\|?\\s*([\\d,]+\\s*(?:KGS|Kgs|kg)?)",
                 "type": "string"
+            },
+            "EXP_DATE": {
+                "label": "Exp. Date",
+                "regex": "Exp\\.?\\s*Date\\s*[=:\\-]?\\s*\\|?\\s*(\\d{2}/\\d{2}/\\d{2,4})",
+                "type": "date"
             }
         },
         "test_parameters_table": [

@@ -17,7 +17,7 @@
                     "Product Specification >>",
                     "Product Specification"
                 ],
-                "regex": "Product\\s*Specification\\s*>+\\s*\\|?\\s*([\\w]+)",
+                "regex": "Product\\s*Specification\\s*(?:&gt;|>)++\\s*\\|?\\s*(.*)",
                 "type": "string"
             }
         },
@@ -116,7 +116,7 @@
                     "No:",
                     "Batch No"
                 ],
-                "regex": "B\\.?\\s*No[:\\-]?\\s*[-]?\\s*\\|?\\s*(\\d[\\d]+)",
+                "regex": "(?:B\\.|8\\.)?\\s*No[:\\-]?\\s*[-]?\\s*\\|?\\s*(\\d[\\d]+)",
                 "type": "string"
             }
         }

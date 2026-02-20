@@ -38,8 +38,7 @@ export default function ImageViewer({ imageUrl }) {
                     <img
                         src={imageUrl}
                         alt="Document Page"
-                        className="max-w-none"
-                        style={{ maxHeight: 'none' }} // Allow growing beyond container
+                        className="max-w-full max-h-[85vh] object-contain"
                     />
                 </div>
             </div>

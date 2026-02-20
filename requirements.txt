@@ -31,5 +31,3 @@ mistralai>=1.0.0
 thefuzz==0.20.0
 python-levenshtein==0.23.0
 
-# UI
-streamlit
