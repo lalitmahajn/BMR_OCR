@@ -135,9 +135,8 @@ class PageClassificationEngine:
         Classifies page with support for positional weighting, context inheritance,
         and sub-classification (page numbers).
         """
-        if not ocr_text:
-            logger.warning(f"[{context}] Empty OCR text, returning UNKNOWN")
-            return ClassificationResult(page_type=PageType.UNKNOWN, score=0.0)
+        # --- NUCLEAR DEBUG ---
+        logger.info(f"[{context}] FIRST 200 CHARS: {repr(ocr_text[:200])}")
 
         # 1. Search top 30 lines (increased depth for Mistral markdown)
         lines = ocr_text.upper().splitlines()[:30]
@@ -201,6 +200,11 @@ class PageClassificationEngine:
             key=lambda x: (x["score"], len(x["title"]), -x["index"]),
             reverse=True,
         )
+
+        if candidates:
+            logger.info(
+                f"[{context}] CANDIDATES: {[(c['type'].name, round(c['score'], 3)) for c in candidates[:3]]}"
+            )
 
         best_type = candidates[0]["type"] if candidates else None
         best_score = candidates[0]["score"] if candidates else 0.0

@@ -11,7 +11,7 @@
         "header_fields": {
             "NAME_OF_MATERIAL": {
                 "label": "Name of RM/FP/PM",
-                "regex": "Name\\s*of\\s*RM/?FP/?PM\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
+                "regex": "Name\\s*of\\s*RM/?FP/?PM\\s*[:\\-]?\\s*\\|?\\s*([\\w\\s\\-]+?)(?=\\s*(?:Supplier|Batch|IMI|Date\\s*of|Quantity|Vendor|\\n|$))",
                 "type": "string"
             },
             "SUPPLIER_LOT_BATCH_NO": {

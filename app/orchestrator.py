@@ -1,16 +1,47 @@
 import re
 from pathlib import Path
 from loguru import logger
+import sys
 from sqlalchemy import select
 
 from app.engines.ingestion import IngestionEngine
-from app.engines.classification import PageClassificationEngine, PageType
+from app.engines.classification import PageClassificationEngine, PageType, ClassificationResult
 from app.engines.template import TemplateEngine
 from app.engines.mistral_ocr import MistralOCRAdapter
 from app.engines.validation import ValidationEngine
 from app.engines.storage import StorageEngine
-from app.engines.extraction import MarkdownExtractionEngine
-from app.models.domain import Document, Page, Field
+from app.models.domain import Document, Page, Field, ConfidenceLevel
+from app.schemas.qc_report import QCReportSchema
+from app.schemas.worksheet_polymer import PolymerWorksheetSchema
+import cv2
+
+# Ensure debug logs are visible
+logger.remove()
+logger.add(sys.stderr, level="DEBUG")
+
+
+def parse_extracted_date(val: str) -> str:
+    """Parse dates like DD/MM/YY or DD/MM/YYYY into ISO YYYY-MM-DD."""
+    if not val:
+        return val
+    match = re.search(r"(\d{2})/(\d{2})/(\d{2,4})", val)
+    if match:
+        d, m, y = match.groups()
+        if len(y) == 2:
+            y = "20" + y
+        return f"{y}-{m}-{d}"
+    return val
+
+
+def get_field_type(config) -> str:
+    if not config:
+        return "string"
+    t = getattr(config, "type", None) or (
+        config.get("type") if isinstance(config, dict) else None
+    )
+    if t and hasattr(t, "value"):  # Handle enum
+        return str(t.value)
+    return str(t) if t else "string"
 
 
 class Orchestrator:
@@ -27,7 +58,6 @@ class Orchestrator:
 
         self.validator = ValidationEngine()
         self.storage = StorageEngine()
-        self.extraction_engine = MarkdownExtractionEngine()
 
     def process_document(self, file_path: str):
         logger.info(f"Starting processing for {file_path}")
@@ -48,449 +78,184 @@ class Orchestrator:
             existing_doc = session.scalar(
                 select(Document).where(Document.file_hash == file_hash)
             )
+
             if existing_doc:
-                logger.warning(
-                    f"Duplicate Document Detected! ID: {existing_doc.id}, Filename: {existing_doc.filename}"
+                logger.info(
+                    f"Existing document found (ID: {existing_doc.id}). "
+                    f"Re-using classification but re-running extraction."
                 )
-                logger.info("Skipping processing for duplicate document.")
-                return existing_doc.id
+                doc = existing_doc
+                
+                # Check for existing classified pages
+                db_pages = session.scalars(
+                    select(Page).where(Page.document_id == doc.id).order_by(Page.page_number)
+                ).all()
 
-            # 1. Ingestion
-            image_paths = self.ingestion.process_file(file_path)
+                if db_pages and all(p.page_type for p in db_pages):
+                    logger.info(f"Reusing {len(db_pages)} classified pages from database.")
+                    image_paths = [p.image_path for p in db_pages]
+                    
+                    # Pre-populate page_data_list to skip Phase 1
+                    page_data_list = []
+                    for i, p in enumerate(db_pages):
+                        # Clear old fields for re-extraction
+                        p.fields.clear()
+                        
+                        # Add to list with existing classification
+                        page_data_list.append({
+                            "index": i,
+                            "img_path": p.image_path,
+                            "ocr_text": None, # Will be fetched in Phase 1 if needed
+                            "classification": ClassificationResult(
+                                page_type=PageType(p.page_type),
+                                page_num=p.sub_page_num,
+                                total_pages=p.total_pages,
+                                score=1.0, # Default high confidence for previously stored results
+                                line="" # Not stored in DB
+                            ),
+                            "db_page": p # Pass through to avoid re-creation
+                        })
+                else:
+                    logger.info("No classified pages found in DB. Clearing and re-running ingestion.")
+                    doc.pages.clear()
+                    session.commit()
+                    image_paths = self.ingestion.process_file(file_path)
+                    page_data_list = []
+            else:
+                # 1. Ingestion (new document)
+                image_paths = self.ingestion.process_file(file_path)
+                doc = Document(filename=file_path_obj.name, file_hash=file_hash)
+                self.storage.save_pending_document(session, doc)
+                page_data_list = []
+            
+            # --- PHASE 1: Classification & Pre-Processing ---
+            # Populate or complete page_data_list
+            if not page_data_list:
+                logger.info(f"Phase 1: Classifying all {len(image_paths)} pages")
+                for i, img_path in enumerate(image_paths):
+                    # 1a. Read image dimensions
+                    img = cv2.imread(img_path)
+                    if img is None:
+                        logger.error(f"Failed to read image: {img_path}")
+                        continue
+                    h, w = img.shape[:2]
 
-            # Create DB Document
-            doc = Document(filename=file_path_obj.name, file_hash=file_hash)
-            self.storage.save_pending_document(session, doc)
-
-            # Persistence cache for header fields (keyed by page_type)
-            header_cache = {}
-
-            for i, img_path in enumerate(image_paths):
-                logger.info(f"Processing Page {i + 1}: {img_path}")
-
-                # Read image dimensions
-                import cv2
-
-                img = cv2.imread(img_path)
-                h, w = img.shape[:2]
-
-                # 2. OCR (with check if output is already present/cached)
-                cache_file = Path(img_path).with_suffix(".md")
-                if cache_file.exists():
-                    logger.info(
-                        f"Page {i + 1}: Skipping Mistral API (Local OCR Cache Found)"
+                    # 1b. OCR (check cache)
+                    page_ocr_cache = self.ocr_adapter.extract_text(img_path)
+                    
+                    # 1c. Classify
+                    classification_res = self.classification.classify(
+                        page_ocr_cache.text, context=f"{doc.filename} - Page {i + 1}"
                     )
+                    
+                    page_data_list.append({
+                        "index": i,
+                        "img_path": img_path,
+                        "ocr_text": page_ocr_cache.text,
+                        "classification": classification_res,
+                        "height": h,
+                        "width": w
+                    })
+                    logger.info(f"Page {i+1} classified as {classification_res.page_type}")
+            else:
+                # Already have classification, still need OCR text and dimensions for extraction
+                for p_data in page_data_list:
+                    img_path = p_data["img_path"]
+                    
+                    # OCR (cached)
+                    page_ocr_cache = self.ocr_adapter.extract_text(img_path)
+                    p_data["ocr_text"] = page_ocr_cache.text
+                    
+                    # Dimensions
+                    img = cv2.imread(img_path)
+                    if img is not None:
+                        p_data["height"], p_data["width"] = img.shape[:2]
+                    
+                    logger.info(f"Page {p_data['index']+1} reusing classification: {p_data['classification'].page_type}")
 
-                page_ocr_cache = self.ocr_adapter.extract_text(img_path)
+            # --- PHASE 2: Grouping consecutive pages of same type ---
+            logger.info("Phase 2: Grouping consecutive pages")
+            groups = []
+            if page_data_list:
+                current_group = [page_data_list[0]]
+                for i in range(1, len(page_data_list)):
+                    prev = page_data_list[i-1]
+                    curr = page_data_list[i]
+                    
+                    # Grouping rule: Same page type, and neither is unknown
+                    if (curr["classification"].page_type == prev["classification"].page_type and 
+                        curr["classification"].page_type != PageType.UNKNOWN):
+                        current_group.append(curr)
+                    else:
+                        groups.append(current_group)
+                        current_group = [curr]
+                groups.append(current_group)
 
-                # Export to output folder for audit
-                if page_ocr_cache.text:
-                    try:
-                        doc_output_dir = Path("output") / Path(file_path).stem
-                        doc_output_dir.mkdir(parents=True, exist_ok=True)
-                        output_file = doc_output_dir / f"page_{i + 1}.md"
-                        with open(output_file, "w", encoding="utf-8") as f:
-                            f.write(page_ocr_cache.text)
-                        logger.info(f"Saved raw OCR to {output_file}")
-                    except Exception as e:
-                        logger.error(f"Failed to save raw OCR output: {e}")
+            # --- PHASE 3: Processing Groups ---
+            logger.info(f"Phase 3: Processing {len(groups)} Document Units")
+            
+            for group_idx, group in enumerate(groups):
+                first_page_data = group[0]
+                classification_res = first_page_data["classification"]
+                page_type = classification_res.page_type
+                
+                logger.info(f"Processing Group {group_idx + 1}: Type={page_type}, Pages={[p['index']+1 for p in group]}")
 
-                # 2. Classification using cached OCR result
-                classification_res = self.classification.classify(
-                    page_ocr_cache.text, context=f"{doc.filename} - Page {i + 1}"
-                )
-                page_type_name = classification_res.page_type.name
+                # Create or reuse DB Page records
+                db_pages = []
+                for p_data in group:
+                    if "db_page" in p_data:
+                        db_pages.append(p_data["db_page"])
+                    else:
+                        db_page = Page(
+                            document=doc,
+                            page_number=p_data["index"] + 1,
+                            image_path=str(p_data["img_path"]),
+                            page_type=p_data["classification"].page_type.name,
+                            sub_page_num=p_data["classification"].page_num,
+                            total_pages=p_data["classification"].total_pages,
+                        )
+                        session.add(db_page)
+                        db_pages.append(db_page)
+                
+                session.flush() # Get IDs
 
-                # Create Page
-                db_page = Page(
-                    document=doc,
-                    page_number=i + 1,
-                    image_path=str(img_path),
-                    page_type=page_type_name,
-                    sub_page_num=classification_res.page_num,
-                    total_pages=classification_res.total_pages,
-                )
-                session.add(db_page)
-
-                if classification_res.page_type == PageType.UNKNOWN:
-                    logger.warning(
-                        f"Page {i + 1} Unknown Type - Skipping specific extraction"
-                    )
+                if page_type == PageType.UNKNOWN:
+                    logger.warning(f"Group {group_idx + 1} Unknown Type - Skipping")
                     continue
 
-                # 3. Template Loading
-                template = self.template_engine.get_template(
-                    classification_res.page_type.value
-                )
-                fields_def = self.template_engine.get_fields(
-                    classification_res.page_type.value, w, h
-                )
-
-                # 4. Extraction & Validation
-                # --- NEW: Nested Extraction Logic ---
+                # Template Loading
+                template = self.template_engine.get_template(page_type.value)
+                
+                # Extraction & Validation
+                processed_via_pattern_b = False
                 if template and template.extraction_template:
-                    logger.info(
-                        f"Using Nested Extraction for {classification_res.page_type}"
+                    img_paths = [p["img_path"] for p in group]
+                    
+                    extracted_data = None
+                    if page_type == PageType.QC_TEST_REPORT:
+                        extracted_data = self.ocr_adapter.extract_structured_data(img_paths, QCReportSchema)
+                    elif page_type == PageType.WORKSHEET_POLYMER:
+                        extracted_data = self.ocr_adapter.extract_structured_data(img_paths, PolymerWorksheetSchema)
+
+                    # Map to Database
+                    if extracted_data:
+                        if page_type == PageType.QC_TEST_REPORT:
+                            self._process_structured_qc_report(extracted_data, db_pages, session)
+                            processed_via_pattern_b = True
+                        elif page_type == PageType.WORKSHEET_POLYMER:
+                            self._process_structured_polymer_worksheet(extracted_data, db_pages, session)
+                            processed_via_pattern_b = True
+
+                if processed_via_pattern_b:
+                    session.commit()
+                else:
+                    logger.warning(
+                        f"Skipping extraction for Group {group_idx + 1} (Type={page_type}): "
+                        "No Pattern B Schema registered for this document type. Legacy regex path has been disabled."
                     )
 
-                    # ROUTING: Database-safe specialized extraction
-                    if classification_res.page_type == PageType.PACKING_DETAILS:
-                        logger.info("Routing to Specialized Packing Details Extraction")
-                        nested_res = self.extraction_engine.extract_packing_details(
-                            page_ocr_cache.text, template.extraction_template
-                        )
-                    elif classification_res.page_type == PageType.BMR_CHECKLIST:
-                        logger.info("Routing to Specialized Checklist Extraction")
-                        nested_res = self.extraction_engine.extract_checklist(
-                            page_ocr_cache.text, template.extraction_template
-                        )
-                    else:
-                        nested_res = self.extraction_engine.process_nested_template(
-                            page_ocr_cache.text, template.extraction_template
-                        )
-
-                    # Initialize cache for this page type if missing
-                    if page_type_name not in header_cache:
-                        header_cache[page_type_name] = {}
-
-                    # 4a. Process Headers (with Persistence)
-                    for key, data in nested_res["headers"].items():
-                        val = data["value"]
-                        config = data["config"]
-                        # Get confidence from extraction, default to 0.0
-                        extraction_conf = data.get("confidence", 0.0)
-
-                        # PERSISTENCE LOGIC:
-                        # If val is empty but we have a cached value for this doc type, use it
-                        if not val and key in header_cache[page_type_name]:
-                            val = header_cache[page_type_name][key]
-                            logger.debug(f"Inherited header '{key}': {val}")
-                            # Inherited values are high confidence (verified previously)
-                            extraction_conf = 1.0
-                        elif val:
-                            # Update cache with fresh value
-                            header_cache[page_type_name][key] = val
-
-                        conf_level = self.validator.validate_field(
-                            val, config, extraction_confidence=extraction_conf
-                        )
-                        f = Field(
-                            page=db_page,
-                            name=key,
-                            ocr_value=val,
-                            roi_coordinates="0,0,0,0",
-                            ocr_confidence=extraction_conf,
-                            confidence_level=conf_level,
-                        )
-                        session.add(f)
-
-                    # 4b. Process Named Tables (new format)
-                    if "tables" in nested_res and nested_res["tables"]:
-                        for table_name, table_rows in nested_res["tables"].items():
-                            for row_idx, row_data in enumerate(table_rows):
-                                extracted = row_data["extracted"]
-                                for col_name, col_val in extracted.items():
-                                    if col_name.startswith("_"):
-                                        continue  # Skip internal keys like _table_name
-                                    if col_val and str(col_val).strip():
-                                        # Table extraction is structure-based, assume medium-high confidence
-                                        table_conf = 0.85
-                                        f = Field(
-                                            page=db_page,
-                                            name=f"TABLE_{table_name}_{row_idx}_{col_name}",
-                                            ocr_value=str(col_val).strip(),
-                                            roi_coordinates="0,0,0,0",
-                                            ocr_confidence=table_conf,
-                                            confidence_level=self.validator.validate_field(
-                                                str(col_val), None, table_conf
-                                            ),
-                                        )
-                                        session.add(f)
-                            logger.info(
-                                f"Stored {len(table_rows)} rows for table '{table_name}' on page {i + 1}"
-                            )
-
-                    # 4c. Process Single-Table Rows (legacy format)
-                    for row_data in nested_res.get("rows", []):
-                        extracted = row_data["extracted"]
-                        config = row_data["config"]
-                        ext_tpl = template.extraction_template
-
-                        # PRIORITY 1: Check row-specific result labels
-                        dynamic_keys = [
-                            "observation_label",
-                            "result_label",
-                            "extracted_label",
-                            "value_label",
-                        ]
-                        target_label = None
-                        for dk in dynamic_keys:
-                            if hasattr(config, dk) and getattr(config, dk):
-                                target_label = getattr(config, dk)
-                                break
-
-                        res_key = None
-                        from thefuzz import fuzz
-
-                        if target_label:
-                            highest_match = 0
-                            for k in extracted.keys():
-                                score = fuzz.partial_ratio(
-                                    target_label.lower(), k.lower()
-                                )
-                                if score > 85 and score > highest_match:
-                                    highest_match = score
-                                    res_key = k
-
-                        # PRIORITY 2: Check template-level table_config result keywords
-                        if not res_key and ext_tpl and ext_tpl.table_config:
-                            kw_res = ext_tpl.table_config.result_column_keywords
-                            highest_match = 0
-                            for k in extracted.keys():
-                                for kw in kw_res:
-                                    score = fuzz.partial_ratio(kw.lower(), k.lower())
-                                    if score > 85 and score > highest_match:
-                                        highest_match = score
-                                        res_key = k
-
-                        # Fallback to generic column identification
-                        if not res_key:
-                            res_key = next(
-                                (
-                                    k
-                                    for k in extracted.keys()
-                                    if any(
-                                        kw in k.lower()
-                                        for kw in [
-                                            "result",
-                                            "value",
-                                            "observation",
-                                            "finding",
-                                        ]
-                                    )
-                                ),
-                                list(extracted.keys())[-1] if extracted else "Result",
-                            )
-
-                        val = extracted.get(res_key, "")
-
-                        # CLEANUP: Handle extraction using target_label
-                        if target_label:
-                            target_label = target_label.replace("\\n", "\n")
-                            logger.debug(
-                                f"[{config.parameter}] Label Clean for '{repr(target_label)}'"
-                            )
-
-                            # NEW: LINE-HOPPING LOGIC (Bulletproof generic extraction)
-                            # If label ends with one or more newlines, skip that many lines down
-                            if target_label.endswith("\n"):
-                                shift = target_label.count("\n")
-                                anchor = target_label.strip()
-                                lines = [l.strip() for l in val.split("\n")]
-
-                                logger.debug(
-                                    f"[{config.parameter}] Line-Hoping (Shift: {shift}) for anchor '{anchor}'"
-                                )
-                                found = False
-                                for idx, line in enumerate(lines):
-                                    if anchor.lower() in line.lower():
-                                        target_idx = idx + shift
-                                        if target_idx < len(lines):
-                                            val = lines[target_idx]
-                                            # Strip trailing pipes/delimiters from OCR cells
-                                            val = re.sub(r"[ |:\-=]+$", "", val).strip()
-                                            logger.debug(
-                                                f"[{config.parameter}] Hop Success! Result: {repr(val)}"
-                                            )
-                                            found = True
-                                            break
-                                if found:
-                                    # Skip regex fallbacks if hop worked
-                                    val = re.sub(r"^[ :\-=]+", "", val).strip()
-                                else:
-                                    logger.debug(
-                                        f"[{config.parameter}] Hop failed (Anchor not found or out of bounds). Falling back to Regex."
-                                    )
-
-                            # REGEX FALLBACK (for wildcards like Solid Content)
-                            if not target_label.endswith("\n") or val == extracted.get(
-                                res_key, ""
-                            ):
-                                # Space-Flexible Regex Normalization
-                                norm_label = (
-                                    re.escape(target_label.strip())
-                                    .replace(r"\.\*", r".*?")
-                                    .replace(r"\\\.", r".")
-                                )
-                                # Allow multiple spaces
-                                norm_label = re.sub(r"\\\s+", r"\\s*", norm_label)
-
-                                pattern = rf"{norm_label}(?P<tail>.*?)(?:\s*\n|$)"
-                                match = re.search(
-                                    pattern, val, flags=re.IGNORECASE | re.DOTALL
-                                )
-
-                                if match and match.group("tail").strip():
-                                    val = match.group("tail").strip()
-                                    # Clean pipes
-                                    val = re.sub(r"[ |:\-=]+$", "", val).strip()
-                                else:
-                                    # Final fallback: simple start-strip
-                                    val = re.sub(
-                                        rf"^{re.escape(target_label)}",
-                                        "",
-                                        val,
-                                        flags=re.IGNORECASE,
-                                    ).strip()
-
-                            # Extra cleanup for common delimiters like ':' or '='
-                            val = re.sub(r"^[ :\-=]+", "", val).strip()
-
-                        conf_level = self.validator.validate_field(val, config)
-
-                        # Check if full column extraction is enabled
-                        ext_tpl = template.extraction_template
-                        extract_all = (
-                            ext_tpl
-                            and ext_tpl.table_config
-                            and getattr(
-                                ext_tpl.table_config, "extract_all_columns", False
-                            )
-                        )
-
-                        if extract_all:
-                            # Save ALL columns as separate fields
-                            for col_name, col_val in extracted.items():
-                                if isinstance(col_val, dict):
-                                    logger.warning(
-                                        f"Unexpected dict value in column '{col_name}': {col_val}. Skipping."
-                                    )
-                                    continue
-
-                                if col_val and col_val.strip():
-                                    # Handle config being either an object (Pydantic) or a dict
-                                    if isinstance(config, dict):
-                                        param_name = config.get("parameter", "Unknown")
-                                    else:
-                                        param_name = getattr(
-                                            config, "parameter", "Unknown"
-                                        )
-
-                                    # Use fuzzy match score as confidence proxy if available
-                                    # Since we don't track per-column fuzzy score, use default
-                                    col_conf = 0.8 if res_key else 0.6
-
-                                    f = Field(
-                                        page=db_page,
-                                        name=f"TABLE_{param_name}_{col_name}",
-                                        ocr_value=col_val.strip(),
-                                        roi_coordinates="0,0,0,0",
-                                        ocr_confidence=col_conf,
-                                        confidence_level=self.validator.validate_field(
-                                            col_val, config, col_conf
-                                        ),
-                                    )
-                                    session.add(f)
-                        else:
-                            # Save only the result column (original behavior)
-                            # Use fuzzy match score as confidence proxy
-                            row_conf = (
-                                (highest_match / 100.0) if highest_match > 0 else 0.7
-                            )
-
-                            conf_level = self.validator.validate_field(
-                                val, config, extraction_confidence=row_conf
-                            )
-
-                            f = Field(
-                                page=db_page,
-                                name=f"TABLE_{config.parameter}",
-                                ocr_value=val,
-                                roi_coordinates="0,0,0,0",
-                                ocr_confidence=row_conf,
-                                confidence_level=conf_level,
-                            )
-                            session.add(f)
-
-                    # 4c. Process Footers
-                    for key, data in nested_res["footers"].items():
-                        val = data["value"]
-                        config = data["config"]
-
-                        # FALLBACK: If footer is empty, search for it in the table rows
-                        if not val and "rows" in nested_res:
-                            # Use template-defined label if available, else derive from key
-                            target_label = None
-                            if hasattr(config, "label"):
-                                target_label = config.label
-                            elif isinstance(config, dict):
-                                target_label = config.get("label")
-
-                            target_label = target_label or key
-                            search_key_raw = target_label.lower()
-
-                            for tr in nested_res["rows"]:
-                                # Look for key in all cell values
-                                row_content = " ".join(str(v) for v in tr.values())
-                                if search_key_raw in row_content.lower():
-                                    val = row_content
-                                    # Strip the key from the content (take everything after it)
-                                    split_idx = val.lower().find(search_key_raw)
-                                    if split_idx != -1:
-                                        val = val[
-                                            split_idx + len(search_key_raw) :
-                                        ].strip()
-
-                                    val = re.sub(r"^[ :\-=]+", "", val).strip()
-
-                                    # If image found in the remaining string, we're good
-                                    if "![" in val:
-                                        break
-                                    # Otherwise keep searching other cells if this one was empty
-                                    if not val:
-                                        continue
-                                    break
-
-                        extraction_conf = data.get("confidence", 0.0)
-                        conf_level = self.validator.validate_field(
-                            val, config, extraction_confidence=extraction_conf
-                        )
-                        f = Field(
-                            page=db_page,
-                            name=key,
-                            ocr_value=val,
-                            roi_coordinates="0,0,0,0",
-                            ocr_confidence=extraction_conf,
-                            confidence_level=conf_level,
-                        )
-                        session.add(f)
-
-                # --- OLD: Flat Extraction Fallback ---
-                elif fields_def:
-                    for f_def in fields_def:
-                        logger.debug(
-                            f"Extracting field {f_def.name} from Mistral source"
-                        )
-                        extracted_value, _, extraction_conf = (
-                            self.extraction_engine.extract_field(
-                                page_ocr_cache.text, f_def
-                            )
-                        )
-                        conf_level = self.validator.validate_field(
-                            extracted_value,
-                            f_def,
-                            extraction_confidence=extraction_conf,
-                        )
-                        db_field = Field(
-                            page=db_page,
-                            name=f_def.name,
-                            roi_coordinates="0,0,0,0",
-                            ocr_value=extracted_value,
-                            ocr_confidence=extraction_conf,
-                            confidence_level=conf_level,
-                        )
-                        session.add(db_field)
-
+            doc.status = "COMPLETED"
             session.commit()
             logger.info("Document processing complete. Data saved to DB.")
 
@@ -499,3 +264,324 @@ class Orchestrator:
             session.rollback()
         finally:
             session.close()
+
+    def _process_structured_qc_report(self, data: dict, db_pages: list[Page], session):
+        """Maps the QCReportSchema JSON directly to Field records."""
+        logger.info("Mapping Pattern B QC Report JSON to database Fields")
+        db_page = db_pages[0] # Usually single page for QC Report
+
+        # 1. Flat Fields
+        flat_fields = [
+            "product_name",
+            "batch_no",
+            "ar_no",
+            "mfg_date",
+            "exp_date",
+            "approval_date",
+            "quantity",
+            "packing_details",
+            "overall_result",
+            "remarks",
+            "analyzed_date",
+            "approved_date",
+        ]
+
+        for field_name in flat_fields:
+            val = data.get(field_name)
+            if val is not None and str(val).strip():
+                f_type = "date" if "date" in field_name else "string"
+                if f_type == "date" and isinstance(val, str):
+                    val = parse_extracted_date(val)
+
+                f = Field(
+                    page=db_page,
+                    name=field_name.upper(),
+                    field_type=f_type,
+                    ocr_value=str(val).strip(),
+                    roi_coordinates="0,0,0,0",
+                    ocr_confidence=0.95,
+                    confidence_level=ConfidenceLevel.GREEN,
+                )
+                session.add(f)
+
+        # 2. Signature Booleans
+        for sig_field in [
+            "analyzed_by_signature_present",
+            "approved_by_signature_present",
+        ]:
+            val = data.get(sig_field)
+            if val is not None:
+                f = Field(
+                    page=db_page,
+                    name=sig_field.upper(),
+                    field_type="boolean",
+                    ocr_value=str(val),
+                    roi_coordinates="0,0,0,0",
+                    ocr_confidence=0.90,
+                    confidence_level=ConfidenceLevel.GREEN,
+                )
+                session.add(f)
+
+        # 3. Table Rows
+        test_results = data.get("test_results", [])
+        for i, row in enumerate(test_results):
+            param = row.get("parameter", f"UNKNOWN_{i}")
+            res = row.get("result_value", "")
+            unit = row.get("unit", "")
+            sr_no = row.get("sr_no")
+            
+            if param and str(res).strip():
+                clean_param = re.sub(r"[^a-zA-Z0-9]", "_", param).strip("_").upper()
+                f = Field(
+                    page=db_page,
+                    name=f"TABLE_TEST_PARAMS_{clean_param}",
+                    field_type="string",
+                    ocr_value=str(res).strip(),
+                    unit=str(unit).strip() if unit else None,
+                    sr_no=sr_no,
+                    roi_coordinates="0,0,0,0",
+                    ocr_confidence=0.95,
+                    confidence_level=ConfidenceLevel.GREEN,
+                )
+                session.add(f)
+
+    def _process_structured_polymer_worksheet(self, data: dict, db_pages: list[Page], session):
+        """Maps the PolymerWorksheetSchema JSON directly to Field records."""
+        logger.info("Mapping Pattern B Polymer Worksheet JSON to database Fields")
+        
+        # Helper to get page by index (safe)
+        def get_pg(idx: int) -> Page:
+            if idx < len(db_pages):
+                return db_pages[idx]
+            return db_pages[-1]
+
+        # 1. Document Header (Metadata) -> PAGE 3 (Index 0)
+        p1 = get_pg(0)
+        header = data.get("header")
+        if header:
+            header_fields = {
+                "title": "DOC_HEADER_TITLE",
+                "document_no": "DOC_HEADER_NO",
+                "revision_no": "DOC_HEADER_REV",
+                "effective_date": "DOC_HEADER_EFF_DATE",
+                "next_revision_due": "DOC_HEADER_NEXT_REV_DATE",
+            }
+            for key, db_name in header_fields.items():
+                val = header.get(key)
+                if val:
+                    f = Field(
+                        page=p1,
+                        name=db_name,
+                        field_type="string",
+                        ocr_value=str(val).strip(),
+                        roi_coordinates="0,0,0,0",
+                        ocr_confidence=0.95,
+                        confidence_level=ConfidenceLevel.GREEN,
+                    )
+                    session.add(f)
+
+        # 2. Batch Details Header -> PAGE 4 (Index 1)
+        p2 = get_pg(1)
+        batch_mapping = {
+            "product_code": "PRODUCT_CODE",
+            "ar_no": "AR_NO",
+            "batch_no": "BATCH_NO",
+            "containers_packs": "CONTAINERS_PACKING",
+            "batch_quantity": "BATCH_QUANTITY",
+            "sampled_quantity": "SAMPLED_QUANTITY",
+            "sampling_date": "SAMPLING_DATE",
+            "analysis_date": "ANALYSIS_DATE",
+            "release_date": "RELEASE_DATE",
+        }
+
+        for key, db_name in batch_mapping.items():
+            val = data.get(key)
+            if val is not None and str(val).strip():
+                f_type = "date" if "date" in key else "string"
+                if f_type == "date" and isinstance(val, str):
+                    val = parse_extracted_date(val)
+                
+                f = Field(
+                    page=p2,
+                    name=db_name,
+                    field_type=f_type,
+                    ocr_value=str(val).strip(),
+                    roi_coordinates="0,0,0,0",
+                    ocr_confidence=0.95,
+                    confidence_level=ConfidenceLevel.GREEN,
+                )
+                session.add(f)
+
+        # 3. Main Generic Tests -> Distributed (P3/P4)
+        generic_tests = data.get("generic_tests", [])
+        for row in generic_tests:
+            param = row.get("parameter")
+            obs = row.get("observation")
+            complies = row.get("complies")
+            sr_no = row.get("sr_no")
+
+            if param and obs is not None:
+                # Distribution Logic: Test 08 (Charge) and above belong on P4+
+                # Based on user feedback, "Charge" (Sr No 8) is on Page 4.
+                target_page = p1 # Page 3
+                if sr_no and sr_no >= 8:
+                    target_page = p2 # Page 4
+                elif param and "CHARGE" in param.upper():
+                    target_page = p2 # Page 4
+
+                clean_param = re.sub(r"[^A-Z0-9]", "_", param.upper()).strip("_")
+                f = Field(
+                    page=target_page,
+                    name=f"TABLE_TEST_{clean_param}",
+                    field_type="string",
+                    ocr_value=str(obs).strip(),
+                    sr_no=sr_no,
+                    roi_coordinates="0,0,0,0",
+                    ocr_confidence=0.95,
+                    confidence_level=ConfidenceLevel.GREEN,
+                )
+                session.add(f)
+                
+                if complies is not None:
+                    f_comp = Field(
+                        page=target_page,
+                        name=f"TABLE_TEST_{clean_param}_COMPLIANCE",
+                        field_type="boolean",
+                        ocr_value=str(complies),
+                        sr_no=sr_no,
+                        roi_coordinates="0,0,0,0",
+                        ocr_confidence=0.95,
+                        confidence_level=ConfidenceLevel.GREEN,
+                    )
+                    session.add(f_comp)
+
+        # 4. Solid Content (Test 09) -> PAGE 4 (Index 1)
+        sc = data.get("solid_content")
+        if sc:
+            for dish_key in ["dish_1", "dish_2"]:
+                dish = sc.get(dish_key)
+                if dish:
+                    prefix = f"TABLE_SC_{dish_key.upper()}"
+                    dish_fields = {
+                        "dish_id": f"{prefix}_ID",
+                        "weight_empty_dish": f"{prefix}_EMPTY_WEIGHT",
+                        "weight_dish_plus_sample": f"{prefix}_DISH_PLUS_SAMPLE",
+                        "weight_sample": f"{prefix}_SAMPLE_WEIGHT",
+                        "weight_dried_sample_with_dish": f"{prefix}_DRIED_WITH_DISH",
+                        "net_weight_dried_sample": f"{prefix}_NET_DRIED",
+                        "sc_percentage": f"{prefix}_SC_PERCENT",
+                    }
+                    for k, db_name in dish_fields.items():
+                        v = dish.get(k)
+                        if v:
+                            f = Field(
+                                page=p2,
+                                name=db_name,
+                                field_type="string",
+                                ocr_value=str(v).strip(),
+                                roi_coordinates="0,0,0,0",
+                                ocr_confidence=0.95,
+                                confidence_level=ConfidenceLevel.GREEN,
+                            )
+                            session.add(f)
+            
+            if sc.get("average_sc_percentage"):
+                f_avg = Field(
+                    page=p2,
+                    name="TABLE_SC_AVERAGE_PERCENT",
+                    field_type="string",
+                    ocr_value=str(sc["average_sc_percentage"]).strip(),
+                    roi_coordinates="0,0,0,0",
+                    ocr_confidence=0.95,
+                    confidence_level=ConfidenceLevel.GREEN,
+                )
+                session.add(f_avg)
+            
+            if sc.get("complies") is not None:
+                f_comp = Field(
+                    page=p2,
+                    name="TABLE_SC_COMPLIANCE",
+                    field_type="boolean",
+                    ocr_value=str(sc["complies"]),
+                    roi_coordinates="0,0,0,0",
+                    ocr_confidence=0.95,
+                    confidence_level=ConfidenceLevel.GREEN,
+                )
+                session.add(f_comp)
+
+        # 5. Stability Tests (Test 10) -> PAGE 4 (Index 1)
+        stability = data.get("stability")
+        if stability:
+            results = stability.get("results", [])
+            for i, row in enumerate(results):
+                interval = row.get("interval", f"INT_{i}").upper().replace(" ", "_").replace(".", "_")
+                for sub_field in ["ph", "viscosity"]:
+                    val = row.get(sub_field)
+                    if val is not None:
+                        f = Field(
+                            page=p2,
+                            name=f"TABLE_STABILITY_80C_{interval}_{sub_field.upper()}",
+                            field_type="float",
+                            ocr_value=str(val),
+                            roi_coordinates="0,0,0,0",
+                            ocr_confidence=0.95,
+                            confidence_level=ConfidenceLevel.GREEN,
+                        )
+                        session.add(f)
+
+        # 6. Other Tests (Test 11) -> PAGE 5 (Index 2)
+        p3 = get_pg(2)
+        others = data.get("other_tests")
+        if others:
+            if others.get("grains_gel"):
+                f = Field(
+                    page=p3,
+                    name="TABLE_TEST_GRAINS_GEL",
+                    field_type="string",
+                    ocr_value=str(others["grains_gel"]).strip(),
+                    roi_coordinates="0,0,0,0",
+                    ocr_confidence=0.95,
+                    confidence_level=ConfidenceLevel.GREEN,
+                )
+                session.add(f)
+            if others.get("wet_strength_n"):
+                f = Field(
+                    page=p3,
+                    name="TABLE_TEST_WET_STRENGTH",
+                    field_type="string",
+                    ocr_value=str(others["wet_strength_n"]).strip(),
+                    roi_coordinates="0,0,0,0",
+                    ocr_confidence=0.95,
+                    confidence_level=ConfidenceLevel.GREEN,
+                )
+                session.add(f)
+
+        # 7. Footer / Signatures -> PAGE 5 (Index 2)
+        footer_fields = {
+            "compliance_statement": "COMPLIANCE_STATEMENT",
+            "final_remark": "FINAL_REMARK",
+            "analyzed_by": "ANALYZED_BY",
+            "analyzed_by_date": "ANALYZED_BY_DATE",
+            "checked_by": "CHECKED_BY",
+            "checked_by_date": "CHECKED_BY_DATE",
+            "prepared_by": "PREPARED_BY",
+            "prepared_by_date": "PREPARED_BY_DATE",
+            "reviewed_by": "REVIEWED_BY",
+            "reviewed_by_date": "REVIEWED_BY_DATE",
+            "approved_by": "APPROVED_BY",
+            "approved_by_date": "APPROVED_BY_DATE",
+        }
+
+        for key, db_name in footer_fields.items():
+            val = data.get(key)
+            if val is not None and str(val).strip():
+                f = Field(
+                    page=p3,
+                    name=db_name,
+                    field_type="string",
+                    ocr_value=str(val).strip(),
+                    roi_coordinates="0,0,0,0",
+                    ocr_confidence=0.95,
+                    confidence_level=ConfidenceLevel.GREEN,
+                )
+                session.add(f)

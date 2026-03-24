@@ -11,7 +11,7 @@
             "PRODUCTION_DATE": {
                 "label": "D+",
                 "regex": "D\\+\\s*\\|?\\s*([\\d/]+)",
-                "type": "date"
+                "type": "string"
             }
         },
         "test_parameters_table": [],
@@ -61,7 +61,6 @@
                 "expected_label": [
                     "Production Supervisor"
                 ],
-                "regex": "Prepared\\s*by\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:Production|Reviewed|\\||$))",
                 "type": "signature"
             },
             "REVIEWED_BY": {
@@ -69,7 +68,6 @@
                 "expected_label": [
                     "Production Manager"
                 ],
-                "regex": "Reviewed\\s*by\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+?)(?=\\s*(?:Production|Format|\\||$))",
                 "type": "signature"
             }
         },

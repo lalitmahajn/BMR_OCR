@@ -71,10 +71,24 @@
                 "regex": "Observation\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Complies|Does|Conditions|$))"
             },
             {
+                "sr_no": 1,
+                "parameter": "Physical Appearance - Compliance",
+                "result_label": "Complies",
+                "regex": "(?:Complies|Does not\\s*\\-?\\s*complies)\\s*(?:[:\\-]?\\s*([\u2714\u2713xX\\*]))",
+                "strict": true
+            },
+            {
                 "sr_no": 2,
                 "parameter": "Viscosity",
                 "observation_label": "Observation:",
                 "regex": "Observation\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Complies|Does|Conditions|$))"
+            },
+            {
+                "sr_no": 2,
+                "parameter": "Viscosity - Compliance",
+                "result_label": "Complies",
+                "regex": "(?:Complies|Does not\\s*\\-?\\s*complies)\\s*(?:[:\\-]?\\s*([\u2714\u2713xX\\*]))",
+                "strict": true
             },
             {
                 "sr_no": 3,
@@ -83,10 +97,24 @@
                 "regex": "Observation\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Complies|Does|Conditions|$))"
             },
             {
+                "sr_no": 3,
+                "parameter": "pH - Compliance",
+                "result_label": "Complies",
+                "regex": "(?:Complies|Does not\\s*\\-?\\s*complies)\\s*(?:[:\\-]?\\s*([\u2714\u2713xX\\*]))",
+                "strict": true
+            },
+            {
                 "sr_no": 4,
                 "parameter": "Specific Gravity",
                 "observation_label": "Observation:",
                 "regex": "Observation\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Complies|Does|Conditions|$))"
+            },
+            {
+                "sr_no": 4,
+                "parameter": "Specific Gravity - Compliance",
+                "result_label": "Complies",
+                "regex": "(?:Complies|Does not\\s*\\-?\\s*complies)\\s*(?:[:\\-]?\\s*([\u2714\u2713xX\\*]))",
+                "strict": true
             },
             {
                 "sr_no": 5,
@@ -95,10 +123,24 @@
                 "regex": "Observation\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Complies|Does|Conditions|$))"
             },
             {
+                "sr_no": 5,
+                "parameter": "Solubility - Compliance",
+                "result_label": "Complies",
+                "regex": "(?:Complies|Does not\\s*\\-?\\s*complies)\\s*(?:[:\\-]?\\s*([\u2714\u2713xX\\*]))",
+                "strict": true
+            },
+            {
                 "sr_no": 6,
                 "parameter": "Ionicity",
                 "observation_label": "Observation: cationic / Anionic / Non ionic",
                 "regex": "Observation\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Complies|Does|Conditions|$))"
+            },
+            {
+                "sr_no": 6,
+                "parameter": "Ionicity - Compliance",
+                "result_label": "Complies",
+                "regex": "(?:Complies|Does not\\s*\\-?\\s*complies)\\s*(?:[:\\-]?\\s*([\u2714\u2713xX\\*]))",
+                "strict": true
             },
             {
                 "sr_no": 7,
@@ -107,107 +149,133 @@
                 "regex": "Turbidity\\s*=\\s*([^\\n|]+?)(?=\\s*(?:NTU|Complies|Does|$))"
             },
             {
+                "sr_no": 7,
+                "parameter": "Turbidity - Compliance",
+                "result_label": "Complies",
+                "regex": "(?:Complies|Does not\\s*\\-?\\s*complies)\\s*(?:[:\\-]?\\s*([\u2714\u2713xX\\*]))",
+                "strict": true
+            },
+            {
                 "sr_no": 8,
                 "parameter": "Charge",
-                "result_label": "meq/liter",
-                "regex": "=\\s*([\\d\\.]+)\\s*meq/liter"
+                "result_label": "Charge",
+                "regex": "Charge[\\s\\n\\|]+.*?(Anionic|Cationic|[0-9\\.]+\\s*meq/liter)"
             },
             {
                 "sr_no": 9,
                 "parameter": "Solid Content - Weight (I)-(A)",
-                "result_label": "(I) .* (A)",
-                "regex": "\\(I\\).*?Weight of dried Sample.*?=\\s*\\(A\\)\\s*([\\d\\.]+)"
+                "result_label": "Solid Content",
+                "regex": "with\\s*dish\\s*=\\s*\\(A[\\s\\.\\)]+([0-9\\.]+)"
             },
             {
                 "sr_no": 9,
                 "parameter": "Solid Content - Net Weight (I)-(C)",
-                "result_label": "(I) .* (C)",
-                "regex": "\\(I\\).*?Net weight of dried Sample.*?=\\s*\\(C\\)\\s*([\\d\\.]+)"
+                "result_label": "Solid Content",
+                "regex": "Sample\\s*\\(A\\-Y\\)\\s*=\\s*\\(C[\\s\\.\\)]+([0-9\\.]+)"
             },
             {
                 "sr_no": 9,
                 "parameter": "Solid Content - Weight (II)-(A)",
-                "result_label": "(II) .* (A)",
-                "regex": "\\(II\\).*?Weight of dried Sample.*?=\\s*\\(A\\)\\s*([\\d\\.]+)"
+                "result_label": "Solid Content",
+                "regex": "\\(II\\).*?dish\\s*=\\s*\\(A[\\s\\.\\)]+([0-9\\.]+)"
             },
             {
                 "sr_no": 9,
                 "parameter": "Solid Content - Net Weight (II)-(C)",
-                "result_label": "(II) .* (C)",
-                "regex": "\\(II\\).*?Net weight of dried Sample.*?=\\s*\\(C\\)\\s*([\\d\\.]+)"
+                "result_label": "Solid Content",
+                "regex": "\\(II\\).*?Sample\\s*\\(A\\-Y\\)\\s*=\\s*\\(C[\\s\\.\\)]+([0-9\\.]+)"
             },
             {
                 "sr_no": 9,
                 "parameter": "Solid Content - Avg Result",
-                "result_label": "Avg. =",
-                "regex": "Avg\\.\\s*=\\s*([^\\n|]+?)(?=\\s*(?:Complies|Does|$))"
+                "result_label": "Solid Content",
+                "regex": "Avg\\.\\s*=\\s*([0-9\\.\\s\\+\\=]+%)"
+            },
+            {
+                "sr_no": 9,
+                "parameter": "Solid Content - Compliance",
+                "result_label": "Solid Content",
+                "regex": "Complies\\s*/\\s*Does\\s*not",
+                "strict": false
             },
             {
                 "sr_no": 10,
-                "parameter": "Stability - 80°C - pH (Initial)",
-                "result_label": "Initial",
-                "regex": "Initial.*?pH\\s*[:\\-]?\\s*([\\d\\.]+)"
+                "parameter": "Stability - 80\u00b0C - pH (Initial)",
+                "result_label": "Stability",
+                "regex": "(?i)Initial[\\s\\n]+([0-9\\.]+)",
+                "strict": false
             },
             {
                 "sr_no": 10,
-                "parameter": "Stability - 80°C - Viscosity (Initial)",
-                "result_label": "Initial",
-                "regex": "Initial.*?Viscosity\\s*[:\\-]?\\s*([\\d\\.]+)"
+                "parameter": "Stability - 80\u00b0C - Viscosity (Initial)",
+                "result_label": "Stability",
+                "regex": "(?si)Viscosity.*?Initial[\\s\\n]+([0-9\\.]+)",
+                "strict": false
             },
             {
                 "sr_no": 10,
-                "parameter": "Stability - 80°C - pH (24 Hrs)",
-                "result_label": "24 Hrs",
-                "regex": "24\\s*Hrs.*?pH\\s*[:\\-]?\\s*([\\d\\.]+)"
+                "parameter": "Stability - 80\u00b0C - pH (24 Hrs)",
+                "result_label": "Stability",
+                "regex": "(?i)[37]2[\\s\\n]+hpi[\\s\\n]+([0-9\\.]+)",
+                "strict": false
             },
             {
                 "sr_no": 10,
-                "parameter": "Stability - 80°C - Viscosity (24 Hrs)",
-                "result_label": "24 Hrs",
-                "regex": "24\\s*Hrs.*?Viscosity\\s*[:\\-]?\\s*([\\d\\.]+)"
+                "parameter": "Stability - 80\u00b0C - Viscosity (24 Hrs)",
+                "result_label": "Stability",
+                "regex": "(?i)([0-9\\.]+)[\\s\\n]+cp",
+                "strict": false
             },
             {
                 "sr_no": 10,
-                "parameter": "Stability - 80°C - pH (72 Hrs)",
-                "result_label": "72 Hrs",
-                "regex": "72\\s*Hrs.*?pH\\s*[:\\-]?\\s*([\\d\\.]+)"
+                "parameter": "Stability - 80\u00b0C - pH (72 Hrs)",
+                "result_label": "Stability",
+                "regex": "(?i)72[\\s\\n\\-]+([0-9\\.]+)",
+                "strict": false
             },
             {
                 "sr_no": 10,
-                "parameter": "Stability - 80°C - Viscosity (72 Hrs)",
-                "result_label": "72 Hrs",
-                "regex": "72\\s*Hrs.*?Viscosity\\s*[:\\-]?\\s*([\\d\\.]+)"
-            },
-            {
-                "sr_no": 11,
-                "parameter": "Other Test",
-                "result_label": "Other Test"
+                "parameter": "Stability - 80\u00b0C - Viscosity (72 Hrs)",
+                "result_label": "Stability",
+                "regex": "(?si)Viscosity.*?72[\\s\\n\\-]+([0-9\\.]+)",
+                "strict": false
             }
         ],
         "table_config": {
-            "parameter_column_keywords": [
-                "parameter",
-                "test"
-            ],
-            "result_column_keywords": [
-                "observation",
-                "result",
-                "finding"
-            ],
+            "index_column": "Sr. No",
+            "result_column": "Result",
             "column_mapping": {
-                "sr_no": [
-                    "Sr. No.",
-                    "Sr.No."
+                "Sr. No": [
+                    "Sr. No",
+                    "No.",
+                    "S.No",
+                    "Col_0"
                 ],
-                "test": [
-                    "Test"
+                "Parameter": [
+                    "Parameter",
+                    "Test",
+                    "Col_1"
                 ],
-                "results": [
-                    "Results"
+                "Result": [
+                    "Result",
+                    "Observation",
+                    "Col_2",
+                    "Observation:",
+                    "Finding"
+                ],
+                "Compliance": [
+                    "Compliance",
+                    "Complies",
+                    "Col_3"
                 ]
             }
         },
         "footer_fields": {
+            "OTHER_TEST": {
+                "label": "Other Test",
+                "regex": "(?:Other\\s*Test[\\s\\S]*?\\|\\s*)([^|]+(?:\\n[^|\\n]+)*)",
+                "type": "string"
+            },
             "ANALYZED_BY_DATE": {
                 "label": "Analyzed By / Date",
                 "regex": "Analyzed\\s*By\\s*/\\s*Date\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Reviewed|Approved|$))",

@@ -21,7 +21,7 @@
             },
             "PRODUCT_NAME": {
                 "label": "NAME OF PRODUCT:",
-                "regex": "NAME\\s*OF\\s*PRODUCT\\s*[:\\-]?\\s*\\|?\\s*([^\\n|]+)",
+                "regex": "NAME\\s*OF\\s*PRODUCT\\s*[:\\-]?\\s*\\|?\\s*([\\w\\s\\-]{2,30})(?=\\s*(?:Page|Rev|\\d{2}/|\\n|$))",
                 "type": "string"
             },
             "EFFECTIVE_DATE": {

@@ -5,6 +5,7 @@ from loguru import logger
 from datetime import datetime
 
 from app.core.config import settings
+from app.models.base import Base
 from app.models.domain import Document, Page, Field, AuditLog, VerificationStatus
 
 
@@ -15,6 +16,7 @@ class DatabaseGateError(Exception):
 class StorageEngine:
     def __init__(self):
         self.engine = create_engine(settings.DATABASE_URL)
+        Base.metadata.create_all(self.engine)
 
     def get_session(self) -> Session:
         return Session(self.engine)

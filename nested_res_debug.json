@@ -1,0 +1,307 @@
+{
+    "headers": {
+        "PRODUCT_CODE": {
+            "value": null,
+            "confidence": 0.0,
+            "config": "label='Product Code:' value=None regex='Product\\\\s*Code\\\\s*[:\\\\-]?\\\\s*\\\\|?\\\\s*([^\\\\n|]+)' type='string' expected_label=None multi_page=False continuation_regex=None validation_rules=None"
+        },
+        "AR_NO": {
+            "value": null,
+            "confidence": 0.0,
+            "config": "label='AR. No.' value=None regex='AR\\\\.?\\\\s*No\\\\.?\\\\s*[:\\\\-]?\\\\s*\\\\|?\\\\s*([A-Z0-9\\\\s]+?)(?=\\\\s*(?:Batch|\\\\||$))' type='string' expected_label=None multi_page=False continuation_regex=None validation_rules=None"
+        },
+        "BATCH_NO": {
+            "value": null,
+            "confidence": 0.0,
+            "config": "label='Batch No.' value=None regex='Batch\\\\s*No\\\\.?\\\\s*[:\\\\-]?\\\\s*\\\\|?\\\\s*(\\\\d[\\\\d\\\\s]*?)(?=\\\\s*(?:No\\\\.|containers|\\\\||$))' type='string' expected_label=None multi_page=False continuation_regex=None validation_rules=None"
+        },
+        "CONTAINERS_PACKS": {
+            "value": null,
+            "confidence": 0.0,
+            "config": "label='No. of containers / packs' value=None regex='No\\\\.\\\\s*of\\\\s*containers?\\\\s*/?\\\\s*packs?\\\\s*[:\\\\-]?\\\\s*\\\\|?\\\\s*([^\\\\n|]+)' type='string' expected_label=None multi_page=False continuation_regex=None validation_rules=None"
+        },
+        "BATCH_QUANTITY": {
+            "value": null,
+            "confidence": 0.0,
+            "config": "label='Batch Quantity' value=None regex='Batch\\\\s*Quantity\\\\s*[:\\\\-]?\\\\s*\\\\|?\\\\s*([\\\\d,]+\\\\s*(?:Kg|KGS|kg)?)' type='string' expected_label=None multi_page=False continuation_regex=None validation_rules=None"
+        },
+        "SAMPLED_QUANTITY": {
+            "value": null,
+            "confidence": 0.0,
+            "config": "label='Sampled quantity' value=None regex='Sampled\\\\s*quantity\\\\s*[:\\\\-]?\\\\s*\\\\|?\\\\s*([^\\\\n|]+)' type='string' expected_label=None multi_page=False continuation_regex=None validation_rules=None"
+        },
+        "SAMPLING_DATE": {
+            "value": null,
+            "confidence": 0.0,
+            "config": "label='Sampling date' value=None regex='Sampling\\\\s*date\\\\s*[:\\\\-]?\\\\s*\\\\|?\\\\s*(\\\\d{2}/\\\\d{2}/\\\\d{2,4})' type='date' expected_label=None multi_page=False continuation_regex=None validation_rules=None"
+        },
+        "ANALYSIS_DATE": {
+            "value": null,
+            "confidence": 0.0,
+            "config": "label='Date of Analysis' value=None regex='Date\\\\s*of\\\\s*Analysis\\\\s*[:\\\\-]?\\\\s*\\\\|?\\\\s*(\\\\d{2}/\\\\d{2}/\\\\d{2,4})' type='date' expected_label=None multi_page=False continuation_regex=None validation_rules=None"
+        },
+        "ANALYZED_BY": {
+            "value": "/ Date:",
+            "confidence": 0.7,
+            "config": "label='Analyzed by' value=None regex='Analyzed\\\\s*by\\\\s*[:\\\\-]?\\\\s*\\\\|?\\\\s*([^\\\\n|]+?)(?=\\\\s*(?:Released|\\\\||$))' type='string' expected_label=None multi_page=False continuation_regex=None validation_rules=None"
+        },
+        "RELEASED_DATE": {
+            "value": null,
+            "confidence": 0.0,
+            "config": "label='Released Date' value=None regex='Released\\\\s*Date\\\\s*[:\\\\-]?\\\\s*\\\\|?\\\\s*(\\\\d{2}/\\\\d{2}/\\\\d{2,4})' type='date' expected_label=None multi_page=False continuation_regex=None validation_rules=None"
+        }
+    },
+    "rows": [
+        {
+            "config": "sr_no=1 parameter='Physical Appearance' result=None validation_rules=None observation_label='Observation:' regex='Observation\\\\s*[:\\\\-]?\\\\s*([^\\\\n|]+?)(?=\\\\s*(?:Complies|Does|Conditions|$))'",
+            "extracted": {}
+        },
+        {
+            "config": "sr_no=1 parameter='Physical Appearance - Compliance' result=None validation_rules=None result_label='Complies' regex='(?:Complies|Does not\\\\s*\\\\-?\\\\s*complies)\\\\s*(?:[:\\\\-]?\\\\s*([\u2714\u2713xX\\\\*]))' strict=True",
+            "extracted": {}
+        },
+        {
+            "config": "sr_no=2 parameter='Viscosity' result=None validation_rules=None observation_label='Observation:' regex='Observation\\\\s*[:\\\\-]?\\\\s*([^\\\\n|]+?)(?=\\\\s*(?:Complies|Does|Conditions|$))'",
+            "extracted": {}
+        },
+        {
+            "config": "sr_no=2 parameter='Viscosity - Compliance' result=None validation_rules=None result_label='Complies' regex='(?:Complies|Does not\\\\s*\\\\-?\\\\s*complies)\\\\s*(?:[:\\\\-]?\\\\s*([\u2714\u2713xX\\\\*]))' strict=True",
+            "extracted": {}
+        },
+        {
+            "config": "sr_no=3 parameter='pH' result=None validation_rules=None observation_label='Observation:' regex='Observation\\\\s*[:\\\\-]?\\\\s*([^\\\\n|]+?)(?=\\\\s*(?:Complies|Does|Conditions|$))'",
+            "extracted": {}
+        },
+        {
+            "config": "sr_no=3 parameter='pH - Compliance' result=None validation_rules=None result_label='Complies' regex='(?:Complies|Does not\\\\s*\\\\-?\\\\s*complies)\\\\s*(?:[:\\\\-]?\\\\s*([\u2714\u2713xX\\\\*]))' strict=True",
+            "extracted": {}
+        },
+        {
+            "config": "sr_no=4 parameter='Specific Gravity' result=None validation_rules=None observation_label='Observation:' regex='Observation\\\\s*[:\\\\-]?\\\\s*([^\\\\n|]+?)(?=\\\\s*(?:Complies|Does|Conditions|$))'",
+            "extracted": {}
+        },
+        {
+            "config": "sr_no=4 parameter='Specific Gravity - Compliance' result=None validation_rules=None result_label='Complies' regex='(?:Complies|Does not\\\\s*\\\\-?\\\\s*complies)\\\\s*(?:[:\\\\-]?\\\\s*([\u2714\u2713xX\\\\*]))' strict=True",
+            "extracted": {}
+        },
+        {
+            "config": "sr_no=5 parameter='Solubility' result=None validation_rules=None observation_label='Observation:' regex='Observation\\\\s*[:\\\\-]?\\\\s*([^\\\\n|]+?)(?=\\\\s*(?:Complies|Does|Conditions|$))'",
+            "extracted": {}
+        },
+        {
+            "config": "sr_no=5 parameter='Solubility - Compliance' result=None validation_rules=None result_label='Complies' regex='(?:Complies|Does not\\\\s*\\\\-?\\\\s*complies)\\\\s*(?:[:\\\\-]?\\\\s*([\u2714\u2713xX\\\\*]))' strict=True",
+            "extracted": {}
+        },
+        {
+            "config": "sr_no=6 parameter='Ionicity' result=None validation_rules=None observation_label='Observation: cationic / Anionic / Non ionic' regex='Observation\\\\s*[:\\\\-]?\\\\s*([^\\\\n|]+?)(?=\\\\s*(?:Complies|Does|Conditions|$))'",
+            "extracted": {}
+        },
+        {
+            "config": "sr_no=6 parameter='Ionicity - Compliance' result=None validation_rules=None result_label='Complies' regex='(?:Complies|Does not\\\\s*\\\\-?\\\\s*complies)\\\\s*(?:[:\\\\-]?\\\\s*([\u2714\u2713xX\\\\*]))' strict=True",
+            "extracted": {}
+        },
+        {
+            "config": "sr_no=7 parameter='Turbidity' result=None validation_rules=None result_label='Turbidity =' regex='Turbidity\\\\s*=\\\\s*([^\\\\n|]+?)(?=\\\\s*(?:NTU|Complies|Does|$))'",
+            "extracted": {}
+        },
+        {
+            "config": "sr_no=7 parameter='Turbidity - Compliance' result=None validation_rules=None result_label='Complies' regex='(?:Complies|Does not\\\\s*\\\\-?\\\\s*complies)\\\\s*(?:[:\\\\-]?\\\\s*([\u2714\u2713xX\\\\*]))' strict=True",
+            "extracted": {}
+        },
+        {
+            "config": "sr_no=8 parameter='Charge' result=None validation_rules=None result_label='Charge' regex='Charge[\\\\s\\\\n\\\\|]+.*?(Anionic|Cationic|[0-9\\\\.]+\\\\s*meq/liter)'",
+            "extracted": {
+                "Rishab & Chemicals Pvt. Ltd.": "08",
+                "Parameter": "Charge",
+                "RISHABH METALS & CHEMICAL PVT LTD.": "BR X 0.001 X 1000 = 0.3 x 0.001 x 1000\n10 ml = 10 ml = 0.23 meq/liter",
+                "Compliance": "",
+                "Sr. No": ""
+            }
+        },
+        {
+            "config": "sr_no=9 parameter='Solid Content - Weight (I)-(A)' result=None validation_rules=None result_label='Solid Content' regex='with\\\\s*dish\\\\s*=\\\\s*\\\\(A[\\\\s\\\\.\\\\)]+([0-9\\\\.]+)'",
+            "extracted": {
+                "Col_0": "09",
+                "Parameter": "Solid Content",
+                "Col_2": "(I) Dish ID: Weight of empty Dish Weight of Dish + Sample Weight of sample (X-Y) = Weight of dried Sample with dish = (A). 37.3597 gm Net weight of dried Sample (A-Y) = (C). 1.2301 gm SC = (C/Z) x 100 = 6.8804 = 17.88%\n (II) Dish ID: Weight of empty Dish Weight of Dish + Sample Weight of sample (X-Y) = Weight of dried Sample with dish = (A) 36.4354 gm Net weight of dried Sample (A-Y) = (C) 1.0264 gm SC = (C/Z) x 100 = 5.7180 x 100 = 17.95% Avg. = 17.88 + 17.95 = 17.92%\nComplies / Does not complies"
+            }
+        },
+        {
+            "config": "sr_no=9 parameter='Solid Content - Net Weight (I)-(C)' result=None validation_rules=None result_label='Solid Content' regex='Sample\\\\s*\\\\(A\\\\-Y\\\\)\\\\s*=\\\\s*\\\\(C[\\\\s\\\\.\\\\)]+([0-9\\\\.]+)'",
+            "extracted": {
+                "Col_0": "09",
+                "Parameter": "Solid Content",
+                "Col_2": "(I) Dish ID: Weight of empty Dish Weight of Dish + Sample Weight of sample (X-Y) = Weight of dried Sample with dish = (A). 37.3597 gm Net weight of dried Sample (A-Y) = (C). 1.2301 gm SC = (C/Z) x 100 = 6.8804 = 17.88%\n (II) Dish ID: Weight of empty Dish Weight of Dish + Sample Weight of sample (X-Y) = Weight of dried Sample with dish = (A) 36.4354 gm Net weight of dried Sample (A-Y) = (C) 1.0264 gm SC = (C/Z) x 100 = 5.7180 x 100 = 17.95% Avg. = 17.88 + 17.95 = 17.92%\nComplies / Does not complies"
+            }
+        },
+        {
+            "config": "sr_no=9 parameter='Solid Content - Weight (II)-(A)' result=None validation_rules=None result_label='Solid Content' regex='\\\\(II\\\\).*?dish\\\\s*=\\\\s*\\\\(A[\\\\s\\\\.\\\\)]+([0-9\\\\.]+)'",
+            "extracted": {
+                "Col_0": "09",
+                "Parameter": "Solid Content",
+                "Col_2": "(I) Dish ID: Weight of empty Dish Weight of Dish + Sample Weight of sample (X-Y) = Weight of dried Sample with dish = (A). 37.3597 gm Net weight of dried Sample (A-Y) = (C). 1.2301 gm SC = (C/Z) x 100 = 6.8804 = 17.88%\n (II) Dish ID: Weight of empty Dish Weight of Dish + Sample Weight of sample (X-Y) = Weight of dried Sample with dish = (A) 36.4354 gm Net weight of dried Sample (A-Y) = (C) 1.0264 gm SC = (C/Z) x 100 = 5.7180 x 100 = 17.95% Avg. = 17.88 + 17.95 = 17.92%\nComplies / Does not complies"
+            }
+        },
+        {
+            "config": "sr_no=9 parameter='Solid Content - Net Weight (II)-(C)' result=None validation_rules=None result_label='Solid Content' regex='\\\\(II\\\\).*?Sample\\\\s*\\\\(A\\\\-Y\\\\)\\\\s*=\\\\s*\\\\(C[\\\\s\\\\.\\\\)]+([0-9\\\\.]+)'",
+            "extracted": {
+                "Col_0": "09",
+                "Parameter": "Solid Content",
+                "Col_2": "(I) Dish ID: Weight of empty Dish Weight of Dish + Sample Weight of sample (X-Y) = Weight of dried Sample with dish = (A). 37.3597 gm Net weight of dried Sample (A-Y) = (C). 1.2301 gm SC = (C/Z) x 100 = 6.8804 = 17.88%\n (II) Dish ID: Weight of empty Dish Weight of Dish + Sample Weight of sample (X-Y) = Weight of dried Sample with dish = (A) 36.4354 gm Net weight of dried Sample (A-Y) = (C) 1.0264 gm SC = (C/Z) x 100 = 5.7180 x 100 = 17.95% Avg. = 17.88 + 17.95 = 17.92%\nComplies / Does not complies"
+            }
+        },
+        {
+            "config": "sr_no=9 parameter='Solid Content - Avg Result' result=None validation_rules=None result_label='Solid Content' regex='Avg\\\\.\\\\s*=\\\\s*([0-9\\\\.\\\\s\\\\+\\\\=]+%)'",
+            "extracted": {
+                "Col_0": "09",
+                "Parameter": "Solid Content",
+                "Col_2": "(I) Dish ID: Weight of empty Dish Weight of Dish + Sample Weight of sample (X-Y) = Weight of dried Sample with dish = (A). 37.3597 gm Net weight of dried Sample (A-Y) = (C). 1.2301 gm SC = (C/Z) x 100 = 6.8804 = 17.88%\n (II) Dish ID: Weight of empty Dish Weight of Dish + Sample Weight of sample (X-Y) = Weight of dried Sample with dish = (A) 36.4354 gm Net weight of dried Sample (A-Y) = (C) 1.0264 gm SC = (C/Z) x 100 = 5.7180 x 100 = 17.95% Avg. = 17.88 + 17.95 = 17.92%\nComplies / Does not complies"
+            }
+        },
+        {
+            "config": "sr_no=9 parameter='Solid Content - Compliance' result=None validation_rules=None result_label='Solid Content' regex='Complies\\\\s*/\\\\s*Does\\\\s*not' strict=False",
+            "extracted": {
+                "Col_0": "09",
+                "Parameter": "Solid Content",
+                "Col_2": "(I) Dish ID: Weight of empty Dish Weight of Dish + Sample Weight of sample (X-Y) = Weight of dried Sample with dish = (A). 37.3597 gm Net weight of dried Sample (A-Y) = (C). 1.2301 gm SC = (C/Z) x 100 = 6.8804 = 17.88%\n (II) Dish ID: Weight of empty Dish Weight of Dish + Sample Weight of sample (X-Y) = Weight of dried Sample with dish = (A) 36.4354 gm Net weight of dried Sample (A-Y) = (C) 1.0264 gm SC = (C/Z) x 100 = 5.7180 x 100 = 17.95% Avg. = 17.88 + 17.95 = 17.92%\nComplies / Does not complies"
+            }
+        },
+        {
+            "config": "sr_no=10 parameter='Stability - 80\u00b0C - pH (Initial)' result=None validation_rules=None result_label='Stability' regex='(?i)Initial[\\\\s\\\\n]+([0-9\\\\.]+)' strict=False",
+            "extracted": {
+                "Col_0": "10",
+                "Parameter": "Stability",
+                "Col_2": "24 / 72 Hrs. at 80\u00b0C Hours Initial 3.70 Initial 4.01\n32 hpi 4.01\npH Viscosity 56 cp\n-"
+            }
+        },
+        {
+            "config": "sr_no=10 parameter='Stability - 80\u00b0C - Viscosity (Initial)' result=None validation_rules=None result_label='Stability' regex='(?si)Viscosity.*?Initial[\\\\s\\\\n]+([0-9\\\\.]+)' strict=False",
+            "extracted": {
+                "Col_0": "10",
+                "Parameter": "Stability",
+                "Col_2": "24 / 72 Hrs. at 80\u00b0C Hours Initial 3.70 Initial 4.01\n32 hpi 4.01\npH Viscosity 56 cp\n-"
+            }
+        },
+        {
+            "config": "sr_no=10 parameter='Stability - 80\u00b0C - pH (24 Hrs)' result=None validation_rules=None result_label='Stability' regex='(?i)[37]2[\\\\s\\\\n]+hpi[\\\\s\\\\n]+([0-9\\\\.]+)' strict=False",
+            "extracted": {
+                "Col_0": "10",
+                "Parameter": "Stability",
+                "Col_2": "24 / 72 Hrs. at 80\u00b0C Hours Initial 3.70 Initial 4.01\n32 hpi 4.01\npH Viscosity 56 cp\n-"
+            }
+        },
+        {
+            "config": "sr_no=10 parameter='Stability - 80\u00b0C - Viscosity (24 Hrs)' result=None validation_rules=None result_label='Stability' regex='(?i)([0-9\\\\.]+)[\\\\s\\\\n]+cp' strict=False",
+            "extracted": {
+                "Col_0": "10",
+                "Parameter": "Stability",
+                "Col_2": "24 / 72 Hrs. at 80\u00b0C Hours Initial 3.70 Initial 4.01\n32 hpi 4.01\npH Viscosity 56 cp\n-"
+            }
+        },
+        {
+            "config": "sr_no=10 parameter='Stability - 80\u00b0C - pH (72 Hrs)' result=None validation_rules=None result_label='Stability' regex='(?i)72[\\\\s\\\\n\\\\-]+([0-9\\\\.]+)' strict=False",
+            "extracted": {
+                "Col_0": "10",
+                "Parameter": "Stability",
+                "Col_2": "24 / 72 Hrs. at 80\u00b0C Hours Initial 3.70 Initial 4.01\n32 hpi 4.01\npH Viscosity 56 cp\n-"
+            }
+        },
+        {
+            "config": "sr_no=10 parameter='Stability - 80\u00b0C - Viscosity (72 Hrs)' result=None validation_rules=None result_label='Stability' regex='(?si)Viscosity.*?72[\\\\s\\\\n\\\\-]+([0-9\\\\.]+)' strict=False",
+            "extracted": {
+                "Col_0": "10",
+                "Parameter": "Stability",
+                "Col_2": "24 / 72 Hrs. at 80\u00b0C Hours Initial 3.70 Initial 4.01\n32 hpi 4.01\npH Viscosity 56 cp\n-"
+            }
+        }
+    ],
+    "footers": {
+        "OTHER_TEST": {
+            "value": null,
+            "confidence": 0.6,
+            "config": {
+                "label": "Other Test",
+                "regex": "(?:Other\\s*Test[\\s\\S]*?\\|\\s*)([^|]+(?:\\n[^|\\n]+)*)",
+                "type": "string"
+            }
+        },
+        "ANALYZED_BY_DATE": {
+            "value": "",
+            "confidence": 0.6,
+            "config": {
+                "label": "Analyzed By / Date",
+                "regex": "Analyzed\\s*By\\s*/\\s*Date\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Reviewed|Approved|$))",
+                "type": "signature"
+            }
+        },
+        "REVIEWED_BY_DATE": {
+            "value": null,
+            "confidence": 0.6,
+            "config": {
+                "label": "Reviewed By / Date",
+                "regex": "Reviewed\\s*By\\s*/\\s*Date\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Approved|$))",
+                "type": "signature"
+            }
+        },
+        "APPROVED_BY_DATE": {
+            "value": null,
+            "confidence": 0.6,
+            "config": {
+                "label": "Approved By / Date",
+                "regex": "Approved\\s*By\\s*/\\s*Date\\s*[:\\-]?\\s*([^\\n|]+?)(?=\\s*(?:Prepared|$))",
+                "type": "signature"
+            }
+        },
+        "COMPLIANCE_STATEMENT": {
+            "value": null,
+            "confidence": 0.6,
+            "config": {
+                "label": " The product complies / under deviation / not complies to the specification",
+                "regex": "The\\s*product\\s*(?:complies|under\\s*deviation|not\\s*complies)\\s*to\\s*the\\s*specification",
+                "type": "string"
+            }
+        },
+        "REMARK": {
+            "value": null,
+            "confidence": 0.6,
+            "config": {
+                "label": "Remark: Approved / Rejected",
+                "regex": "Remark\\s*[:\\-]?\\s*(Approved|Rejected)",
+                "type": "string"
+            }
+        },
+        "PREPARED_BY": {
+            "value": "LA",
+            "confidence": 0.6,
+            "config": {
+                "label": "Prepared By",
+                "expected_label": [
+                    "Department Representative"
+                ],
+                "type": "signature"
+            }
+        },
+        "REVIEWED_BY_MNGR": {
+            "value": "270312025 Department Head",
+            "confidence": 0.6,
+            "config": {
+                "label": "Reviewed By",
+                "expected_label": [
+                    "Department Head"
+                ],
+                "type": "signature"
+            }
+        },
+        "APPROVED_BY_HEAD": {
+            "value": "28/01/26 QA Head\n CONFIDENTIAL COPY",
+            "confidence": 0.6,
+            "config": {
+                "label": "Approved By",
+                "expected_label": [
+                    "QA Head"
+                ],
+                "type": "signature"
+            }
+        }
+    }
+}

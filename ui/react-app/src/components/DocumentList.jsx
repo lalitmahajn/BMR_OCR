@@ -28,30 +28,30 @@ const DocumentItem = ({ doc, onSelectPage, selectedPageId }) => {
         <div className="mb-1">
             <button
                 onClick={toggle}
-                className="w-full flex items-center p-2 hover:bg-gray-100 rounded text-left text-sm"
+                className="w-full flex items-center p-2.5 hover:bg-slate-700/60 rounded-xl text-left text-sm transition-all duration-200 group relative overflow-hidden"
             >
                 {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                <FileText size={16} className="mx-2 text-blue-600" />
+                <FileText size={16} className="mx-2 text-blue-400 group-hover:text-blue-300 transition-colors" />
                 <span className="truncate flex-1 font-medium">{doc.filename}</span>
-                <span className="text-xs text-gray-500 bg-gray-200 px-1.5 rounded">{doc.page_count}p</span>
+                <span className="text-[10px] font-semibold tracking-wide px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--border-soft)', color: 'var(--text-primary)' }}>{doc.page_count} PAGES</span>
             </button>
 
             {expanded && (
-                <div className="pl-6 space-y-0.5 mt-1 border-l-2 border-gray-100 ml-3">
+                <div className="pl-6 space-y-1 mt-2 border-l-2 ml-3" style={{ borderColor: 'var(--border-soft)' }}>
                     {loading ? (
-                        <div className="text-xs text-gray-400 p-2">Loading pages...</div>
+                        <div className="text-xs text-slate-400 p-2">Loading pages...</div>
                     ) : (
                         pages.map((page) => (
                             <button
                                 key={page.id}
                                 onClick={() => onSelectPage(page)}
                                 className={cn(
-                                    "w-full text-left text-xs p-2 rounded hover:bg-gray-50 transition-colors flex justify-between",
-                                    selectedPageId === page.id ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-600"
+                                    "w-full text-left text-xs p-2.5 rounded-xl hover:bg-slate-700/60 transition-all duration-200 flex justify-between items-center group",
+                                    selectedPageId === page.id ? "bg-gradient-to-r from-blue-900/40 to-slate-800/0 text-blue-300 font-semibold shadow-[inset_2px_0_0_0_rgba(96,165,250,1)] bg-slate-800/50" : "text-slate-400"
                                 )}
                             >
                                 <span>Page {page.page_number}</span>
-                                {selectedPageId === page.id && <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1"></div>}
+                                {selectedPageId === page.id && <div className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.8)]"></div>}
                             </button>
                         ))
                     )}
@@ -69,14 +69,15 @@ export default function DocumentList({ onSelectPage, selectedPageId }) {
     }, []);
 
     return (
-        <div className="w-64 bg-white border-r h-full flex flex-col">
-            <div className="p-4 border-b">
-                <h1 className="font-bold text-gray-800 flex items-center gap-2">
+        <div className="w-72 h-full flex flex-col relative" style={{ background: 'linear-gradient(180deg, var(--bg-sidebar) 0%, var(--bg-warm) 100%)', borderRight: '1px solid var(--border-soft)' }}>
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none mix-blend-overlay"></div>
+            <div className="p-4" style={{ borderBottom: '1px solid var(--border-soft)' }}>
+                <h1 className="font-bold flex items-center gap-2.5 text-lg" style={{ color: 'var(--text-primary)' }}>
                     <img src="/vite.svg" className="w-6 h-6" alt="Logo" />
-                    BMR Verifier
+                    <span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent drop-shadow-sm font-extrabold tracking-tight">BMR Verifier</span>
                 </h1>
             </div>
-            <div className="flex-1 overflow-y-auto p-2">
+            <div className="flex-1 overflow-y-auto p-3 z-10 custom-scrollbar">
                 {documents.map((doc) => (
                     <DocumentItem
                         key={doc.id}

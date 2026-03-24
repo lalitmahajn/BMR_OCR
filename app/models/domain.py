@@ -62,6 +62,9 @@ class Field(Base):
     page_id: Mapped[int] = mapped_column(ForeignKey("pages.id"))
 
     name: Mapped[str] = mapped_column(String)  # Field name from template
+    field_type: Mapped[Optional[str]] = mapped_column(
+        String, nullable=True
+    )  # Type from template: string, date, signature, etc.
     roi_coordinates: Mapped[str] = mapped_column(
         String
     )  # JSON string or specific format x,y,w,h
@@ -70,6 +73,9 @@ class Field(Base):
         Text, nullable=True
     )  # Raw OCR value
     ocr_confidence: Mapped[float] = mapped_column(Float, default=0.0)
+
+    unit: Mapped[Optional[str]] = mapped_column(String, nullable=True)  # New: e.g. cps, NTU
+    sr_no: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # New: Table sequence
 
     verified_value: Mapped[Optional[str]] = mapped_column(
         Text, nullable=True

@@ -6,21 +6,21 @@ export default function ImageViewer({ imageUrl }) {
     const [scale, setScale] = useState(1);
     const [rotation, setRotation] = useState(0);
 
-    if (!imageUrl) return <div className="flex items-center justify-center h-full bg-gray-100 text-gray-400">No Image Selected</div>;
+    if (!imageUrl) return <div className="flex items-center justify-center h-full" style={{ backgroundColor: 'var(--bg-viewer)', color: 'var(--text-muted)' }}>No Image Selected</div>;
 
     return (
-        <div className="flex flex-col h-full bg-gray-100 relative overflow-hidden">
+        <div className="flex flex-col h-full relative overflow-hidden" style={{ backgroundColor: 'var(--bg-viewer)' }}>
             {/* Toolbar */}
-            <div className="absolute top-4 right-4 flex gap-2 z-10 bg-white/80 p-1 rounded shadow backdrop-blur">
-                <button onClick={() => setScale(s => Math.max(0.5, s - 0.1))} className="p-1 hover:bg-gray-200 rounded">
+            <div className="absolute top-4 right-4 flex gap-2 z-10 p-1.5 rounded-lg shadow-lg backdrop-blur-md" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-soft)', color: 'var(--text-primary)' }}>
+                <button onClick={() => setScale(s => Math.max(0.5, s - 0.1))} className="p-1.5 hover:bg-slate-700/50 rounded-md transition-colors">
                     <ZoomOut size={20} />
                 </button>
-                <span className="px-2 text-sm flex items-center">{Math.round(scale * 100)}%</span>
-                <button onClick={() => setScale(s => Math.min(3, s + 0.1))} className="p-1 hover:bg-gray-200 rounded">
+                <span className="px-2 text-sm flex items-center font-medium" style={{ color: 'var(--text-primary)' }}>{Math.round(scale * 100)}%</span>
+                <button onClick={() => setScale(s => Math.min(3, s + 0.1))} className="p-1.5 hover:bg-slate-700/50 rounded-md transition-colors">
                     <ZoomIn size={20} />
                 </button>
-                <div className="w-px bg-gray-300 mx-1"></div>
-                <button onClick={() => setRotation(r => (r + 90) % 360)} className="p-1 hover:bg-gray-200 rounded">
+                <div className="w-px mx-0.5" style={{ backgroundColor: 'var(--border-soft)' }}></div>
+                <button onClick={() => setRotation(r => (r + 90) % 360)} className="p-1.5 hover:bg-slate-700/50 rounded-md transition-colors">
                     <RotateCw size={20} />
                 </button>
             </div>

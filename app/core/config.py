@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     TEMPLATE_DIR: Path = BASE_DIR / "templates"
 
     # Database (SQLite for now, easy switch to Postgres)
-    DATABASE_URL: str = "sqlite:///./sql_app.db"
+    DATABASE_URL: str = "sqlite:///./bmr_data.db"
 
     # Engine Settings
     OCR_ENABLED: bool = True

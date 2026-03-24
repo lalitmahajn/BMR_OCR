@@ -6,11 +6,15 @@ Implements OCR interface using Mistral AI's cloud OCR API
 import os
 import base64
 import time
+import json
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional, List, Type, Union
 from loguru import logger
+from pydantic import BaseModel
 
-from mistralai import Mistral
+from mistralai.client import Mistral
+from mistralai.extra import response_format_from_pydantic_model
+import fitz  # PyMuPDF
 from dotenv import load_dotenv
 
 from app.engines.ocr import OCRAdapter, OCRResult
@@ -95,7 +99,13 @@ class MistralOCRAdapter(OCRAdapter):
             # Clean OCR artifacts (inline)
             import re as _re
 
-            cleaned_text = _re.sub(r"\s+", " ", markdown_text)
+            # Preserve newlines while normalizing horizontal whitespace
+            cleaned_text = _re.sub(
+                r"[^\S\n]+", " ", markdown_text
+            )  # Collapse spaces/tabs but keep \n
+            cleaned_text = _re.sub(
+                r"\n{3,}", "\n\n", cleaned_text
+            )  # Collapse excess blank lines
             cleaned_text = _re.sub(r"[_]{3,}", "", cleaned_text)
             cleaned_text = _re.sub(r"\.{3,}", "", cleaned_text).strip()
 
@@ -165,6 +175,150 @@ class MistralOCRAdapter(OCRAdapter):
                     return ""
 
         return ""
+
+    def extract_structured_data(
+        self, image_paths: Union[str, List[str]], schema_class: Type[BaseModel]
+    ) -> Optional[dict]:
+        """
+        Extract structured data using Mistral's native JSON Schema extraction (Pattern B).
+        Bypasses Markdown parsing entirely.
+
+        Args:
+            image_path: Path to the image file
+            schema_class: The Pydantic BaseModel class defining the expected JSON structure
+
+        Returns:
+            A python dictionary containing the structured data, or None if it fails.
+        """
+        if isinstance(image_paths, str):
+            image_paths = [image_paths]
+
+        img_path_obj = Path(image_paths[0])
+        
+        # 1. Check Cache (Use first image's name as base, but add count to distinguish)
+        cache_name = f"{img_path_obj.stem}_multi_{len(image_paths)}_{schema_class.__name__}.json"
+        cache_file = img_path_obj.parent / cache_name
+
+        if cache_file.exists():
+            try:
+                logger.info(
+                    f"Loading cached Structured Mistral OCR for {len(image_paths)} pages starting with {img_path_obj.name}"
+                )
+                with open(cache_file, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception as e:
+                logger.warning(f"Failed to read cache file {cache_file}: {e}")
+
+        try:
+            temp_pdf_path = None
+            if len(image_paths) == 1:
+                # Single image or PDF
+                image_path = image_paths[0]
+                with open(image_path, "rb") as f:
+                    image_data = base64.b64encode(f.read()).decode("utf-8")
+                
+                suffix = Path(image_path).suffix.lower()
+                mime_type = "application/pdf" if suffix == ".pdf" else ("image/jpeg" if suffix in [".jpg", ".jpeg"] else "image/png")
+            else:
+                # Multiple images - Merge into PDF
+                logger.info(f"Merging {len(image_paths)} images into temporary PDF for extraction")
+                doc = fitz.open()
+                for img_p in image_paths:
+                    imgdoc = fitz.open(img_p)
+                    pdfbytes = imgdoc.convert_to_pdf()
+                    imgpdf = fitz.open("pdf", pdfbytes)
+                    doc.insert_pdf(imgpdf)
+                
+                temp_pdf_path = f"tmp_merge_{int(time.time())}.pdf"
+                doc.save(temp_pdf_path)
+                doc.close()
+
+                with open(temp_pdf_path, "rb") as f:
+                    image_data = base64.b64encode(f.read()).decode("utf-8")
+                mime_type = "application/pdf"
+                
+                # Clean up temp PDF immediately after reading into memory
+                if os.path.exists(temp_pdf_path):
+                    os.remove(temp_pdf_path)
+
+            # Execute Pattern B: Native OCR Structured Extraction
+            logger.info(
+                f"Calling Mistral OCR API with Pattern B (Structured) for {schema_class.__name__}"
+            )
+
+            for attempt in range(self.max_retries):
+                try:
+                    # Use the official helper to convert Pydantic to the correct format property
+                    annotation_format = response_format_from_pydantic_model(schema_class)
+                    
+                    doc_payload = {
+                        "type": "document_url" if mime_type == "application/pdf" else "image_url",
+                    }
+                    if mime_type == "application/pdf":
+                        doc_payload["document_url"] = f"data:{mime_type};base64,{image_data}"
+                    else:
+                        doc_payload["image_url"] = f"data:{mime_type};base64,{image_data}"
+                    
+                    response = self.client.ocr.process(
+                        model=self.model,
+                        document=doc_payload,
+                        document_annotation_format=annotation_format,
+                        document_annotation_prompt=f"Extract all information from this document exactly into the following JSON schema: {schema_class.__name__}"
+                    )
+
+                    # Breakthrough: Structured JSON resides at Top-Level 'document_annotation' 
+                    if hasattr(response, 'document_annotation') and response.document_annotation:
+                        # Convert to dict and validate through schema class to trigger validators
+                        if isinstance(response.document_annotation, str):
+                            raw_dict = json.loads(response.document_annotation)
+                        else:
+                            raw_dict = response.document_annotation
+                        
+                        # Validate and dump to apply normalization (like CPS for Viscosity)
+                        validated_data = schema_class.model_validate(raw_dict)
+                        structured_json = validated_data.model_dump()
+                        
+                        # 2. Save to Cache
+                        try:
+                            with open(cache_file, "w", encoding="utf-8") as f:
+                                json.dump(structured_json, f, indent=4)
+                            logger.info(
+                                f"Saved Structured Result to cache: {cache_file.name}"
+                            )
+                        except Exception as e:
+                            logger.error(
+                                f"Failed to save structured result to cache: {e}"
+                            )
+
+                        return structured_json
+                    
+                    logger.warning(f"No structured data returned for {schema_class.__name__}. Falling back to Markdown.")
+                    break
+
+                except Exception as e:
+                    error_msg = str(e)
+                    if len(error_msg) > 500:
+                        error_msg = error_msg[:500] + "... [TRUNCATED DUE TO SIZE]"
+                    
+                    logger.warning(
+                        f"Mistral Pattern B API call failed (attempt {attempt + 1}): {error_msg}"
+                    )
+                    if attempt < self.max_retries - 1:
+                        time.sleep(2**attempt)
+                    else:
+                        logger.error(
+                            "All Mistral API retry attempts exhausted for Pattern B"
+                        )
+                        return None
+
+        except FileNotFoundError:
+            logger.error(f"Image/Document file not found: {image_path}")
+            return None
+        except Exception as e:
+            logger.error(f"Mistral Structured Data extraction failed: {e}")
+            return None
+
+        return None
 
     def extract_from_pdf(self, pdf_path: str) -> List[str]:
         """

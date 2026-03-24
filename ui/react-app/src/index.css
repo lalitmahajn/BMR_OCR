@@ -1,1 +1,43 @@
 @import "tailwindcss";
+
+:root {
+  --bg-warm: #0f172a;
+  /* Slate 900 for main app bg */
+  --bg-sidebar: #1e293b;
+  /* Slate 800 for sidebar */
+  --bg-viewer: #020617;
+  /* Slate 950 for image viewer backdrop */
+  --bg-panel: #0f172a;
+  /* Slate 900 for right panel */
+  --bg-surface: #1e293b;
+  /* Slate 800 for cards/headers */
+  --border-soft: #334155;
+  /* Slate 700 for borders */
+  --text-primary: #f8fafc;
+  /* Slate 50 for main text */
+  --text-muted: #94a3b8;
+  /* Slate 400 for muted text */
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Softer scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc8c0;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b0aaa0;
+}
