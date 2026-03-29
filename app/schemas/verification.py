@@ -21,6 +21,7 @@ class PageResponse(BaseModel):
 class FieldResponse(BaseModel):
     id: int
     name: str
+    label: Optional[str] = None
     value: Optional[str]
     confidence: float
     confidence_level: str

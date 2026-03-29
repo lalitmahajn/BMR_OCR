@@ -39,7 +39,7 @@ const FieldRow = ({ field, onUpdate }) => {
             <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
             <div className="flex justify-between items-center mb-2 z-10 relative">
                 <label className="text-sm font-semibold truncate flex-1 mr-2" style={{ color: 'var(--text-primary)' }} title={field.name}>
-                    {field.name}
+                    {field.label || field.name}
                 </label>
                 <span className={cn(
                     "text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-md font-bold transition-colors",

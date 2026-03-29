@@ -62,6 +62,7 @@ class Field(Base):
     page_id: Mapped[int] = mapped_column(ForeignKey("pages.id"))
 
     name: Mapped[str] = mapped_column(String)  # Field name from template
+    label: Mapped[Optional[str]] = mapped_column(String, nullable=True)  # New: User-friendly label
     field_type: Mapped[Optional[str]] = mapped_column(
         String, nullable=True
     )  # Type from template: string, date, signature, etc.

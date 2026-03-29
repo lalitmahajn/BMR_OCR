@@ -85,6 +85,7 @@ def get_page_fields(page_id: int, session: Session = Depends(get_session)):
         FieldResponse(
             id=f.id,
             name=f.name,
+            label=f.label,
             value=f.verified_value if f.verified_value is not None else f.ocr_value,
             confidence=f.ocr_confidence,
             confidence_level=f.confidence_level.value,
@@ -113,6 +114,7 @@ def update_field(
     return FieldResponse(
         id=field.id,
         name=field.name,
+        label=field.label,
         value=field.verified_value,
         confidence=field.ocr_confidence,
         confidence_level=field.confidence_level.value,

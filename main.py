@@ -5,8 +5,6 @@ from pathlib import Path
 from loguru import logger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from app.core.config import settings
 from app.models.base import Base
 from app.engines.storage import StorageEngine
 from app.orchestrator import Orchestrator

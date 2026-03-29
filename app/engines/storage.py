@@ -1,12 +1,11 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
-from typing import List
 from loguru import logger
 from datetime import datetime
 
 from app.core.config import settings
 from app.models.base import Base
-from app.models.domain import Document, Page, Field, AuditLog, VerificationStatus
+from app.models.domain import Document, Field, AuditLog, VerificationStatus
 
 
 class DatabaseGateError(Exception):

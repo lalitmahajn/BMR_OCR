@@ -44,15 +44,19 @@ class MistralOCRAdapter(OCRAdapter):
         """
         self.api_key = api_key or os.environ.get("MISTRAL_API_KEY")
         self.model = model
+        self.timeout = int(os.environ.get("MISTRAL_TIMEOUT", "180")) # seconds
         self.max_retries = int(os.environ.get("MISTRAL_MAX_RETRIES", "3"))
-        self.timeout = int(os.environ.get("MISTRAL_TIMEOUT", "30"))
 
         if not self.api_key or self.api_key == "your_api_key_here":
             logger.error("Mistral API key not configured!")
             self.client = None
         else:
-            self.client = Mistral(api_key=self.api_key)
-            logger.info("Mistral OCR adapter initialized successfully")
+            # Initialize client with version-appropriate timeout_ms (in milliseconds)
+            self.client = Mistral(
+                api_key=self.api_key,
+                timeout_ms=self.timeout * 1000,
+            )
+            logger.info(f"Mistral OCR adapter initialized (Timeout={self.timeout}s, Model={self.model})")
 
     def extract_text(self, image_path: str, roi: Optional[ROI] = None) -> OCRResult:
         """
@@ -242,8 +246,9 @@ class MistralOCRAdapter(OCRAdapter):
                     os.remove(temp_pdf_path)
 
             # Execute Pattern B: Native OCR Structured Extraction
+            wait_hint = "" if len(image_paths) == 1 else " (This may take 1-2 minutes for multi-page documents)"
             logger.info(
-                f"Calling Mistral OCR API with Pattern B (Structured) for {schema_class.__name__}"
+                f"Calling Mistral OCR API with Pattern B (Structured) for {schema_class.__name__}{wait_hint}"
             )
 
             for attempt in range(self.max_retries):
