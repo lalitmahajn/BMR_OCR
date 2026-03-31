@@ -1,0 +1,49 @@
+document_type: PRODUCTION_REPORT
+pages: 1
+description: "Production Report"
+
+# Available types: string | number | date | boolean | signature | enum
+# For enum, also add: options: [Value1, Value2, ...]
+
+header_fields:
+  - name: product_name
+    type: string
+    example: ""
+    required: yes
+
+  - name: batch_no
+    type: string
+    example: ""
+    required: yes
+
+  - name: date
+    type: date
+    example: ""
+    required: yes
+
+  - name: quantity_produced
+    type: number
+    example: ""   # e.g., "500 KG"
+    required: yes
+
+  - name: shift
+    type: enum
+    options: [Morning, Afternoon, Night, General]
+    example: ""
+    required: no
+
+
+footer_fields:
+  - name: prepared_by
+    type: signature
+    example: ""
+    required: no
+
+  - name: checked_by
+    type: signature
+    example: ""
+    required: no
+
+
+exclude:
+  - ""

@@ -1,0 +1,215 @@
+document_type: WORKSHEET_POLYMER
+pages: 3  # Pages 3, 4, 5 of the sample PDF
+description: "Worksheet for Polymer Product"
+
+# Available types: string | number | date | boolean | signature | enum
+# For enum, also add: options: [Value1, Value2, ...]
+
+header_fields:
+  - name: document_no
+    type: string
+    example: "POLY/01/00"
+    required: yes
+
+  - name: revision_no
+    type: number
+    example: "03"
+    required: yes
+
+  - name: effective_date
+    type: date
+    example: "01/10/2025"
+    required: yes
+
+  - name: next_revision_due
+    type: date
+    example: "30/09/2028"
+    required: yes
+
+data_sheet_fields:
+  - name: product_code
+    type: string
+    example: "RL-5065"
+    required: yes
+
+  - name: ar_no
+    type: string
+    example: "R126FG101674"
+    required: yes
+
+  - name: batch_no
+    type: string
+    example: "10012601674"
+    required: yes
+
+  - name: no_of_containers/packs
+    type: string
+    example: "5900 kg x 01"
+    required: yes
+
+  - name: batch_quantity
+    type: number
+    example: "5900"
+    required: yes
+
+  - name: sampled_quantity
+    type: number
+    example: "500"
+    required: yes
+
+  - name: sampling_date
+    type: date
+    example: "24/01/26"
+    required: yes
+
+  - name: date_of_analysis
+    type: date
+    example: "24/01/26"
+    required: yes
+
+  - name: release_date
+    type: date
+    example: "28/01/26"
+    required: yes
+
+
+tables:
+  - name: page_3_tests
+    page: 1
+    columns:
+      - sr_no
+      - test
+      - results
+      - complies
+
+    sample_rows:
+      - sr_no: { value: 1, type: constant }
+        test: { value: "Physical Appearance", type: constant, unit: none }
+        results: { value: "Amber color visc liquid", type: string }
+        complies: { value: "Yes", type: boolean }
+
+      - sr_no: { value: 2, type: constant }
+        test: { value: "Viscosity", type: constant, unit: "cps" }
+        results: { value: "78", type: number }
+        complies: { value: "Yes", type: boolean }
+
+      - sr_no: { value: 3, type: constant }
+        test: { value: "pH", type: constant, unit: none }
+        results: { value: "3.70", type: number }
+        complies: { value: "Yes", type: boolean }
+
+      - sr_no: { value: 4, type: constant }
+        test: { value: "Specific Gravity", type: constant, unit: none }
+        results: { value: "1.060", type: number }
+        complies: { value: "Yes", type: boolean }
+
+      - sr_no: { value: 5, type: constant }
+        test: { value: "Solubility", type: constant, unit: none }
+        results: { value: "Soluble in water", type: string }
+        complies: { value: "Yes", type: boolean }
+
+      - sr_no: { value: 6, type: constant }
+        test: { value: "Ionicity", type: constant, unit: none }
+        results: { value: "cationic", type: enum, options: ["cationic", "Anionic", "Non-ionic"] }
+        complies: { value: "Yes", type: boolean }
+
+      - sr_no: { value: 7, type: constant }
+        test: { value: "Turbidity", type: constant, unit: "NTU" }
+        results: { value: "1.4", type: number }
+        complies: { value: "Yes", type: boolean }
+
+  - name: page_4_tests
+    page: 2
+    columns:
+      - sr_no
+      - test
+      - results
+      - complies
+
+    sample_rows:
+      - sr_no: { value: 8, type: constant }
+        test: { value: "Charge", type: constant, unit: "meq/liter" }
+        results: { value: "0.23", type: number }
+        complies: { value: "Yes", type: boolean }
+
+  - name: page_5_tests
+    page: 3
+    columns:
+      - sr_no
+      - test
+      - results
+      - complies
+
+    sample_rows:
+      - sr_no: { value: 11, type: constant }
+        test: { value: "Presence of Grains / Gel", type: constant, unit: none }
+        results: { value: "Absent", type: string }
+        complies: { value: "Yes", type: boolean }
+
+      - sr_no: { value: 12, type: constant }
+        test: { value: "Wet Strength N / Chloride Content", type: constant, unit: "N" }
+        results: { value: "7.21", type: number }
+        complies: { value: "Yes", type: boolean }
+  - name: solid_content
+    page: 2
+    columns:
+      - dish_id
+      - sc_percentage
+      - avg_percentage
+      - complies
+
+    sample_rows:
+      - dish_id: { value: "1", type: constant }
+        sc_percentage: { value: "17.88%", type: string }
+
+      - dish_id: { value: "2", type: constant }
+        sc_percentage: { value: "17.95%", type: string }
+
+      - dish_id: { value: "Avg.", type: constant }
+        avg_percentage: { value: "17.92%", type: string }
+        complies: { value: "Yes", type: boolean }
+
+  - name: stability
+    page: 2
+    columns:
+      - hours
+      - ph
+      - viscosity
+
+    sample_rows:
+      - hours: { value: "Initial", type: constant }
+        ph: { value: "3.70", type: number }
+        viscosity: { value: "78.05", type: number }
+
+      - hours: { value: "32 h", type: string }
+        ph: { value: "4.01", type: number }
+        viscosity: { value: "56.4", type: number }
+
+      - hours: { value: "", type: string }
+        ph: { value: "", type: number }
+        viscosity: { value: "", type: number }
+
+      - hours: { value: "", type: string }
+        ph: { value: "", type: number }
+        viscosity: { value: "", type: number }
+
+
+footer_fields:
+  - name: analyzed_by
+    type: signature
+    example: ""
+    required: no
+
+  - name: checked_by
+    type: signature
+    example: ""
+    required: no
+
+  - name: approved_by
+    type: signature
+    example: ""
+    required: no
+
+
+exclude:
+  - ""

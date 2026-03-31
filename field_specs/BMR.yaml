@@ -1,0 +1,188 @@
+document_type: BMR
+pages: 8   # Adjust to actual page count
+description: "Batch Manufacturing Record (BMR)"
+
+# Available types: string | number | date | boolean | signature | enum
+# For enum, also add: options: [Value1, Value2, ...]
+
+header_fields:
+  - name: product_name
+    type: string
+    example: ""
+    required: yes
+
+  - name: product_code
+    type: string
+    example: ""
+    required: yes
+
+  - name: batch_no
+    type: string
+    example: ""
+    required: yes
+
+  - name: batch_size
+    type: number
+    example: ""   # e.g., "500 KG"
+    required: yes
+
+  - name: manufacturing_date
+    type: date
+    example: ""
+    required: yes
+
+  - name: expiry_date
+    type: date
+    example: ""
+    required: no
+
+  - name: document_no
+    type: string
+    example: ""
+    required: yes
+
+  - name: revision_no
+    type: string
+    example: ""
+    required: yes
+
+
+tables:
+  - name: raw_materials
+    page: 2
+    columns:
+      - name: sr_no
+        type: number
+
+      - name: item_name
+        type: string
+        example: ""
+
+      - name: ar_no
+        type: string
+        example: ""
+
+      - name: required_quantity
+        type: number
+        example: ""
+
+      - name: issued_quantity
+        type: number
+        example: ""
+
+      - name: unit
+        type: string
+        example: ""   # KG / L / Nos
+
+    sample_rows:
+      - sr_no: 1
+        item_name: ""
+        ar_no: ""
+        required_quantity: ""
+        issued_quantity: ""
+        unit: ""
+
+  - name: process_steps
+    page: 3
+    columns:
+      - name: step_no
+        type: number
+
+      - name: description
+        type: string
+        example: ""   # What was done
+
+      - name: start_time
+        type: string
+        example: ""   # e.g., "09:30"
+
+      - name: end_time
+        type: string
+        example: ""
+
+      - name: done_by
+        type: signature
+        example: ""
+        required: no
+
+      - name: checked_by
+        type: signature
+        example: ""
+        required: no
+
+    sample_rows:
+      - step_no: ""
+        description: ""
+        done_by: ""
+        checked_by: ""
+
+  - name: in_process_checks
+    page: 4
+    columns:
+      - name: sr_no
+        type: number
+
+      - name: parameter
+        type: string
+        example: ""
+
+      - name: specification
+        type: string
+        example: ""
+
+      - name: observation
+        type: string
+        example: ""
+
+      - name: complies
+        type: boolean
+        example: ""   # Yes / No
+
+    sample_rows:
+      - sr_no: 1
+        parameter: ""
+        specification: ""
+        observation: ""
+        complies: ""
+
+  - name: batch_reconciliation
+    page: 6
+    columns:
+      - name: description
+        type: string
+        example: ""   # e.g., "Theoretical Yield", "Actual Yield", "% Yield"
+
+      - name: value
+        type: number
+        example: ""
+
+    sample_rows:
+      - description: ""
+        value: ""
+
+
+footer_fields:
+  - name: manufactured_by
+    type: signature
+    example: ""
+    required: no
+
+  - name: checked_by
+    type: signature
+    example: ""
+    required: no
+
+  - name: qa_released_by
+    type: signature
+    example: ""
+    required: no
+
+  - name: qa_release_date
+    type: date
+    example: ""
+    required: no
+
+
+exclude:
+  - stamp      # MASTER COPY
+  - page_info  # Page X of Y

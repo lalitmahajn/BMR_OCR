@@ -1,0 +1,48 @@
+document_type: EMAIL
+pages: 1
+description: "Rishabh Metals & Chemicals Pvt Ltd Mail (Gmail)"
+
+# Available types: string | number | date | boolean | signature | enum
+# For enum, also add: options: [Value1, Value2, ...]
+
+header_fields:
+  - name: subject
+    type: string
+    example: ""
+    required: yes
+
+  - name: sender
+    type: string
+    example: ""   # Email address or name
+    required: yes
+
+  - name: recipient
+    type: string
+    example: ""
+    required: yes
+
+  - name: date_sent
+    type: date
+    example: ""
+    required: yes
+
+  - name: body_summary
+    type: string
+    example: ""   # Short summary or full body text
+    required: yes
+
+
+tables:
+  - name: attachments
+    page: 1
+    columns:
+      - name: attachment_name
+        type: string
+        example: ""
+
+    sample_rows:
+      - attachment_name: ""
+
+
+exclude:
+  - ""

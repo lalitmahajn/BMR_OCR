@@ -1,0 +1,140 @@
+document_type: QC_TEST_REPORT
+pages: 1
+description: "Finished Good Q.C. Test Report for Speciality Chemicals"
+
+# Available types: string | number | date | boolean | signature | enum
+# For enum, also add: options: [Value1, Value2, ...]
+# required: yes = flagged RED in UI if missing | no = silently skipped
+
+header_fields:
+  - name: product_name
+    type: string
+    example: "RL-5065"
+    required: yes
+
+  - name: mfg_date
+    type: date
+    example: "23/01/26"
+    required: yes
+
+  - name: ar_no
+    type: string
+    example: "R/26/FG/01674"
+    required: yes
+
+  - name: approval_date
+    type: date
+    example: "28/01/26"
+    required: yes
+
+  - name: batch_no
+    type: string
+    example: "100/260/674"
+    required: yes
+
+  - name: packing_details
+    type: string
+    example: "5900 Kg x 01"
+    required: yes
+
+  - name: quantity
+    type: string
+    example: "5900"
+    required: yes
+
+  - name: exp_date
+    type: date
+    example: "22/07/26"
+    required: yes
+
+
+
+# ─────────────────────────────────────────
+# TABLE: Test Parameters (14 rows)
+# ─────────────────────────────────────────
+tables:
+  - name: test_results
+    page: 1
+    columns:
+      - sr_no
+      - test_parameter
+      - results
+
+    sample_rows:
+      - sr_no: { value: 1, type: constant }
+        test_parameter: { value: "Physical Appearance", type: constant, unit: none }
+        results: { value: "Amber color visc liquid", type: string }
+
+      - sr_no: { value: 2, type: constant }
+        test_parameter: { value: "Viscosity", type: constant, unit: "CPS" }
+        results: { value: "78", type: number }
+
+      - sr_no: { value: 3, type: constant }
+        test_parameter: { value: "pH", type: constant, unit: none }
+        results: { value: "3.70", type: number }
+
+      - sr_no: { value: 4, type: constant }
+        test_parameter: { value: "Specific Gravity", type: constant, unit: none }
+        results: { value: "1.060", type: number }
+
+      - sr_no: { value: 5, type: constant }
+        test_parameter: { value: "Solid Content / Active %", type: constant, unit: "%" }
+        results: { value: "17.92", type: number }
+
+      - sr_no: { value: 6, type: constant }
+        test_parameter: { value: "Ionicity", type: constant, unit: none }
+        results: { value: "Cationic", type: string }
+
+      - sr_no: { value: 7, type: constant }
+        test_parameter: { value: "Charge", type: constant, unit: "mg/lit" }
+        results: { value: "0.23", type: number }
+
+      - sr_no: { value: 8, type: constant }
+        test_parameter: { value: "Solubility", type: constant, unit: none }
+        results: { value: "Soluble in water", type: string }
+
+      - sr_no: { value: 9, type: constant }
+        test_parameter: { value: "Turbidity", type: constant, unit: "NTU" }
+        results: { value: "1.4", type: number }
+
+      - sr_no: { value: 10, type: constant }
+        test_parameter: { value: "Color Gardner", type: constant, unit: none }
+        results: { value: "NA", type: string }
+
+      - sr_no: { value: 11, type: constant }
+        test_parameter: { value: "Presence of Grains / Gel", type: constant, unit: none }
+        results: { value: "Absent", type: string }
+
+      - sr_no: { value: 12, type: constant }
+        test_parameter: { value: "Stability Test / Boring Test", type: constant, unit: none }
+        results: { value: "Pass", type: string }
+
+      - sr_no: { value: 13, type: constant }
+        test_parameter: { value: "Performance Test / Cobb Value", type: constant, unit: none }
+        results: { value: "NA", type: string }
+
+      - sr_no: { value: 14, type: constant }
+        test_parameter: { value: "Tensile Strength Test / Chloride Content", type: constant, unit: "N" }
+        results: { value: "7.21", type: number }
+
+    total_expected_rows: 14
+
+
+footer_fields:
+  - name: result
+    type: enum
+    options: [APPROVED, REJECTED]
+    example: "APPROVED"
+    required: yes
+
+  - name: remarks
+    type: string
+    example: "U1D High Viscosity"
+    required: yes
+
+
+exclude:
+  - company_name           # "RISHABH METALS & CHEMICALS PVT. LTD."
+  - analyzed_by_signature_present   # always null
+  - approved_by_signature_present   # always null
+                  # page number noise at top

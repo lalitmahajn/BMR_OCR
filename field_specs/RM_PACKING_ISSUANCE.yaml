@@ -1,0 +1,94 @@
+document_type: RM_PACKING_ISSUANCE
+pages: 1
+description: "Raw Material & Packing Material Issuance Record"
+
+# Available types: string | number | date | boolean | signature | enum
+# For enum, also add: options: [Value1, Value2, ...]
+
+header_fields:
+  - name: batch_no
+    type: string
+    example: ""
+    required: yes
+
+  - name: product_name
+    type: string
+    example: ""
+    required: yes
+
+  - name: date
+    type: date
+    example: ""
+    required: yes
+
+
+tables:
+  - name: issuance_items
+    page: 1
+    columns:
+      - name: sr_no
+        type: number
+
+      - name: item_name
+        type: string
+        example: ""   # Raw material / packing material name
+
+      - name: ar_no
+        type: string
+        example: ""
+
+      - name: required_quantity
+        type: number
+        example: ""   # As per BMR
+
+      - name: issued_quantity
+        type: number
+        example: ""   # Actual issued
+
+      - name: unit
+        type: string
+        example: ""   # KG / L / Nos
+
+      - name: batch_no_rm
+        type: string
+        example: ""   # Batch number of the raw material
+        required: no
+
+      - name: done_by
+        type: signature
+        example: ""
+        required: no
+
+      - name: checked_by
+        type: signature
+        example: ""
+        required: no
+
+    sample_rows:
+      - sr_no: 1
+        item_name: ""
+        ar_no: ""
+        required_quantity: ""
+        issued_quantity: ""
+        unit: ""
+
+
+footer_fields:
+  - name: issued_by
+    type: signature
+    example: ""
+    required: no
+
+  - name: checked_by
+    type: signature
+    example: ""
+    required: no
+
+  - name: verified_by
+    type: signature
+    example: ""
+    required: no
+
+
+exclude:
+  - ""

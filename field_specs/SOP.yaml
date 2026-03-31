@@ -1,0 +1,119 @@
+document_type: SOP
+pages: 6   # Adjust to actual page count
+description: "Standard Operating Procedure"
+
+# Available types: string | number | date | boolean | signature | enum
+# For enum, also add: options: [Value1, Value2, ...]
+
+header_fields:
+  - name: title
+    type: string
+    example: ""   # Full SOP title
+    required: yes
+
+  - name: document_no
+    type: string
+    example: ""
+    required: yes
+
+  - name: revision_no
+    type: string
+    example: ""
+    required: yes
+
+  - name: effective_date
+    type: date
+    example: ""
+    required: yes
+
+  - name: next_revision_due
+    type: date
+    example: ""
+    required: no
+
+  - name: department
+    type: string
+    example: ""
+    required: no
+
+  - name: scope
+    type: string
+    example: ""   # Scope / applicability statement
+    required: yes
+
+  - name: objective
+    type: string
+    example: ""
+    required: yes
+
+
+tables:
+  - name: responsibility
+    page: 1
+    columns:
+      - name: sr_no
+        type: number
+
+      - name: role
+        type: string
+        example: ""   # e.g., "QA Manager", "Production Operator"
+
+      - name: responsibility
+        type: string
+        example: ""   # What they are responsible for
+
+    sample_rows:
+      - sr_no: 1
+        role: ""
+        responsibility: ""
+
+  - name: revision_history
+    page: last
+    columns:
+      - name: revision_no
+        type: string
+
+      - name: date
+        type: date
+
+      - name: reason
+        type: string
+        example: ""   # Reason for revision
+
+      - name: approved_by
+        type: signature
+
+    sample_rows:
+      - revision_no: ""
+        date: ""
+        reason: ""
+        approved_by: ""
+
+
+procedure_fields:
+  - name: procedure_steps
+    type: string
+    example: ""   # Full procedure text or summary
+    required: yes
+
+
+footer_fields:
+  - name: prepared_by
+    type: signature
+    example: ""
+    required: no
+
+  - name: reviewed_by
+    type: signature
+    example: ""
+    required: no
+
+  - name: approved_by
+    type: signature
+    example: ""
+    required: no
+
+
+exclude:
+  - stamp      # MASTER COPY
+  - page_info  # Page X of Y

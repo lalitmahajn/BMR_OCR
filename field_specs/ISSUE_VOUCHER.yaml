@@ -1,0 +1,84 @@
+document_type: ISSUE_VOUCHER
+pages: 1
+description: "Issue - Mtrl Voucher"
+
+# Available types: string | number | date | boolean | signature | enum
+# For enum, also add: options: [Value1, Value2, ...]
+
+header_fields:
+  - name: voucher_no
+    type: string
+    example: ""
+    required: yes
+
+  - name: date
+    type: date
+    example: ""
+    required: yes
+
+  - name: issued_to
+    type: string
+    example: ""
+    required: yes
+
+  - name: department
+    type: string
+    example: ""
+    required: no
+
+
+tables:
+  - name: issued_items
+    page: 1
+    columns:
+      - name: sr_no
+        type: number
+
+      - name: item_code
+        type: string
+        example: ""
+
+      - name: item_name
+        type: string
+        example: ""
+
+      - name: quantity
+        type: number
+        example: ""
+
+      - name: unit
+        type: string
+        example: ""   # KG / L / Nos
+
+      - name: rate
+        type: number
+        example: ""   # Price per unit (if present)
+        required: no
+
+      - name: amount
+        type: number
+        example: ""   # Total value (if present)
+        required: no
+
+    sample_rows:
+      - sr_no: 1
+        item_code: ""
+        item_name: ""
+        quantity: ""
+        unit: ""
+
+
+footer_fields:
+  - name: issued_by
+    type: signature
+    example: ""
+    required: no
+
+  - name: received_by
+    type: signature
+    example: ""
+    required: no
+
+
+exclude:
+  - ""

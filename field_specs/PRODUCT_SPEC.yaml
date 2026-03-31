@@ -1,0 +1,65 @@
+document_type: PRODUCT_SPEC
+pages: 1
+description: "View Product Specification"
+
+# Available types: string | number | date | boolean | signature | enum
+# For enum, also add: options: [Value1, Value2, ...]
+
+header_fields:
+  - name: product_name
+    type: string
+    example: ""
+    required: yes
+
+  - name: product_code
+    type: string
+    example: ""
+    required: yes
+
+  - name: effective_date
+    type: date
+    example: ""
+    required: yes
+
+  - name: revision_no
+    type: string
+    example: ""
+    required: yes
+
+
+tables:
+  - name: specifications
+    page: 1
+    columns:
+      - name: sr_no
+        type: number
+
+      - name: parameter
+        type: string
+        example: ""   # e.g., "Viscosity", "pH", "Appearance"
+
+      - name: specification
+        type: string
+        example: ""   # e.g., "5000-8000 cps"
+
+      - name: method
+        type: string
+        example: ""   # Test method if present
+        required: no
+
+    sample_rows:
+      - sr_no: 1
+        parameter: ""
+        specification: ""
+        method: ""
+
+
+footer_fields:
+  - name: approved_by
+    type: signature
+    example: ""
+    required: no
+
+
+exclude:
+  - ""

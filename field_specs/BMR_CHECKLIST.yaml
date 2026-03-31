@@ -1,0 +1,101 @@
+document_type: BMR_CHECKLIST
+pages: 2
+description: "BMR Review Checklist"
+
+# Available types: string | number | date | boolean | signature | enum
+# For enum, also add: options: [Value1, Value2, ...]
+
+header_fields:
+  - name: document_no
+    type: string
+    example: ""   # e.g., QAD/RJ-DP-02/F/001
+    required: yes
+
+  - name: revision_no
+    type: string
+    example: ""
+    required: yes
+
+  - name: effective_date
+    type: date
+    example: ""
+    required: yes
+
+  - name: review_date
+    type: date
+    example: ""
+    required: yes
+
+
+tables:
+  - name: review_points
+    page: 1
+    section: "SECTION: - A"
+    columns:
+      - name: sr_no
+        type: number
+
+      - name: review_point
+        type: string
+        example: ""   # Full text of checklist question
+
+      - name: status
+        type: enum
+        options: [Yes, No, NA]
+        example: ""
+
+    sample_rows:
+      - sr_no: 1
+        review_point: ""
+        status: ""
+      - sr_no: 2
+        review_point: ""
+        status: ""
+
+    total_expected_rows: 15
+
+  - name: attachments
+    page: 2
+    section: "SECTION: - B"
+    columns:
+      - name: sr_no
+        type: number
+
+      - name: attachment
+        type: string
+        example: ""   # e.g., "QC Test Report", "Deviation Report"
+
+      - name: status
+        type: enum
+        options: [Yes, No, NA]
+        example: ""
+
+    sample_rows:
+      - sr_no: 1
+        attachment: ""
+        status: ""
+
+    total_expected_rows: 4
+
+
+footer_fields:
+  - name: prepared_issued_by
+    type: signature
+    example: ""   # QA Executive name
+    required: no
+
+  - name: reviewed_by
+    type: signature
+    example: ""   # Asst. QA Manager
+    required: no
+
+  - name: approved_by
+    type: signature
+    example: ""   # QA Manager / MR
+    required: no
+
+
+exclude:
+  - company_name
+  - stamp       # MASTER COPY / CONTROLLED COPY
+  - page_info   # Page X of Y

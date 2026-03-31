@@ -1,0 +1,83 @@
+document_type: PACKING_DETAILS
+pages: 1
+description: "Packing Details"
+
+# Available types: string | number | date | boolean | signature | enum
+# For enum, also add: options: [Value1, Value2, ...]
+
+header_fields:
+  - name: product_name
+    type: string
+    example: ""
+    required: yes
+
+  - name: batch_no
+    type: string
+    example: ""
+    required: yes
+
+  - name: total_qty
+    type: number
+    example: ""
+    required: yes
+
+  - name: tare_weight
+    type: number
+    example: ""
+    required: no
+
+  - name: balance_id
+    type: string
+    example: ""
+    required: no
+
+  - name: calibration_status
+    type: enum
+    options: [Calibrated, Due, NA]
+    example: ""
+    required: no
+
+  - name: rinsing_status
+    type: boolean
+    example: ""   # Yes / No
+    required: no
+
+
+tables:
+  - name: drums
+    page: 1
+    columns:
+      - name: drum_no
+        type: string
+        example: ""
+
+      - name: gross_weight
+        type: number
+        example: ""
+
+      - name: done_by
+        type: signature
+        example: ""
+        required: no
+
+      - name: checked_by
+        type: signature
+        example: ""
+        required: no
+
+    sample_rows:
+      - drum_no: ""
+        gross_weight: ""
+        done_by: ""
+        checked_by: ""
+
+
+footer_fields:
+  - name: signature_and_date
+    type: signature
+    example: ""
+    required: no
+
+
+exclude:
+  - ""

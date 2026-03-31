@@ -1,0 +1,75 @@
+document_type: STORES_REQUISITION
+pages: 1
+description: "Stores Requisition Slip Polymer Plant"
+
+# Available types: string | number | date | boolean | signature | enum
+# For enum, also add: options: [Value1, Value2, ...]
+
+header_fields:
+  - name: requisition_no
+    type: string
+    example: ""
+    required: yes
+
+  - name: date
+    type: date
+    example: ""
+    required: yes
+
+  - name: department
+    type: string
+    example: ""
+    required: yes
+
+  - name: required_by_date
+    type: date
+    example: ""
+    required: no
+
+
+tables:
+  - name: items
+    page: 1
+    columns:
+      - name: sr_no
+        type: number
+
+      - name: item_name
+        type: string
+        example: ""   # Material / item description
+
+      - name: quantity
+        type: number
+        example: ""
+
+      - name: unit
+        type: string
+        example: ""   # KG, L, Nos, etc.
+
+      - name: ar_no
+        type: string
+        example: ""
+        required: no
+
+    sample_rows:
+      - sr_no: 1
+        item_name: ""
+        quantity: ""
+        unit: ""
+        ar_no: ""
+
+
+footer_fields:
+  - name: requested_by
+    type: signature
+    example: ""
+    required: no
+
+  - name: approved_by
+    type: signature
+    example: ""
+    required: no
+
+
+exclude:
+  - ""

@@ -1,0 +1,59 @@
+document_type: DEVIATION_ACCEPTANCE
+pages: 1
+description: "Acceptance Under Deviation for Raw Material / Finished Products / Packing Material"
+
+# Available types: string | number | date | boolean | signature | enum
+# For enum, also add: options: [Value1, Value2, ...]
+
+header_fields:
+  - name: product_name
+    type: string
+    example: ""
+    required: yes
+
+  - name: batch_no
+    type: string
+    example: ""
+    required: yes
+
+  - name: ar_no
+    type: string
+    example: ""
+    required: yes
+
+  - name: deviation_date
+    type: date
+    example: ""
+    required: yes
+
+  - name: deviation_description
+    type: string
+    example: ""
+    required: yes
+
+  - name: reason
+    type: string
+    example: ""
+    required: yes
+
+  - name: disposition
+    type: enum
+    options: [Accept, Reject, Rework]
+    example: ""
+    required: yes
+
+
+footer_fields:
+  - name: prepared_by
+    type: signature
+    example: ""
+    required: no
+
+  - name: approved_by
+    type: signature
+    example: ""
+    required: no
+
+
+exclude:
+  - ""
