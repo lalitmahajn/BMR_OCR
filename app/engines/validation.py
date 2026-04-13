@@ -38,41 +38,53 @@ class FieldValidator:
         if match:
             try:
                 return True, float(match.group())
-            except:
+            except (ValueError, TypeError):
                 pass
 
         return False, 0
 
     @staticmethod
-    def parse_date(value: str, format_str: str = "DD/MM/YY") -> Tuple[bool, str]:
-        """Parse and validate date string"""
+    def parse_date(value: str, format_str: str = "DD/MM/YYYY") -> Tuple[bool, str]:
+        """Parse and validate date string, standardizing to DD/MM/YYYY."""
         if not value:
             return False, ""
 
         # Common OCR cleanup
-        cleaned = value.strip().replace(".", "/").replace(",", "/")
+        cleaned = value.strip().replace(".", "/").replace(",", "/").replace("-", "/")
 
-        # Try to parse DDMMYY format (e.g., "2810126" -> "28/01/26")
-        if len(cleaned) >= 6 and cleaned.isdigit():
+        # Try to parse exact formats without slashes
+        if len(cleaned) >= 8 and cleaned.isdigit():
             try:
-                dd = cleaned[:2]
-                mm = cleaned[2:4]
-                yy = cleaned[4:6]
-                parsed = f"{dd}/{mm}/{yy}"
-
-                # Validate it's a real date
-                datetime.strptime(parsed, "%d/%m/%y")
-                return True, parsed
+                dt = datetime.strptime(cleaned[:8], "%d%m%Y")
+                return True, dt.strftime("%d/%m/%Y")
+            except (ValueError, TypeError):
+                pass
+        elif len(cleaned) == 6 and cleaned.isdigit():
+            try:
+                dt = datetime.strptime(cleaned, "%d%m%y")
+                return True, dt.strftime("%d/%m/%Y")
             except (ValueError, TypeError):
                 pass
 
-        # Check if already in DD/MM/YY format
+        # Check if already in some format with slashes
         if "/" in cleaned:
-            try:
-                datetime.strptime(cleaned, "%d/%m/%y")
-                return True, cleaned
-            except (ValueError, TypeError):
-                pass
+            formats = ["%d/%m/%Y", "%d/%m/%y", "%Y/%m/%d", "%m/%d/%Y"]
+            for fmt in formats:
+                try:
+                    dt = datetime.strptime(cleaned, fmt)
+                    return True, dt.strftime("%d/%m/%Y")
+                except (ValueError, TypeError):
+                    continue
+                    
+        # If it contains alphabetical characters (e.g. 21-Jan-26)
+        if any(c.isalpha() for c in cleaned):
+            formats = ["%d/%b/%y", "%d/%b/%Y", "%b/%d/%Y", "%d %b %Y"]
+            for fmt in formats:
+                try:
+                    dt = datetime.strptime(cleaned, fmt)
+                    return True, dt.strftime("%d/%m/%Y")
+                except (ValueError, TypeError):
+                    continue
 
         return False, cleaned
 
@@ -99,7 +111,7 @@ class FieldValidator:
                         return False, num, unit
 
                 return True, num, unit
-            except:
+            except (ValueError, TypeError):
                 pass
         return False, 0, ""
 
@@ -154,7 +166,7 @@ class FieldValidator:
 
         elif f_type == "date":
             success, parsed_date = FieldValidator.parse_date(
-                value, rules.get("format", "DD/MM/YY")
+                value, rules.get("format", "DD/MM/YYYY")
             )
             if not success:
                 result["valid"] = False

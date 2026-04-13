@@ -38,7 +38,7 @@ class IssuanceRow(BaseModel):
     )
     expire_date: Optional[str] = Field(
         None,
-        description="Expiry date checked (e.g., 'Sep.27', 'Nov-26', 'Mar-26')",
+        description="Expiry date checked (DD/MM/YYYY)",
     )
     physical_appearance: Optional[str] = Field(
         None, description="Physical appearance observation if possible"
@@ -68,10 +68,10 @@ class RMPackingIssuanceSchema(BaseModel):
         None, description="Revision number (e.g., '00')"
     )
     effective_date: Optional[str] = Field(
-        None, description="Effective date of the form"
+        None, description="Effective date of the form (DD/MM/YYYY)"
     )
     review_date: Optional[str] = Field(
-        None, description="Review date of the form"
+        None, description="Review date of the form (DD/MM/YYYY)"
     )
     product: Optional[str] = Field(
         None,
@@ -91,17 +91,17 @@ class RMPackingIssuanceSchema(BaseModel):
         None, description="Name/signature of person who prepared and issued"
     )
     prepared_date: Optional[str] = Field(
-        None, description="Date of preparation"
+        None, description="Date of preparation (DD/MM/YYYY)"
     )
     reviewed_by: Optional[str] = Field(
         None, description="Name/signature of reviewer"
     )
     reviewed_date: Optional[str] = Field(
-        None, description="Date of review"
+        None, description="Date of review (DD/MM/YYYY)"
     )
     approved_by: Optional[str] = Field(
         None, description="Name/signature of approver"
     )
     approved_date: Optional[str] = Field(
-        None, description="Date of approval"
+        None, description="Date of approval (DD/MM/YYYY)"
     )

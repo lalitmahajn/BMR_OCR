@@ -6,7 +6,6 @@ from sqlalchemy import select
 
 from app.engines.ingestion import IngestionEngine
 from app.engines.classification import PageClassificationEngine, PageType, ClassificationResult
-from app.engines.template import TemplateEngine
 from app.engines.mistral_ocr import MistralOCRAdapter
 from app.engines.validation import ValidationEngine
 from app.engines.storage import StorageEngine
@@ -32,15 +31,24 @@ logger.add(sys.stderr, level="DEBUG")
 
 
 def parse_extracted_date(val: str) -> str:
-    """Parse dates like DD/MM/YY or DD/MM/YYYY into ISO YYYY-MM-DD."""
+    """Standardize date formats to DD/MM/YYYY."""
     if not val:
         return val
-    match = re.search(r"(\d{2})/(\d{2})/(\d{2,4})", val)
-    if match:
-        d, m, y = match.groups()
+    
+    # 1. Try DD/MM/YYYY or DD-MM-YYYY (or 2-digit years)
+    match_dmv = re.search(r"(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})", val)
+    if match_dmv:
+        d, m, y = match_dmv.groups()
         if len(y) == 2:
             y = "20" + y
-        return f"{y}-{m}-{d}"
+        return f"{int(d):02}/{int(m):02}/{y}"
+    
+    # 2. Try YYYY-MM-DD (ISO)
+    match_iso = re.search(r"(\d{4})[-/](\d{1,2})[-/](\d{1,2})", val)
+    if match_iso:
+        y, m, d = match_iso.groups()
+        return f"{int(d):02}/{int(m):02}/{y}"
+        
     return val
 
 
@@ -60,7 +68,6 @@ class Orchestrator:
         logger.info("Initializing Orchestrator...")
         self.ingestion = IngestionEngine()
         self.classification = PageClassificationEngine()
-        self.template_engine = TemplateEngine()
 
         # Initialize OCR adapters
         self.mistral_ocr = MistralOCRAdapter()
@@ -235,41 +242,38 @@ class Orchestrator:
                     logger.warning(f"Group {group_idx + 1} Unknown Type - Skipping")
                     continue
 
-                # Template Loading
-                template = self.template_engine.get_template(page_type.value)
-                
                 # Extraction & Validation
                 processed_via_pattern_b = False
-                if template and template.extraction_template:
-                    img_paths = [p["img_path"] for p in group]
-                    
-                    extracted_data = None
-                    schema_map = {
-                        PageType.QC_TEST_REPORT: QCReportSchema,
-                        PageType.WORKSHEET_POLYMER: PolymerWorksheetSchema,
-                        PageType.PRODUCTION_REPORT: ProductionReportSchema,
-                        PageType.STORES_REQUISITION: StoresRequisitionSchema,
-                        PageType.ISSUE_VOUCHER: IssueVoucherSchema,
-                        PageType.DEVIATION_ACCEPTANCE: DeviationAcceptanceSchema,
-                        PageType.PRODUCT_SPEC: ProductSpecSchema,
-                        PageType.EMAIL: EmailSchema,
-                        PageType.RM_PACKING_ISSUANCE: RMPackingIssuanceSchema,
-                        PageType.PACKING_DETAILS: PackingDetailsSchema,
-                        PageType.BMR_CHECKLIST: BMRChecklistSchema,
-                        PageType.SOP: SOPSchema,
-                        PageType.BMR: BMRSchema,
-                    }
-                    schema_cls = schema_map.get(page_type)
-                    if schema_cls:
-                        extracted_data = self.ocr_adapter.extract_structured_data(img_paths, schema_cls)
+                
+                img_paths = [p["img_path"] for p in group]
+                
+                extracted_data = None
+                schema_map = {
+                    PageType.QC_TEST_REPORT: QCReportSchema,
+                    PageType.WORKSHEET_POLYMER: PolymerWorksheetSchema,
+                    PageType.PRODUCTION_REPORT: ProductionReportSchema,
+                    PageType.STORES_REQUISITION: StoresRequisitionSchema,
+                    PageType.ISSUE_VOUCHER: IssueVoucherSchema,
+                    PageType.DEVIATION_ACCEPTANCE: DeviationAcceptanceSchema,
+                    PageType.PRODUCT_SPEC: ProductSpecSchema,
+                    PageType.EMAIL: EmailSchema,
+                    PageType.RM_PACKING_ISSUANCE: RMPackingIssuanceSchema,
+                    PageType.PACKING_DETAILS: PackingDetailsSchema,
+                    PageType.BMR_CHECKLIST: BMRChecklistSchema,
+                    PageType.SOP: SOPSchema,
+                    PageType.BMR: BMRSchema,
+                }
+                schema_cls = schema_map.get(page_type)
+                if schema_cls:
+                    extracted_data = self.ocr_adapter.extract_structured_data(img_paths, schema_cls)
 
-                    # Map to Database
-                    if extracted_data:
-                        if page_type == PageType.WORKSHEET_POLYMER:
-                            self._process_structured_polymer_worksheet(extracted_data, db_pages, session, template)
-                        else:
-                            self._process_structured_generic(extracted_data, db_pages, session, template)
-                        processed_via_pattern_b = True
+                # Map to Database
+                if extracted_data:
+                    logger.info(f"Successfully extracted {len(extracted_data)} top-level keys for Group {group_idx + 1}")
+                    self._process_structured_generic(extracted_data, db_pages, session, page_type)
+                    processed_via_pattern_b = True
+                else:
+                    logger.error(f"Pattern B extraction RETURNED NULL for Group {group_idx + 1} (Type={page_type})")
 
                 if processed_via_pattern_b:
                     session.commit()
@@ -289,300 +293,13 @@ class Orchestrator:
         finally:
             session.close()
 
-    def _process_structured_qc_report(self, data: dict, db_pages: list[Page], session, template=None):
+    def _process_structured_qc_report(self, data: dict, db_pages: list[Page], session):
         """Deprecated: Now handled by _process_structured_generic."""
-        return self._process_structured_generic(data, db_pages, session, template)
+        return self._process_structured_generic(data, db_pages, session)
 
-    def _process_structured_polymer_worksheet(self, data: dict, db_pages: list[Page], session, template=None):
-        """Maps the PolymerWorksheetSchema JSON directly to Field records."""
-        logger.info("Mapping Pattern B Polymer Worksheet JSON to database Fields")
-        
-        # Helper to get page by index (safe)
-        def get_pg(idx: int) -> Page:
-            if idx < len(db_pages):
-                return db_pages[idx]
-            return db_pages[-1]
-
-        # 1. Document Header (Metadata) -> PAGE 3 (Index 0)
-        p1 = get_pg(0)
-        header = data.get("header")
-        if header:
-            header_fields = {
-                "title": "DOC_HEADER_TITLE",
-                "document_no": "DOC_HEADER_NO",
-                "revision_no": "DOC_HEADER_REV",
-                "effective_date": "DOC_HEADER_EFF_DATE",
-                "next_revision_due": "DOC_HEADER_NEXT_REV_DATE",
-            }
-            for key, db_name in header_fields.items():
-                val = header.get(key)
-                if val:
-                    # Get label from template
-                    label = key.replace("_", " ").title()
-                    if template and hasattr(template, "extraction_template"):
-                        h_fields = getattr(template.extraction_template, "header_fields", {}) or {}
-                        field_cfg = h_fields.get(key.upper()) or h_fields.get(key)
-                        if field_cfg:
-                            label = getattr(field_cfg, "label", label) or label
-
-                    f = Field(
-                        page=p1,
-                        name=db_name,
-                        label=label.strip(": "),
-                        field_type="string",
-                        ocr_value=str(val).strip(),
-                        roi_coordinates="0,0,0,0",
-                        ocr_confidence=0.95,
-                        confidence_level=ConfidenceLevel.GREEN,
-                    )
-                    session.add(f)
-
-        # 2. Batch Details Header -> PAGE 4 (Index 1)
-        p2 = get_pg(1)
-        batch_mapping = {
-            "product_code": "PRODUCT_CODE",
-            "ar_no": "AR_NO",
-            "batch_no": "BATCH_NO",
-            "containers_packs": "CONTAINERS_PACKING",
-            "batch_quantity": "BATCH_QUANTITY",
-            "sampled_quantity": "SAMPLED_QUANTITY",
-            "sampling_date": "SAMPLING_DATE",
-            "analysis_date": "ANALYSIS_DATE",
-            "release_date": "RELEASE_DATE",
-        }
-
-        for key, db_name in batch_mapping.items():
-            val = data.get(key)
-            if val is not None and str(val).strip():
-                f_type = "date" if "date" in key else "string"
-                if f_type == "date" and isinstance(val, str):
-                    val = parse_extracted_date(val)
-                
-                # Get label from template
-                label = key.replace("_", " ").title()
-                if template and hasattr(template, "extraction_template"):
-                    h_fields = getattr(template.extraction_template, "header_fields", {}) or {}
-                    field_cfg = h_fields.get(key.upper()) or h_fields.get(key)
-                    if field_cfg:
-                        label = getattr(field_cfg, "label", label) or label
-
-                f = Field(
-                    page=p2,
-                    name=db_name,
-                    label=label.strip(": "),
-                    field_type=f_type,
-                    ocr_value=str(val).strip(),
-                    roi_coordinates="0,0,0,0",
-                    ocr_confidence=0.95,
-                    confidence_level=ConfidenceLevel.GREEN,
-                )
-                session.add(f)
-
-        # 3. Main Generic Tests -> Distributed (P3/P4)
-        generic_tests = data.get("generic_tests", [])
-        for row in generic_tests:
-            param = row.get("parameter")
-            obs = row.get("observation")
-            complies = row.get("complies")
-            sr_no = row.get("sr_no")
-
-            if param and obs is not None:
-                # Distribution Logic: Test 08 (Charge) and above belong on P4+
-                # Based on user feedback, "Charge" (Sr No 8) is on Page 4.
-                target_page = p1 # Page 3
-                if sr_no and sr_no >= 8:
-                    target_page = p2 # Page 4
-                elif param and "CHARGE" in param.upper():
-                    target_page = p2 # Page 4
-
-                clean_param = re.sub(r"[^A-Z0-9]", "_", param.upper()).strip("_")
-                f = Field(
-                    page=target_page,
-                    name=f"TABLE_TEST_{clean_param}",
-                    label=param, # USE FIELD NAMES PROVIDED BY OCR
-                    field_type="string",
-                    ocr_value=str(obs).strip(),
-                    sr_no=sr_no,
-                    roi_coordinates="0,0,0,0",
-                    ocr_confidence=0.95,
-                    confidence_level=ConfidenceLevel.GREEN,
-                )
-                session.add(f)
-                
-                if complies is not None:
-                    f_comp = Field(
-                        page=target_page,
-                        name=f"TABLE_TEST_{clean_param}_COMPLIANCE",
-                        label=f"{param} (Compliance)",
-                        field_type="boolean",
-                        ocr_value=str(complies),
-                        sr_no=sr_no,
-                        roi_coordinates="0,0,0,0",
-                        ocr_confidence=0.95,
-                        confidence_level=ConfidenceLevel.GREEN,
-                    )
-                    session.add(f_comp)
-
-        # 4. Solid Content (Test 09) -> PAGE 4 (Index 1)
-        sc = data.get("solid_content")
-        if sc:
-            for dish_key in ["dish_1", "dish_2"]:
-                dish = sc.get(dish_key)
-                if dish:
-                    prefix = f"TABLE_SC_{dish_key.upper()}"
-                    dish_fields = {
-                        "dish_id": f"{prefix}_ID",
-                        "weight_empty_dish": f"{prefix}_EMPTY_WEIGHT",
-                        "weight_dish_plus_sample": f"{prefix}_DISH_PLUS_SAMPLE",
-                        "weight_sample": f"{prefix}_SAMPLE_WEIGHT",
-                        "weight_dried_sample_with_dish": f"{prefix}_DRIED_WITH_DISH",
-                        "net_weight_dried_sample": f"{prefix}_NET_DRIED",
-                        "sc_percentage": f"{prefix}_SC_PERCENT",
-                    }
-                    for k, db_name in dish_fields.items():
-                        v = dish.get(k)
-                        if v:
-                            # Prettier labels for SC
-                            label_map = {
-                                "dish_id": "Dish ID",
-                                "weight_empty_dish": "Empty Dish Weight",
-                                "weight_dish_plus_sample": "Dish + Sample Weight",
-                                "weight_sample": "Sample Weight",
-                                "weight_dried_sample_with_dish": "Dried Sample w/ Dish",
-                                "net_weight_dried_sample": "Net Dried Weight",
-                                "sc_percentage": "SC %",
-                            }
-                            friendly_label = label_map.get(k, k.replace("_", " ").title())
-                            full_label = f"Dish {dish_key[-1]} - {friendly_label}"
-
-                            f = Field(
-                                page=p2,
-                                name=db_name,
-                                label=full_label,
-                                field_type="string",
-                                ocr_value=str(v).strip(),
-                                roi_coordinates="0,0,0,0",
-                                ocr_confidence=0.95,
-                                confidence_level=ConfidenceLevel.GREEN,
-                            )
-                            session.add(f)
-            
-            if sc.get("average_sc_percentage"):
-                f_avg = Field(
-                    page=p2,
-                    name="TABLE_SC_AVERAGE_PERCENT",
-                    label="Solid Content - Average %",
-                    field_type="string",
-                    ocr_value=str(sc["average_sc_percentage"]).strip(),
-                    roi_coordinates="0,0,0,0",
-                    ocr_confidence=0.95,
-                    confidence_level=ConfidenceLevel.GREEN,
-                )
-                session.add(f_avg)
-            
-            if sc.get("complies") is not None:
-                f_comp = Field(
-                    page=p2,
-                    name="TABLE_SC_COMPLIANCE",
-                    label="Solid Content - Compliance",
-                    field_type="boolean",
-                    ocr_value=str(sc["complies"]),
-                    roi_coordinates="0,0,0,0",
-                    ocr_confidence=0.95,
-                    confidence_level=ConfidenceLevel.GREEN,
-                )
-                session.add(f_comp)
-
-        # 5. Stability Tests (Test 10) -> PAGE 4 (Index 1)
-        stability = data.get("stability")
-        if stability:
-            results = stability.get("results", [])
-            for i, row in enumerate(results):
-                interval = row.get("interval", f"INT_{i}").upper().replace(" ", "_").replace(".", "_")
-                for sub_field in ["ph", "viscosity"]:
-                    val = row.get(sub_field)
-                    if val is not None:
-                        f = Field(
-                            page=p2,
-                            name=f"TABLE_STABILITY_80C_{interval}_{sub_field.upper()}",
-                            label=f"Stability 80C ({interval}) - {sub_field.upper()}",
-                            field_type="float",
-                            ocr_value=str(val),
-                            roi_coordinates="0,0,0,0",
-                            ocr_confidence=0.95,
-                            confidence_level=ConfidenceLevel.GREEN,
-                        )
-                        session.add(f)
-
-        # 6. Other Tests (Test 11) -> PAGE 5 (Index 2)
-        p3 = get_pg(2)
-        others = data.get("other_tests")
-        if others:
-            if others.get("grains_gel"):
-                f = Field(
-                    page=p3,
-                    name="TABLE_TEST_GRAINS_GEL",
-                    label="Grains / Gel",
-                    field_type="string",
-                    ocr_value=str(others["grains_gel"]).strip(),
-                    roi_coordinates="0,0,0,0",
-                    ocr_confidence=0.95,
-                    confidence_level=ConfidenceLevel.GREEN,
-                )
-                session.add(f)
-            if others.get("wet_strength_n"):
-                f = Field(
-                    page=p3,
-                    name="TABLE_TEST_WET_STRENGTH",
-                    label="Wet Strength (N)",
-                    field_type="string",
-                    ocr_value=str(others["wet_strength_n"]).strip(),
-                    roi_coordinates="0,0,0,0",
-                    ocr_confidence=0.95,
-                    confidence_level=ConfidenceLevel.GREEN,
-                )
-                session.add(f)
-
-        # 7. Footer / Signatures -> PAGE 5 (Index 2)
-        footer_fields = {
-            "compliance_statement": "COMPLIANCE_STATEMENT",
-            "final_remark": "FINAL_REMARK",
-            "analyzed_by": "ANALYZED_BY",
-            "analyzed_by_date": "ANALYZED_BY_DATE",
-            "checked_by": "CHECKED_BY",
-            "checked_by_date": "CHECKED_BY_DATE",
-            "prepared_by": "PREPARED_BY",
-            "prepared_by_date": "PREPARED_BY_DATE",
-            "reviewed_by": "REVIEWED_BY",
-            "reviewed_by_date": "REVIEWED_BY_DATE",
-            "approved_by": "APPROVED_BY",
-            "approved_by_date": "APPROVED_BY_DATE",
-        }
-
-        for key, db_name in footer_fields.items():
-            val = data.get(key)
-            if val is not None and str(val).strip():
-                label = key.replace("_", " ").title()
-                if template and hasattr(template, "extraction_template"):
-                    f_fields = getattr(template.extraction_template, "footer_fields", {}) or {}
-                    field_cfg = f_fields.get(key.upper()) or f_fields.get(key)
-                    if field_cfg:
-                        if isinstance(field_cfg, dict):
-                            label = field_cfg.get("label", label)
-                        else:
-                            label = getattr(field_cfg, "label", label) or label
-
-                f = Field(
-                    page=p3,
-                    name=db_name,
-                    label=label.strip(": "),
-                    field_type="string",
-                    ocr_value=str(val).strip(),
-                    roi_coordinates="0,0,0,0",
-                    ocr_confidence=0.95,
-                    confidence_level=ConfidenceLevel.GREEN,
-                )
-                session.add(f)
+    def _process_structured_polymer_worksheet(self, data: dict, db_pages: list[Page], session):
+        """Deprecated: Now handled by _process_structured_generic."""
+        return self._process_structured_generic(data, db_pages, session, page_type=PageType.WORKSHEET_POLYMER)
 
     # ================================================================
     # Helper: Shared field creator (reduces duplication)
@@ -608,369 +325,129 @@ class Orchestrator:
         )
         session.add(f)
 
-    def _get_template_label(self, template, section, key, fallback):
-        """Looks up a human-readable label from a template section."""
-        if not template or not hasattr(template, "extraction_template"):
-            return fallback
-        fields = getattr(template.extraction_template, section, {}) or {}
-        cfg = fields.get(key.upper()) or fields.get(key)
-        if cfg:
-            lbl = getattr(cfg, "label", None) if not isinstance(cfg, dict) else cfg.get("label")
-            if lbl:
-                return lbl
+    def _get_template_label(self, key, fallback):
+        """Deprecated: Now replaced by auto-labeling logic in _flatten_and_add_generic."""
         return fallback
 
-    def _process_structured_qc_report(self, data: dict, db_pages: list[Page], session, template=None):
+    def _process_structured_qc_report(self, data: dict, db_pages: list[Page], session):
         """Deprecated: Now handled by _process_structured_generic."""
-        return self._process_structured_generic(data, db_pages, session, template)
-
-    def _process_structured_polymer_worksheet(self, data: dict, db_pages: list[Page], session, template=None):
-        """Maps the PolymerWorksheetSchema JSON directly to Field records."""
-        logger.info("Mapping Pattern B Polymer Worksheet JSON to database Fields")
-        
-        # Helper to get page by index (safe)
-        def get_pg(idx: int) -> Page:
-            if idx < len(db_pages):
-                return db_pages[idx]
-            return db_pages[-1]
-
-        # 1. Document Header (Metadata) -> PAGE 3 (Index 0)
-        p1 = get_pg(0)
-        header = data.get("header")
-        if header:
-            header_fields = {
-                "title": "DOC_HEADER_TITLE",
-                "document_no": "DOC_HEADER_NO",
-                "revision_no": "DOC_HEADER_REV",
-                "effective_date": "DOC_HEADER_EFF_DATE",
-                "next_revision_due": "DOC_HEADER_NEXT_REV_DATE",
-            }
-            for key, db_name in header_fields.items():
-                val = header.get(key)
-                if val:
-                    # Get label from template
-                    label = key.replace("_", " ").title()
-                    if template and hasattr(template, "extraction_template"):
-                        h_fields = getattr(template.extraction_template, "header_fields", {}) or {}
-                        field_cfg = h_fields.get(key.upper()) or h_fields.get(key)
-                        if field_cfg:
-                            label = getattr(field_cfg, "label", label) or label
-
-                    f = Field(
-                        page=p1,
-                        name=db_name,
-                        label=label.strip(": "),
-                        field_type="string",
-                        ocr_value=str(val).strip(),
-                        roi_coordinates="0,0,0,0",
-                        ocr_confidence=0.95,
-                        confidence_level=ConfidenceLevel.GREEN,
-                    )
-                    session.add(f)
-
-        # 2. Batch Details Header -> PAGE 4 (Index 1)
-        p2 = get_pg(1)
-        batch_mapping = {
-            "product_code": "PRODUCT_CODE",
-            "ar_no": "AR_NO",
-            "batch_no": "BATCH_NO",
-            "containers_packs": "CONTAINERS_PACKING",
-            "batch_quantity": "BATCH_QUANTITY",
-            "sampled_quantity": "SAMPLED_QUANTITY",
-            "sampling_date": "SAMPLING_DATE",
-            "analysis_date": "ANALYSIS_DATE",
-            "release_date": "RELEASE_DATE",
-        }
-
-        for key, db_name in batch_mapping.items():
-            val = data.get(key)
-            if val is not None and str(val).strip():
-                f_type = "date" if "date" in key else "string"
-                if f_type == "date" and isinstance(val, str):
-                    val = parse_extracted_date(val)
-                
-                # Get label from template
-                label = key.replace("_", " ").title()
-                if template and hasattr(template, "extraction_template"):
-                    h_fields = getattr(template.extraction_template, "header_fields", {}) or {}
-                    field_cfg = h_fields.get(key.upper()) or h_fields.get(key)
-                    if field_cfg:
-                        label = getattr(field_cfg, "label", label) or label
-
-                f = Field(
-                    page=p2,
-                    name=db_name,
-                    label=label.strip(": "),
-                    field_type=f_type,
-                    ocr_value=str(val).strip(),
-                    roi_coordinates="0,0,0,0",
-                    ocr_confidence=0.95,
-                    confidence_level=ConfidenceLevel.GREEN,
-                )
-                session.add(f)
-
-        # 3. Main Generic Tests -> Distributed (P3/P4)
-        generic_tests = data.get("generic_tests", [])
-        for row in generic_tests:
-            param = row.get("parameter")
-            obs = row.get("observation")
-            complies = row.get("complies")
-            sr_no = row.get("sr_no")
-
-            if param and obs is not None:
-                # Distribution Logic: Test 08 (Charge) and above belong on P4+
-                target_page = p1 # Page 3
-                if sr_no and sr_no >= 8:
-                    target_page = p2 # Page 4
-                elif param and "CHARGE" in param.upper():
-                    target_page = p2 # Page 4
-
-                clean_param = re.sub(r"[^A-Z0-9]", "_", param.upper()).strip("_")
-                f = Field(
-                    page=target_page,
-                    name=f"TABLE_TEST_{clean_param}",
-                    label=param, # USE FIELD NAMES PROVIDED BY OCR
-                    field_type="string",
-                    ocr_value=str(obs).strip(),
-                    sr_no=sr_no,
-                    roi_coordinates="0,0,0,0",
-                    ocr_confidence=0.95,
-                    confidence_level=ConfidenceLevel.GREEN,
-                )
-                session.add(f)
-                
-                if complies is not None:
-                    f_comp = Field(
-                        page=target_page,
-                        name=f"TABLE_TEST_{clean_param}_COMPLIANCE",
-                        label=f"{param} (Compliance)",
-                        field_type="boolean",
-                        ocr_value=str(complies),
-                        sr_no=sr_no,
-                        roi_coordinates="0,0,0,0",
-                        ocr_confidence=0.95,
-                        confidence_level=ConfidenceLevel.GREEN,
-                    )
-                    session.add(f_comp)
-
-        # 4. Solid Content (Test 09) -> PAGE 4 (Index 1)
-        p2 = get_pg(1)
-        sc = data.get("solid_content")
-        if sc:
-            for dish_key in ["dish_1", "dish_2"]:
-                dish = sc.get(dish_key)
-                if dish:
-                    prefix = f"TABLE_SC_{dish_key.upper()}"
-                    dish_fields = {
-                        "dish_id": f"{prefix}_ID",
-                        "weight_empty_dish": f"{prefix}_EMPTY_WEIGHT",
-                        "weight_dish_plus_sample": f"{prefix}_DISH_PLUS_SAMPLE",
-                        "weight_sample": f"{prefix}_SAMPLE_WEIGHT",
-                        "weight_dried_sample_with_dish": f"{prefix}_DRIED_WITH_DISH",
-                        "net_weight_dried_sample": f"{prefix}_NET_DRIED",
-                        "sc_percentage": f"{prefix}_SC_PERCENT",
-                    }
-                    for k, db_name in dish_fields.items():
-                        v = dish.get(k)
-                        if v:
-                            # Prettier labels for SC
-                            label_map = {
-                                "dish_id": "Dish ID",
-                                "weight_empty_dish": "Empty Dish Weight",
-                                "weight_dish_plus_sample": "Dish + Sample Weight",
-                                "weight_sample": "Sample Weight",
-                                "weight_dried_sample_with_dish": "Dried Sample w/ Dish",
-                                "net_weight_dried_sample": "Net Dried Weight",
-                                "sc_percentage": "SC %",
-                            }
-                            friendly_label = label_map.get(k, k.replace("_", " ").title())
-                            full_label = f"Dish {dish_key[-1]} - {friendly_label}"
-
-                            f = Field(
-                                page=p2,
-                                name=db_name,
-                                label=full_label,
-                                field_type="string",
-                                ocr_value=str(v).strip(),
-                                roi_coordinates="0,0,0,0",
-                                ocr_confidence=0.95,
-                                confidence_level=ConfidenceLevel.GREEN,
-                            )
-                            session.add(f)
-            
-            if sc.get("average_sc_percentage"):
-                f_avg = Field(
-                    page=p2,
-                    name="TABLE_SC_AVERAGE_PERCENT",
-                    label="Solid Content - Average %",
-                    field_type="string",
-                    ocr_value=str(sc["average_sc_percentage"]).strip(),
-                    roi_coordinates="0,0,0,0",
-                    ocr_confidence=0.95,
-                    confidence_level=ConfidenceLevel.GREEN,
-                )
-                session.add(f_avg)
-            
-            if sc.get("complies") is not None:
-                f_comp = Field(
-                    page=p2,
-                    name="TABLE_SC_COMPLIANCE",
-                    label="Solid Content - Compliance",
-                    field_type="boolean",
-                    ocr_value=str(sc["complies"]),
-                    roi_coordinates="0,0,0,0",
-                    ocr_confidence=0.95,
-                    confidence_level=ConfidenceLevel.GREEN,
-                )
-                session.add(f_comp)
-
-        # 5. Stability Tests (Test 10) -> PAGE 4 (Index 1)
-        stability = data.get("stability")
-        if stability:
-            results = stability.get("results", [])
-            for i, row in enumerate(results):
-                interval = row.get("interval", f"INT_{i}").upper().replace(" ", "_").replace(".", "_")
-                for sub_field in ["ph", "viscosity"]:
-                    val = row.get(sub_field)
-                    if val is not None:
-                        f = Field(
-                            page=p2,
-                            name=f"TABLE_STABILITY_80C_{interval}_{sub_field.upper()}",
-                            label=f"Stability 80C ({interval}) - {sub_field.upper()}",
-                            field_type="float",
-                            ocr_value=str(val),
-                            roi_coordinates="0,0,0,0",
-                            ocr_confidence=0.95,
-                            confidence_level=ConfidenceLevel.GREEN,
-                        )
-                        session.add(f)
-
-        # 6. Other Tests (Test 11) -> PAGE 5 (Index 2)
-        p3 = get_pg(2)
-        others = data.get("other_tests")
-        if others:
-            if others.get("grains_gel"):
-                f = Field(
-                    page=p3,
-                    name="TABLE_TEST_GRAINS_GEL",
-                    label="Grains / Gel",
-                    field_type="string",
-                    ocr_value=str(others["grains_gel"]).strip(),
-                    roi_coordinates="0,0,0,0",
-                    ocr_confidence=0.95,
-                    confidence_level=ConfidenceLevel.GREEN,
-                )
-                session.add(f)
-            if others.get("wet_strength_n"):
-                f = Field(
-                    page=p3,
-                    name="TABLE_TEST_WET_STRENGTH",
-                    label="Wet Strength (N)",
-                    field_type="string",
-                    ocr_value=str(others["wet_strength_n"]).strip(),
-                    roi_coordinates="0,0,0,0",
-                    ocr_confidence=0.95,
-                    confidence_level=ConfidenceLevel.GREEN,
-                )
-                session.add(f)
-
-        # 7. Footer / Signatures -> PAGE 5 (Index 2)
-        footer_fields = {
-            "compliance_statement": "COMPLIANCE_STATEMENT",
-            "final_remark": "FINAL_REMARK",
-            "analyzed_by": "ANALYZED_BY",
-            "analyzed_by_date": "ANALYZED_BY_DATE",
-            "checked_by": "CHECKED_BY",
-            "checked_by_date": "CHECKED_BY_DATE",
-            "prepared_by": "PREPARED_BY",
-            "prepared_by_date": "PREPARED_BY_DATE",
-            "reviewed_by": "REVIEWED_BY",
-            "reviewed_by_date": "REVIEWED_BY_DATE",
-            "approved_by": "APPROVED_BY",
-            "approved_by_date": "APPROVED_BY_DATE",
-        }
-
-        for key, db_name in footer_fields.items():
-            val = data.get(key)
-            if val is not None and str(val).strip():
-                label = key.replace("_", " ").title()
-                if template and hasattr(template, "extraction_template"):
-                    f_fields = getattr(template.extraction_template, "footer_fields", {}) or {}
-                    field_cfg = f_fields.get(key.upper()) or f_fields.get(key)
-                    if field_cfg:
-                        if isinstance(field_cfg, dict):
-                            label = field_cfg.get("label", label)
-                        else:
-                            label = getattr(field_cfg, "label", label) or label
-
-                f = Field(
-                    page=p3,
-                    name=db_name,
-                    label=label.strip(": "),
-                    field_type="string",
-                    ocr_value=str(val).strip(),
-                    roi_coordinates="0,0,0,0",
-                    ocr_confidence=0.95,
-                    confidence_level=ConfidenceLevel.GREEN,
-                )
-                session.add(f)
+        return self._process_structured_generic(data, db_pages, session, page_type=PageType.QC_TEST_REPORT)
 
     # ================================================================
     # Generic Mapper (for all remaining document types)
     # ================================================================
 
-    def _process_structured_generic(self, data: dict, db_pages: list[Page], session, template=None):
-        """Maps any Pydantic-extracted JSON to Field records by walking the dict.
-        
-        Handles:
-        - Flat scalar fields (string, date, boolean, etc.)
-        - Nested dicts (flattened as PARENT_CHILD)
-        - Lists of dicts (table rows with automatic sr_no detection)
-        """
-        logger.info("Mapping Pattern B (generic) JSON to database Fields")
-        page = db_pages[0]
+    def _get_target_page(self, key: str, value, db_pages: list[Page], page_type=None) -> Page:
+        """Determines which physical page in a document unit should receive a field."""
+        if not db_pages:
+            return None
+        if len(db_pages) == 1:
+            return db_pages[0]
 
+        # 1. Check for footer/signature names (usually last page)
+        is_footer = False
+        kl = key.lower()
+        if any(w in kl for w in ("signature", "remark", "footer", "reviewed_by", "approved_by", "checked_by")):
+            is_footer = True
+            
+        if is_footer:
+            return db_pages[-1]
+
+        # 2. Document-specific distribution (Pattern-based)
+        if page_type == PageType.BMR_CHECKLIST:
+            # Section A (Review Points) -> Page 1
+            if key == "review_points":
+                return db_pages[0]
+            # Section B (Attachments) -> Page 2
+            if key == "attachments":
+                return db_pages[1] if len(db_pages) > 1 else db_pages[0]
+        
+        if page_type == PageType.SOP:
+            if "REVISION" in key.upper():
+                return db_pages[-1]
+
+        if page_type == PageType.WORKSHEET_POLYMER:
+            # Page distribution (Assuming db_pages index 0=P3, 1=P4, 2=P5)
+            ukey = key.upper()
+            if "PAGE_4" in ukey or "STABILITY" in ukey or "SOLID_CONTENT" in ukey or "CHARGE" in ukey:
+                return db_pages[1] if len(db_pages) > 1 else db_pages[0]
+            if "PAGE_5" in ukey or "GRAINS" in ukey or "WET_STRENGTH" in ukey:
+                return db_pages[2] if len(db_pages) > 2 else db_pages[-1]
+            return db_pages[0]
+
+        # Default to first page for headers/scalars
+        return db_pages[0]
+
+    def _flatten_and_add_generic(self, session, data: dict, target_page, db_pages, page_type, prefix=""):
+        """Recursively flattens nested dicts into database fields with smart labeling."""
         for key, value in data.items():
             if value is None:
                 continue
 
-            db_key = key.upper()
-            label = self._get_template_label(template, "header_fields", key, key.replace("_", " ").title())
+            field_name = f"{prefix}_{key}".upper() if prefix else key.upper()
             
-            # Smart type detection
-            if isinstance(value, bool) or str(value).lower() in ("true", "false"):
-                f_type = "boolean"
-            elif "date" in key.lower() or "dated" in key.lower():
-                f_type = "date"
-            else:
-                f_type = "string"
-
-            # Case 1: Scalar (string, int, float, bool)
-            if isinstance(value, (str, int, float, bool)):
-                # Also check footer_fields for label if not in header
-                if not self._get_template_label(template, "header_fields", key, None):
-                    footer_label = self._get_template_label(template, "footer_fields", key, None)
-                    if footer_label:
-                        label = footer_label
+            if isinstance(value, dict):
+                # Recurse
+                self._flatten_and_add_generic(session, value, target_page, db_pages, page_type, prefix=field_name)
+            elif isinstance(value, (str, int, float, bool)):
+                # Cleanup Label & Fix "Results" labeling
+                clean_name = field_name
                 
-                self._add_field(session, page, db_key, value, label=label, field_type=f_type)
+                # SMART FIX: If we are at a leaf named "RESULTS" or "COMPLIES", 
+                # we want the parent key to be the basis of our label.
+                # E.g. PAGE_3_TESTS_PHYSICAL_APPEARANCE_RESULTS -> PHYSICAL_APPEARANCE
+                if clean_name.endswith("_RESULTS"):
+                    clean_name = clean_name.replace("_RESULTS", "")
+                elif clean_name.endswith("_COMPLIES"):
+                    # We might want to keep "Compliance" if it's the checkmark
+                    if "APPEARANCE" in clean_name or "VISCOSITY" in clean_name or "PH" in clean_name:
+                         clean_name = clean_name.replace("_COMPLIES", "_COMPLIANCE")
 
-            # Case 2: Nested dict (e.g., batch_reconciliation)
-            elif isinstance(value, dict):
-                for sub_key, sub_val in value.items():
-                    if sub_val is not None and str(sub_val).strip():
-                        flat_name = f"{db_key}_{sub_key.upper()}"
-                        sub_label = sub_key.replace("_", " ").title()
-                        
-                        # Sub-key type detection
-                        if isinstance(sub_val, bool) or str(sub_val).lower() in ("true", "false"):
-                            sub_type = "boolean"
-                        elif "date" in sub_key.lower() or "dated" in sub_key.lower():
-                            sub_type = "date"
-                        else:
-                            sub_type = "string"
-                            
-                        self._add_field(session, page, flat_name, sub_val, label=sub_label, field_type=sub_type)
+                prefixes_to_strip = ["GENERIC_TESTS_", "PAGE_1_TESTS_", "PAGE_3_TESTS_", "PAGE_4_TESTS_", "PAGE_5_TESTS_", "TEST_RESULTS_"]
+                for p in prefixes_to_strip:
+                    if clean_name.startswith(p):
+                        clean_name = clean_name.replace(p, "")
+                
+                label = clean_name.replace("_", " ").title().strip()
+                
+                # Specific overrides for acronyms
+                if label.startswith("Ph "):
+                    label = "pH " + label[3:]
+                elif label == "Ph":
+                    label = "pH"
+                elif "Ar No" in label:
+                    label = label.replace("Ar No", "AR No")
+                elif "Sc Percentage" in label:
+                    label = label.replace("Sc Percentage", "SC %")
+
+                # Type detection
+                if isinstance(value, bool) or str(value).lower() in ("true", "false"):
+                    f_type = "boolean"
+                elif "date" in field_name.lower() or "date" in key.lower():
+                    f_type = "date"
+                else:
+                    f_type = "string"
+
+                self._add_field(session, target_page, field_name, value, label=label, field_type=f_type)
+
+    def _process_structured_generic(self, data: dict, db_pages: list[Page], session, page_type=None):
+        """Maps any Pydantic-extracted JSON to Field records by walking the dict.
+        
+        Distributes fields across multi-page units if multiple db_pages are provided.
+        """
+        logger.info(f"Mapping Pattern B (generic) JSON to {len(db_pages)} database Pages")
+        
+        for key, value in data.items():
+            if value is None:
+                continue
+
+            # Determine target page for this specific key
+            target_page = self._get_target_page(key, value, db_pages, page_type)
+            db_key = key.upper()
+
+            # Recursive flattening for scalars and dicts
+            if isinstance(value, (str, int, float, bool, dict)):
+                self._flatten_and_add_generic(session, {key: value}, target_page, db_pages, page_type)
 
             # Case 3: List of dicts (table rows)
             elif isinstance(value, list) and value and isinstance(value[0], dict):
@@ -989,7 +466,7 @@ class Orchestrator:
                             col_type = "date" if "date" in col.lower() else "string"
                             
                             self._add_field(
-                                session, page,
+                                session, target_page,
                                 name=col_name,
                                 value=col_val,
                                 label=col_label,
@@ -1001,4 +478,4 @@ class Orchestrator:
             elif isinstance(value, list):
                 joined = ", ".join(str(v) for v in value if v is not None)
                 if joined.strip():
-                    self._add_field(session, page, db_key, joined, label=label)
+                    self._add_field(session, target_page, db_key, joined, label=db_key.replace("_", " ").title())

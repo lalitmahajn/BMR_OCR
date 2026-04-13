@@ -15,7 +15,7 @@ class VoucherItemRow(BaseModel):
     )
     batch_lot: Optional[str] = Field(
         None,
-        description="Batch or lot reference including dates if present (e.g., '10012601614 12-Jan-26 11-Jan-27')",
+        description="Batch or lot reference including dates if present (e.g., '10012601614 12/01/2026 11/01/2027')",
     )
     quantity: Optional[str] = Field(
         None,
@@ -36,11 +36,11 @@ class IssueVoucherSchema(BaseModel):
     )
     ref_date: Optional[str] = Field(
         None,
-        description="Reference date, shown as 'dt.' (e.g., '21-Jan-26')",
+        description="Reference date, shown as 'dt.' (e.g., '21/01/2026')",
     )
     dated: Optional[str] = Field(
         None,
-        description="Date of the voucher (e.g., '21-Jan-26')",
+        description="Date of the voucher (e.g., '21/01/2026')",
     )
     items: List[VoucherItemRow] = Field(
         default_factory=list,
@@ -52,19 +52,19 @@ class IssueVoucherSchema(BaseModel):
     )
     narration: Optional[str] = Field(
         None,
-        description="Narration text describing the transaction (e.g., '10012601674:RL 5065:BC 6000:Date:-21.01.2026')",
+        description="Narration text describing the transaction (e.g., '10012601674:RL 5065:BC 6000:Date:21/01/2026')",
     )
     checked_by: Optional[str] = Field(
         None, description="Name or signature of the person who checked"
     )
     checked_by_date: Optional[str] = Field(
-        None, description="Date when checked"
+        None, description="Date when checked (DD/MM/YYYY)"
     )
     verified_by: Optional[str] = Field(
         None, description="Name or signature of the person who verified"
     )
     verified_by_date: Optional[str] = Field(
-        None, description="Date when verified"
+        None, description="Date when verified (DD/MM/YYYY)"
     )
     authorised_signatory: Optional[str] = Field(
         None, description="Name or signature of the authorised signatory"

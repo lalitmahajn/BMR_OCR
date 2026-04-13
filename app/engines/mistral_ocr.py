@@ -268,7 +268,12 @@ class MistralOCRAdapter(OCRAdapter):
                         model=self.model,
                         document=doc_payload,
                         document_annotation_format=annotation_format,
-                        document_annotation_prompt=f"Extract all information from this document exactly into the following JSON schema: {schema_class.__name__}"
+                        document_annotation_prompt=(
+                            f"Extract all information from this document exactly into the following JSON schema: {schema_class.__name__}. "
+                            "VERY IMPORTANT: All dates MUST be formatted exactly as DD/MM/YYYY (e.g., 28/10/2026). "
+                            "If a section or table is empty or has a diagonal line drawn through it, "
+                            "return an empty list or null for those fields. DO NOT hallucinate rows for empty tables."
+                        )
                     )
 
                     # Breakthrough: Structured JSON resides at Top-Level 'document_annotation' 

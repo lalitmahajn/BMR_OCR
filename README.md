@@ -5,10 +5,11 @@ This project is a modern web application for OCR verification, designed to extra
 It is built with a Python (FastAPI) backend and a React (Vite) frontend.
 
 ## 🏗️ Project Structure
-- `app/`: Python backend source code (FastAPI, SQLAlchemy, Extraction Engine)
-- `scripts/`: Python utility scripts for ingestion, extraction dumping, and debugging
-- `templates/`: JSON schema templates defining field extraction rules
-- `ui/react-app/`: Modern React frontend application
+- `app/`: Python backend source code (FastAPI, SQLAlchemy, Mistral AI Extraction Engine)
+- `app/schemas/`: Pydantic schemas enforcing schema-native, LLM-based extraction
+- `.agent/skills/`: Custom agentic workflows and AI instructions (e.g. `bmr-debug`)
+- `ui/react-app/`: Modern React frontend application (Neon Glassmorphism UI)
+- `*.py` (Root utility scripts): Various `tmp_*.py` and `audit_*.py` files for ingestion, database testing, and debug workflows
 
 ---
 

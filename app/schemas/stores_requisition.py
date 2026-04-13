@@ -52,7 +52,7 @@ class StoresRequisitionSchema(BaseModel):
         None, description="Name or signature of the person who issued the materials"
     )
     issued_by_date: Optional[str] = Field(
-        None, description="Date of issuance"
+        None, description="Date of issuance (DD/MM/YYYY)"
     )
     production_incharge: Optional[str] = Field(
         None,

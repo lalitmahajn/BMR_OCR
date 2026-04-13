@@ -8,10 +8,10 @@ This project is a modern web application for OCR verification, built with a Pyth
 - **Framework**: [FastAPI](https://fastapi.tiangolo.com/) (High-performance Python API)
 - **Language**: Python 3.11+
 - **Database**: SQLite (via SQLAlchemy & Alembic)
+- **Extraction Engine**: Mistral AI (Schema-Native LLM Extraction)
 - **Key Libraries**:
   - `uvicorn`: ASGI server
-  - `pydantic`: Data validation
-  - `paddleocr`: OCR engine
+  - `pydantic`: Data validation & strict extraction schemas
 
 ### Frontend (UI)
 - **Framework**: [React 19](https://react.dev/)

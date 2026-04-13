@@ -1,92 +1,115 @@
-from typing import List, Optional, Literal
-from pydantic import BaseModel, Field, validator
+from typing import Optional, Literal
+from pydantic import BaseModel, Field
 
 
-class WorksheetTestRow(BaseModel):
-    sr_no: Optional[int] = Field(None, description="The serial number of the test")
-    parameter: str = Field(..., description="Name of the test parameter")
-    observation: Optional[str] = Field(None, description="The raw observation or measurement")
-    complies: Optional[bool] = Field(None, description="True if the result complies with specifications")
+class GenericTestRow(BaseModel):
+    """Standard test result row with the observation and compliance checkmark."""
+
+    results: Optional[str] = Field(
+        None, description="The handwritten result/observation"
+    )
+    complies: Optional[bool] = Field(
+        None, description="True if tick is over 'Complies'"
+    )
 
 
-class SolidContentDish(BaseModel):
-    dish_id: Optional[str] = Field(None, description="Dish ID")
-    weight_empty_dish: Optional[str] = Field(None, description="Weight of empty Dish")
-    weight_dish_plus_sample: Optional[str] = Field(None, description="Weight of Dish + Sample")
-    weight_sample: Optional[str] = Field(None, description="Weight of sample (X-Y)")
-    weight_dried_sample_with_dish: Optional[str] = Field(None, description="Weight of dried Sample with dish (A)")
-    net_weight_dried_sample: Optional[str] = Field(None, description="Net weight of dried Sample (C)")
-    sc_percentage: Optional[str] = Field(None, description="Calculated Solid Content (SC) percentage")
+class PolymerIonicity(BaseModel):
+    results: Optional[Literal["Cationic", "Anionic", "Non-ionic"]] = Field(
+        None, description="The specific option that was ticked"
+    )
+    complies: Optional[bool] = Field(None)
 
-class SolidContentTest(BaseModel):
-    dish_1: Optional[SolidContentDish] = Field(None, description="First dish calculation")
-    dish_2: Optional[SolidContentDish] = Field(None, description="Second dish calculation (if any)")
-    average_sc_percentage: Optional[str] = Field(None, description="Average Solid Content percentage")
-    complies: Optional[bool] = Field(None, description="True if the overall solid content complies")
 
-class StabilityTestRow(BaseModel):
-    """Specific sub-table for Stability results at different intervals."""
-    interval: str = Field(..., description="Time interval (e.g., Initial, 24 Hrs, 72 Hrs)")
-    ph: Optional[str] = Field(None, description="pH value at this interval")
-    viscosity: Optional[str] = Field(None, description="Viscosity value at this interval")
+class Page3Tests(BaseModel):
+    """Fields specifically printed on Page 3 (Worksheet Page 1)"""
 
-class StabilityTest(BaseModel):
-    temp_condition: Optional[str] = Field("80°C", description="Temperature condition for the stability test")
-    results: List[StabilityTestRow] = Field(default_factory=list, description="Rows of stability test results")
+    physical_appearance: Optional[GenericTestRow] = Field(None)
+    viscosity: Optional[GenericTestRow] = Field(None)
+    ph: Optional[GenericTestRow] = Field(None)
+    specific_gravity: Optional[GenericTestRow] = Field(None)
+    solubility: Optional[GenericTestRow] = Field(None)
+    ionicity: Optional[PolymerIonicity] = Field(None)
+    turbidity: Optional[GenericTestRow] = Field(None)
 
-class OtherTests(BaseModel):
-    grains_gel: Optional[str] = Field(None, description="Observation for Grains/Gel")
-    wet_strength_n: Optional[str] = Field(None, description="Observation for Wet strength (N)")
 
-class DocumentHeader(BaseModel):
-    title: Optional[str] = Field(None, description="Title of the worksheet")
-    document_no: Optional[str] = Field(None, description="Document Number")
-    revision_no: Optional[str] = Field(None, description="Revision Number")
-    effective_date: Optional[str] = Field(None, description="Effective Date")
-    next_revision_due: Optional[str] = Field(None, description="Next Revision Due Date")
+class SolidContent(BaseModel):
+    dish_1_sc_percentage: Optional[str] = Field(None, description="SC % for Dish 1")
+    dish_2_sc_percentage: Optional[str] = Field(None, description="SC % for Dish 2")
+    solid_content_avg_percentage: Optional[str] = Field(
+        None, description="Avg % from the Solid Content test block"
+    )
+
+
+class StabilityRow(BaseModel):
+    hours: Optional[str] = Field(
+        None, description="Time interval (e.g., Initial, 32 h)"
+    )
+    ph: Optional[str] = Field(None, description="pH value")
+    viscosity: Optional[str] = Field(None, description="Viscosity value")
+
+
+class StabilityBlock(BaseModel):
+    initial: Optional[StabilityRow] = Field(None, description="Pre-printed Initial row")
+    row_2: Optional[StabilityRow] = Field(
+        None, description="Second handwritten row (e.g. 32 h)"
+    )
+    row_3: Optional[StabilityRow] = Field(None, description="Third handwritten row")
+    row_4: Optional[StabilityRow] = Field(None, description="Fourth handwritten row")
+
+
+class Page4Tests(BaseModel):
+    """Fields specifically printed on Page 4 (Worksheet Page 2)"""
+
+    charge: Optional[GenericTestRow] = Field(None)
+    solid_content: Optional[SolidContent] = Field(
+        None, description="Dish 1 and Dish 2 solid content results"
+    )
+    stability: Optional[StabilityBlock] = Field(None, description="3x5 Stability table")
+
+
+class Page5Tests(BaseModel):
+    """Fields specifically printed on Page 5 (Worksheet Page 3)"""
+
+    presence_of_grains_gel: Optional[GenericTestRow] = Field(None)
+    wet_strength: Optional[GenericTestRow] = Field(None)
+
 
 class PolymerWorksheetSchema(BaseModel):
-    # Document Header
-    header: Optional[DocumentHeader] = Field(None, description="Standard operating procedure header fields")
+    """Schema native extractor for Polymer Worksheet, matching the constant table specifications."""
 
-    # Batch Details Header
-    product_code: Optional[str] = Field(None, description="Product Code")
-    ar_no: Optional[str] = Field(None, description="AR. No.")
-    batch_no: Optional[str] = Field(None, description="Batch Number")
-    containers_packs: Optional[str] = Field(None, description="No. of containers / packs")
-    batch_quantity: Optional[str] = Field(None, description="Batch Quantity (e.g., 5900 kg)")
-    sampled_quantity: Optional[str] = Field(None, description="Sampled quantity")
-    sampling_date: Optional[str] = Field(None, description="Date of sampling / Sampling date")
-    analysis_date: Optional[str] = Field(None, description="Date of Analysis")
-    release_date: Optional[str] = Field(None, description="Released Date")
+    # Header Fields
+    document_no: Optional[str] = Field(None)
+    revision_no: Optional[float] = Field(None)
+    effective_date: Optional[str] = Field(None)
+    next_revision_due: Optional[str] = Field(None)
 
-    # Main Generic Tests (1 to 8)
-    generic_tests: List[WorksheetTestRow] = Field(default_factory=list, description="Standard test rows like Physical Appearance, Viscosity, pH, etc.")
+    # Data Sheet Fields
+    product_code: Optional[str] = Field(None)
+    ar_no: Optional[str] = Field(None)
+    batch_no: Optional[str] = Field(None)
+    no_of_containers_packs: Optional[str] = Field(None, alias="no_of_containers/packs")
+    batch_quantity: Optional[float] = Field(None)
+    sampled_quantity: Optional[float] = Field(None)
 
-    # Specialized Tests (9, 10, 11)
-    solid_content: Optional[SolidContentTest] = Field(None, description="Solid Content (Test 09)")
-    stability: Optional[StabilityTest] = Field(None, description="Stability (Test 10)")
-    other_tests: Optional[OtherTests] = Field(None, description="Other Tests like Grains/Gel and Wet strength (Test 11)")
-
-    # Footer / Compliance
-    compliance_statement: Optional[str] = Field(
-        None, description="Logic like 'Product complies to specification'"
+    solid_content_complies: Optional[bool] = Field(
+        None, description="Checkmark overall compliance for Solid Content"
     )
-    final_remark: Optional[Literal["Approved", "Rejected"]] = Field(None)
+    sampling_date: Optional[str] = Field(None)
+    date_of_analysis: Optional[str] = Field(None)
+    release_date: Optional[str] = Field(None)
 
-    # Signatures
-    analyzed_by: Optional[str] = Field(None, description="Name of analyst")
-    analyzed_by_date: Optional[str] = Field(None, description="Date of analysis signature")
-    checked_by: Optional[str] = Field(None, description="Name of checker")
-    checked_by_date: Optional[str] = Field(None, description="Date of checked by signature")
-    prepared_by: Optional[str] = Field(None, description="Name of preparer")
-    prepared_by_date: Optional[str] = Field(None, description="Date of preparation signature")
-    reviewed_by: Optional[str] = Field(None, description="Name of reviewer")
-    reviewed_by_date: Optional[str] = Field(None, description="Date of review signature")
-    approved_by: Optional[str] = Field(None, description="Name of approver")
-    approved_by_date: Optional[str] = Field(None, description="Date of approval signature")
+    # Page-Specific Test Blocks
+    page_3_tests: Optional[Page3Tests] = Field(
+        None, description="Tests on Worksheet Page 1"
+    )
+    page_4_tests: Optional[Page4Tests] = Field(
+        None, description="Tests on Worksheet Page 2"
+    )
+    page_5_tests: Optional[Page5Tests] = Field(
+        None, description="Tests on Worksheet Page 3"
+    )
 
-    @validator("generic_tests", each_item=True)
-    def normalize_units(cls, v):
-        # We can add similar 'CPS' normalization logic here if needed for Worksheet
-        return v
+    # Footer Signatures
+    analyzed_by: Optional[str] = Field(None)
+    checked_by: Optional[str] = Field(None)
+    approved_by: Optional[str] = Field(None)

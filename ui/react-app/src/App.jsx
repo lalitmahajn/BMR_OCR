@@ -61,7 +61,7 @@ function App() {
   }
 
   return (
-    <div className={`flex h-screen w-screen overflow-hidden font-sans ${isResizing ? 'cursor-col-resize select-none' : ''}`} style={{ backgroundColor: 'var(--bg-warm)', color: 'var(--text-primary)' }}>
+    <div className={`flex h-screen w-screen overflow-hidden font-sans ${isResizing ? 'cursor-col-resize select-none' : ''}`}>
       {/* Sidebar: Document List */}
       <DocumentList
         onSelectPage={setSelectedPage}
@@ -69,16 +69,17 @@ function App() {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
+      <div className="flex-1 flex flex-col h-full overflow-hidden relative z-0">
         {/* Header (Optional) */}
-        <div className="px-4 py-2.5 flex justify-between items-center z-10" style={{ backgroundColor: 'var(--bg-surface)', borderBottom: '1px solid var(--border-soft)' }}>
-          <h2 className="font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>
+        <div className="px-6 py-3.5 flex justify-between items-center z-20 glass-panel shadow-sm border-b border-white/5">
+          <h2 className="font-semibold text-lg tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-indigo-300 drop-shadow-sm">
             {selectedPage
               ? `Reviewing: Page ${selectedPage.page_number}`
               : "Select a document to begin"}
           </h2>
-          <div className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            {selectedPage && `${fields.filter(f => f.status === "VERIFIED").length} / ${fields.length} Verified`}
+          <div className="text-sm font-medium px-3 py-1 rounded-full bg-slate-800/60 border border-white/10 shadow-inner" style={{ color: 'var(--text-muted)' }}>
+            <span className="text-emerald-400 mr-1">{selectedPage ? fields.filter(f => f.status === "VERIFIED").length : 0}</span> 
+            / {selectedPage ? fields.length : 0} Verified
           </div>
         </div>
 
@@ -92,14 +93,16 @@ function App() {
           {/* Draggable Handle */}
           <div
             onMouseDown={handleMouseDown}
-            className={`w-1.5 h-full cursor-col-resize hover:bg-blue-500 transition-colors z-30 ${isResizing ? 'bg-blue-600' : 'bg-transparent'}`}
+            className={`w-1.5 h-full cursor-col-resize z-30 transition-all duration-300 flex justify-center items-center group ${isResizing ? 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.6)]' : 'bg-transparent hover:bg-blue-500/50 hover:shadow-[0_0_10px_rgba(59,130,246,0.3)]'}`}
             title="Drag to resize"
-          />
+          >
+             <div className="h-12 w-[2px] bg-white/20 rounded-full group-hover:bg-white/60 transition-colors" />
+          </div>
 
           {/* Right: Field Panel */}
           <div
-            style={{ width: `${sidebarWidth}px`, backgroundColor: 'var(--bg-surface)', borderLeft: '1px solid var(--border-soft)', boxShadow: '-2px 0 12px rgba(0,0,0,0.04)' }}
-            className="flex flex-col z-20"
+            style={{ width: `${sidebarWidth}px` }}
+            className="flex flex-col z-20 glass-panel border-l border-white/5 shadow-[-10px_0_30px_rgba(0,0,0,0.5)] bg-slate-900/40"
           >
             <FieldPanel
               fields={fields}

@@ -42,7 +42,7 @@ env/
 output/
 data/
 *_extraction_results.md
-*.txt
+API.txt
 scripts/
 debug_rows.json
 page3_fields.json

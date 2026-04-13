@@ -49,7 +49,7 @@ class EmailSchema(BaseModel):
     )
     date_sent: Optional[str] = Field(
         None,
-        description="Date and time the email was sent (e.g., 'Sat, Jan 24, 2026 at 2:22 PM')",
+        description="Date and time the email was sent (DD/MM/YYYY) (e.g., '24/01/2026')",
     )
     message_count: Optional[str] = Field(
         None, description="Number of messages in the thread (e.g., '1 message')"

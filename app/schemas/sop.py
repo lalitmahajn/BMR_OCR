@@ -61,7 +61,7 @@ class RevisionHistoryRow(BaseModel):
         None, description="Revision number (e.g., '00', '01', '02')"
     )
     effective_date: Optional[str] = Field(
-        None, description="Effective date of this revision"
+        None, description="Effective date of this revision (DD/MM/YYYY)"
     )
     description_of_change: Optional[str] = Field(
         None,

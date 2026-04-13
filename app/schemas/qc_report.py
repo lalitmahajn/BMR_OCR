@@ -1,95 +1,68 @@
-from pydantic import BaseModel, Field, validator
-from typing import List, Optional, Literal
+from pydantic import BaseModel, Field
+from typing import Optional, Literal
 
 
-class TestRow(BaseModel):
-    """Represents a single row in the physical/chemical parameters test table."""
-
-    sr_no: Optional[int] = Field(
-        None, description="The serial number of the test (from the first column)"
-    )
-    parameter: str = Field(
-        description="The name of the physical or chemical test performed (e.g., pH, Viscosity, Physical Appearance, Turbidity, Specific Gravity)"
-    )
-    result_value: str = Field(
-        description="The specific measured numeric or qualitative value resulting from the test"
-    )
-    unit: Optional[str] = Field(
-        None, 
-        description="The unit of measurement. NOTE: If parameter is 'Viscosity', ALWAYS return 'CPS'. For Turbidity use 'NTU', for Chloride use 'N'."
-    )
-
-    @validator("unit", always=True)
-    def force_viscosity_unit(cls, v, values):
-        if "parameter" in values and "viscosity" in values["parameter"].lower():
-            return "CPS"
-        return v
+class Page1Tests(BaseModel):
+    """The handwritten measured values for the 14 pre-printed test parameters.
+    Extract ONLY the value/result for each parameter. Do not include units like CPS or NTU unless they are scribbled.
+    """
+    physical_appearance: str = Field(description="Result for 'Physical Appearance'")
+    viscosity: str = Field(description="Result for 'Viscosity'")
+    ph: str = Field(description="Result for 'pH'")
+    specific_gravity: str = Field(description="Result for 'Specific Gravity @ 25°C'")
+    solid_content: str = Field(description="Result for 'Solid Content / Active %'")
+    ionicity: str = Field(description="Result for 'Ionicity'")
+    charge: str = Field(description="Result for 'Charge'")
+    solubility: str = Field(description="Result for 'Solubility'")
+    turbidity: str = Field(description="Result for 'Turbidity'")
+    color_gardner: str = Field(description="Result for 'Color Gardner'")
+    presence_of_grains: str = Field(description="Result for 'Presence of Grains / Gel'")
+    stability_test: str = Field(description="Result for 'Stability Test / Boring Test'")
+    performance_test: str = Field(description="Result for 'Performance Test / Cobb Value'")
+    tensile_strength: str = Field(description="Result for 'Tensile Strength Test / Chloride Content'")
 
 
 class QCReportSchema(BaseModel):
-    """The full structured data extracted from a Finished Goods Q.C. Test Report."""
+    """Finished Good Q.C. Test Report for Speciality Chemicals.
+    Single-page document with 8 header fields, 14 explicit test results, and footer fields.
+    """
 
+    # Header fields (in document layout order)
     product_name: str = Field(
-        description="The name of the manufactured product being tested"
+        description="Product name (e.g., 'RL-5065')"
     )
-    batch_no: str = Field(description="The alphanumeric batch or lot number")
-    ar_no: Optional[str] = Field(
-        None, description="The AR number (Analytical Report Number) if present"
+    mfg_date: str = Field(
+        description="Manufacturing date (DD/MM/YYYY) (e.g., '23/01/2026')"
     )
-
-    mfg_date: Optional[str] = Field(
-        None, description="Manufacturing date (typically DD/MM/YYYY or YYYY-MM-DD)"
+    ar_no: str = Field(
+        description="AR number in format like 'R/26/FG/01674'"
     )
-    exp_date: Optional[str] = Field(
-        None, description="Expiry date (typically DD/MM/YYYY or YYYY-MM-DD)"
+    approval_date: str = Field(
+        description="Approval date (DD/MM/YYYY) (e.g., '28/01/2026')"
     )
-    approval_date: Optional[str] = Field(
-        None, description="The date the batch was approved"
+    batch_no: str = Field(
+        description="Batch number (e.g., '100/260/674')"
     )
-
-    quantity: Optional[str] = Field(
-        None, description="Total quantity of the batch (e.g., '500 KGS', '1000 kg')"
+    packing_details: str = Field(
+        description="Packing details (e.g., '5900 Kg x 01')"
     )
-    packing_details: Optional[str] = Field(
-        None, description="How the product is packed (e.g., '50 Kg x 10 drums')"
+    quantity: str = Field(
+        description="Quantity value only, no unit (e.g., '5900')"
     )
-
-    # Table Extraction
-    test_results: List[TestRow] = Field(
-        description="The main table listing all physical and chemical parameters tested and their results."
+    exp_date: str = Field(
+        description="Expiry date (DD/MM/YYYY) (e.g., '22/07/2026')"
     )
 
-    # Footer Extraction & Legal Compliance
-    overall_result: Optional[Literal["APPROVED", "REJECTED"]] = Field(
-        None, 
-        description="The final decision. NOTE: Look for tick marks or cross-outs on the paper to determine if the batch was APPROVED or REJECTED."
+    # Test Results (Explicit Fields)
+    page_1_tests: Page1Tests = Field(
+        description="The handwritten test results for the 14 standard parameters."
+    )
+
+    # Footer fields
+    result: Literal["APPROVED", "REJECTED"] = Field(
+        description="Final result — either 'APPROVED' or 'REJECTED'. Look for strikethrough or tick mark."
     )
     remarks: Optional[str] = Field(
         None,
-        description="Any additional remarks or notes left at the bottom of the document",
-    )
-
-    analyzed_date: Optional[str] = Field(
-        None,
-        description="The date the document was analyzed (from the Analyzed By section)",
-    )
-    approved_date: Optional[str] = Field(
-        None,
-        description="The date the document was approved (from the Approved By section)",
-    )
-
-    analyzed_by_role: str = Field(
-        "QC Executive", description="The role of the person who analyzed the sample"
-    )
-    approved_by_role: str = Field(
-        "QC Manager / Incharge", description="The role of the person who approved the sample"
-    )
-
-    analyzed_by_signature_present: Optional[bool] = Field(
-        False,
-        description="True if there is a written signature or initials in the 'Analyzed By' section",
-    )
-    approved_by_signature_present: Optional[bool] = Field(
-        False,
-        description="True if there is a written signature or initials in the 'Approved By' section",
+        description="Remarks text at the bottom (e.g., 'U1D High Viscosity')"
     )

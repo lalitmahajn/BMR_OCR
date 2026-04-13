@@ -1,22 +1,33 @@
 @import "tailwindcss";
 
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
 :root {
-  --bg-warm: #0f172a;
-  /* Slate 900 for main app bg */
-  --bg-sidebar: #1e293b;
-  /* Slate 800 for sidebar */
-  --bg-viewer: #020617;
-  /* Slate 950 for image viewer backdrop */
-  --bg-panel: #0f172a;
-  /* Slate 900 for right panel */
-  --bg-surface: #1e293b;
-  /* Slate 800 for cards/headers */
-  --border-soft: #334155;
-  /* Slate 700 for borders */
+  /* Rich Dark Mode Fundamentals */
+  --bg-warm: #09090b; /* Zinc 950 */
+  --bg-sidebar: rgba(24, 24, 27, 0.4); /* Zinc 900 with opacity */
+  --bg-viewer: #000000;
+  --bg-panel: rgba(9, 9, 11, 0.7);
+  --bg-surface: rgba(39, 39, 42, 0.4);
+  
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(56, 189, 248, 0.2); /* Sky blue glow */
+  
   --text-primary: #f8fafc;
-  /* Slate 50 for main text */
-  --text-muted: #94a3b8;
-  /* Slate 400 for muted text */
+  --text-muted: #a1a1aa;
+  
+  --accent-primary: #38bdf8; /* Sky 400 */
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--bg-warm);
+  color: var(--text-primary);
+  /* A subtle moving mesh gradient background simulation */
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.04), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(129, 140, 248, 0.04), transparent 25%);
+  background-attachment: fixed;
 }
 
 * {
@@ -24,9 +35,19 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Softer scrollbar */
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: var(--bg-surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Modern sleeker scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -34,10 +55,20 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ccc8c0;
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #b0aaa0;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Input Chrome Autosave Override */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px #18181b inset !important;
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
 }

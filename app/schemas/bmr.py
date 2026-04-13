@@ -163,10 +163,10 @@ class BMRSchema(BaseModel):
         None, description="Process completion shift (e.g., '2')"
     )
     batch_start_date_time: Optional[str] = Field(
-        None, description="Batch start date and time (e.g., '22/01/26')"
+        None, description="Batch start date (DD/MM/YYYY) and time"
     )
     completion_date_time: Optional[str] = Field(
-        None, description="Completion date and time (e.g., '23/01/26')"
+        None, description="Completion date (DD/MM/YYYY) and time"
     )
     total_time_cycle_hrs: Optional[str] = Field(
         None, description="Total time cycle in hours (e.g., '25:45')"

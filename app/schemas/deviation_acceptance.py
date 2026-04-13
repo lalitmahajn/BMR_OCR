@@ -45,7 +45,7 @@ class DeviationAcceptanceSchema(BaseModel):
         None, description="Vendor or Supplier name (e.g., 'RMCPL')"
     )
     date_of_testing: Optional[str] = Field(
-        None, description="Date of testing (DD/MM/YY format)"
+        None, description="Date of testing (DD/MM/YYYY)"
     )
     test_results: List[DeviationTestRow] = Field(
         default_factory=list,
@@ -53,13 +53,13 @@ class DeviationAcceptanceSchema(BaseModel):
     )
     # Approval signatures
     qcm_signature_date: Optional[str] = Field(
-        None, description="Date of QCM approval"
+        None, description="Date of QCM approval (DD/MM/YYYY)"
     )
     qam_signature_date: Optional[str] = Field(
-        None, description="Date of QAM pre-approval"
+        None, description="Date of QAM pre-approval (DD/MM/YYYY)"
     )
     ed_signature_date: Optional[str] = Field(
-        None, description="Date of ED approval"
+        None, description="Date of ED approval (DD/MM/YYYY)"
     )
     form_no: Optional[str] = Field(
         None, description="Form number (e.g., 'RR-14-04, Rev: 00')"

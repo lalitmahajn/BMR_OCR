@@ -13,7 +13,7 @@ class ReviewPointRow(BaseModel):
     )
     status: Optional[str] = Field(
         None,
-        description="Status: 'Yes', 'No', or 'NA'. Determined from checkboxes (☑ marks) in the Yes/No/NA columns",
+        description="Status: 'Yes', 'No', or 'NA'. Determined from checkboxes (☑ marks) specifically in Section A on Page 1.",
     )
 
 
@@ -28,7 +28,7 @@ class AttachmentRow(BaseModel):
     )
     status: Optional[str] = Field(
         None,
-        description="Status: 'Yes', 'No', or 'NA'. Determined from checkboxes (☑ marks) in the Yes/No/NA columns",
+        description="Status: 'Yes', 'No', or 'NA'. Determined from checkboxes (☑ marks) specifically in Section B on Page 2.",
     )
 
 
@@ -50,12 +50,12 @@ class BMRChecklistSchema(BaseModel):
     # Section A: Review Points
     review_points: List[ReviewPointRow] = Field(
         default_factory=list,
-        description="All review points from Section A with their Yes/No/NA status",
+        description="All 15 review points from 'SECTION: - A' on the first page of the checklist.",
     )
     # Section B: Attachments
     attachments: List[AttachmentRow] = Field(
         default_factory=list,
-        description="All attachment items from Section B with their Yes/No/NA status",
+        description="All attachment items from 'SECTION: - B' on the second page of the checklist.",
     )
     # Footer signatures
     prepared_issued_by: Optional[str] = Field(
