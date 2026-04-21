@@ -45,6 +45,22 @@ A modern, high-performance web application designed for **OCR verification** and
 
 ---
 
+## ⚙️ Setup & Configuration
+
+### Prerequisites
+- **Python 3.11+**
+- **Node.js 18+**
+- **Mistral AI API Key** (Required for extraction)
+
+### Environment Setup
+1. Create a `.env` file in the root directory.
+2. Add your Mistral API key:
+   ```env
+   MISTRAL_API_KEY=your_api_key_here
+   ```
+
+---
+
 ## 🚀 Quick Start (Windows)
 
 To run the full application locally, you will need two terminal sessions.
@@ -79,6 +95,11 @@ The `main.py` script serves as the primary entry point for various system operat
 | `python main.py --init-db` | Initialize the SQLite database schema. |
 | `python main.py --process <path>` | Process a specific PDF/Image file via CLI. |
 
+### API Documentation
+Once the server is running, interactive API documentation is available at:
+- **Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **ReDoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+
 ---
 
 ## 📁 Project Structure
@@ -95,11 +116,11 @@ The `main.py` script serves as the primary entry point for various system operat
 ├── docs/                # Project documentation and specifications
 ├── field_specs/         # YAML definitions for field extraction
 ├── output/              # Processed results and exported data
-├── templates/           # Document and export templates
-├── tmp/                 # Temporary processing files
 ├── ui/                  # Frontend application
 │   └── react-app/       # React/Vite/Tailwind source code
-└── requirements.txt     # Python dependencies
+├── main.py              # Main CLI and FastAPI entry point
+├── requirements.txt     # Python dependencies
+└── *.py (Root)          # Utility scripts for database audits and testing
 ```
 
 ---
