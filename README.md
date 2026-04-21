@@ -84,7 +84,6 @@ The `main.py` script serves as the primary entry point for various system operat
 ## 📁 Project Structure
 
 ```text
-├── .agent/              # Custom agentic workflows and AI skills
 ├── .vscode/             # Editor configuration and settings
 ├── app/                 # Backend source code (FastAPI)
 │   ├── core/            # Core configuration and security
