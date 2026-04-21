@@ -20,10 +20,6 @@ python-dotenv==1.0.1
 loguru==0.7.2
 python-dateutil==2.8.2
 
-# OCR
-paddlepaddle
-paddleocr
-
 # Mistral AI
 mistralai>=1.0.0
 
