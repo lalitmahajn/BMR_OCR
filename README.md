@@ -111,10 +111,10 @@ Once the server is running, interactive API documentation is available at:
 │   ├── engines/         # OCR, Classification, and Validation logic
 │   ├── models/          # Database ORM models (SQLAlchemy)
 │   ├── routers/         # API endpoints and route definitions
-│   └── schemas/         # Pydantic data validation schemas
+│   └── schemas/         # Pydantic data validation schemas (Generated from field_specs)
 ├── data/                # Document storage (inputs, images, uploads)
 ├── docs/                # Project documentation and specifications
-├── field_specs/         # YAML definitions for field extraction
+├── field_specs/         # YAML definitions (Used for schema creation; not used by the runtime engine)
 ├── output/              # Processed results and exported data
 ├── ui/                  # Frontend application
 │   └── react-app/       # React/Vite/Tailwind source code
